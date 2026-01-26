@@ -28,8 +28,28 @@
             text-align: center; 
             color: #a0aeca; 
             font-size: 1.3rem; 
-            margin-bottom: 50px; 
+            margin-bottom: 30px; 
         }
+        .lang-switch { 
+            text-align: center; 
+            margin: 20px 0 40px; 
+        }
+        .lang-btn { 
+            padding: 10px 24px; 
+            margin: 0 8px; 
+            background: #252932; 
+            color: #ffe600; 
+            border: none; 
+            border-radius: 50px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+        }
+        .lang-btn.active { 
+            background: #ffe600; 
+            color: #000; 
+        }
+        .lang-btn:hover { background: #353f52; }
         .hero { 
             background: linear-gradient(135deg, #1a1f2e, #0b0e17); 
             border-radius: 16px; 
@@ -96,7 +116,7 @@
             font-weight: bold; 
             cursor: pointer; 
             transition: all 0.3s; 
-            margin-top: 20px; 
+            margin: 10px; 
         }
         .copy-btn:hover { background: #353f52; }
         .copy-btn.copied { background: #22c55e; color: white; }
@@ -115,71 +135,105 @@
             color: #4e5969; 
             font-size: 0.95rem; 
         }
+        [data-lang="zh"] { display: none; }
+        body.zh [data-lang="en"] { display: none; }
+        body.zh [data-lang="zh"] { display: block; }
     </style>
 </head>
-<body>
+<body class="en">
     <div class="container">
-        <h1>BuySOU</h1>
-        <p class="subtitle">Fastest way to buy $SOU on BSC • Send BNB directly • No presale • Instant swap 🔥🚀</p>
-
-        <div class="hero">
-            <p>Join the SOU revolution! Connect wallet and create your personal BuySOU contract.</p>
-            <p>Simply send BNB to your contract address to buy $SOU with 5% slippage protection.</p>
-            <button id="connectWallet" class="connect-btn">Connect Wallet (BSC Mainnet)</button>
-            <p id="walletInfo" class="status">Not connected • Please connect MetaMask to BSC</p>
+        <div class="lang-switch">
+            <button class="lang-btn active" data-set-lang="en">English</button>
+            <button class="lang-btn" data-set-lang="zh">中文</button>
         </div>
 
-        <div id="status" class="status"></div>
+        <h1 data-lang="en">BuySOU</h1>
+        <h1 data-lang="zh">BuySOU</h1>
+
+        <p class="subtitle" data-lang="en">Fastest way to buy $SOU on BSC • Send BNB directly • No presale • Instant swap 🔥🚀</p>
+        <p class="subtitle" data-lang="zh">BSC 上最快购买 $SOU 的方式 • 直接转 BNB • 即时兑换 🔥🚀</p>
+
+        <div class="hero">
+            <p data-lang="en">Join the SOU revolution! Connect wallet and create your personal BuySOU contract.</p>
+            <p data-lang="zh">加入 SOU 革命！连接钱包，创建你专属的 BuySOU 合约。</p>
+
+            <p data-lang="en">Simply send any amount of BNB to your contract address to buy $SOU instantly (with 5% slippage protection).</p>
+            <p data-lang="zh">只需向你的合约地址转任意数量的 BNB，即可即时购买 $SOU（5% 滑点保护）。</p>
+
+            <button id="connectWallet" class="connect-btn" data-lang="en">Connect Wallet (BSC Mainnet)</button>
+            <button id="connectWallet" class="connect-btn" data-lang="zh">连接钱包 (BSC 主网)</button>
+
+            <p id="walletInfo" class="status" data-lang="en">Not connected • Please connect MetaMask to BSC</p>
+            <p id="walletInfo" class="status" data-lang="zh">未连接 • 请将 MetaMask 切换到 BSC 网络</p>
+        </div>
+
+        <div id="status" class="status" data-lang="en"></div>
+        <div id="status" class="status" data-lang="zh"></div>
 
         <div id="myContractSection" style="display:none;">
             <div class="token-card">
-                <h2>Your BuySOU Contract</h2>
+                <h2 data-lang="en">Your BuySOU Contract</h2>
+                <h2 data-lang="zh">你的 BuySOU 合约</h2>
+
                 <div class="info-item">
-                    <span class="label">Contract Address:</span><br>
+                    <span class="label" data-lang="en">Contract Address:</span>
+                    <span class="label" data-lang="zh">合约地址：</span><br>
                     <div class="address-box" id="contractAddr">Not created yet</div>
                 </div>
+
                 <div class="info-item">
-                    <span class="label">Total BNB Invested:</span>
+                    <span class="label" data-lang="en">Total BNB Invested:</span>
+                    <span class="label" data-lang="zh">总投入 BNB：</span>
                     <div class="value" id="totalBNB">0 BNB</div>
                 </div>
+
                 <div class="info-item">
-                    <span class="label">Total Purchases:</span>
+                    <span class="label" data-lang="en">Total Purchases:</span>
+                    <span class="label" data-lang="zh">总购买次数：</span>
                     <div class="value" id="totalPurchases">0</div>
                 </div>
-                <div class="info-item">
-                    <span class="label">Contract BNB Balance:</span>
-                    <div class="value" id="contractBNB">0 BNB</div>
-                </div>
-                <div class="info-item">
-                    <span class="label">Contract SOU Balance:</span>
-                    <div class="value" id="contractSOU">0 SOU</div>
-                </div>
 
-                <button id="createBtn" class="copy-btn" style="display:none;">Create Your BuySOU Contract 🚀</button>
-                <button id="copyAddrBtn" class="copy-btn" style="display:none;">Copy Contract Address</button>
-                <button id="refreshBtn" class="copy-btn" style="margin-left:10px; display:none;">Refresh Stats</button>
+                <button id="createBtn" class="copy-btn" style="display:none;" data-lang="en">Create Your BuySOU Contract 🚀</button>
+                <button id="createBtn" class="copy-btn" style="display:none;" data-lang="zh">创建你的 BuySOU 合约 🚀</button>
+
+                <button id="copyAddrBtn" class="copy-btn" style="display:none;" data-lang="en">Copy Contract Address</button>
+                <button id="copyAddrBtn" class="copy-btn" style="display:none;" data-lang="zh">复制合约地址</button>
+
+                <button id="refreshBtn" class="copy-btn" style="display:none;" data-lang="en">Refresh Stats</button>
+                <button id="refreshBtn" class="copy-btn" style="display:none;" data-lang="zh">刷新数据</button>
             </div>
 
             <div class="buy-guide">
-                <h3>How to Buy $SOU</h3>
-                <p>1. Copy your personal BuySOU contract address above</p>
-                <p>2. Send any amount of BNB to that address from your wallet</p>
-                <p>3. Tokens are automatically swapped via PancakeSwap and sent to you instantly</p>
-                <p style="margin-top:20px; color:#ffe600;">DYOR • High risk • Meme token • Have fun!</p>
+                <h3 data-lang="en">How to Buy $SOU</h3>
+                <h3 data-lang="zh">如何购买 $SOU</h3>
+
+                <p data-lang="en">1. Copy your personal BuySOU contract address above</p>
+                <p data-lang="zh">1. 复制上方你的专属 BuySOU 合约地址</p>
+
+                <p data-lang="en">2. Send any amount of BNB to that address from your wallet</p>
+                <p data-lang="zh">2. 从钱包向该地址转任意数量的 BNB</p>
+
+                <p data-lang="en">3. Tokens are automatically swapped via PancakeSwap and sent to you instantly</p>
+                <p data-lang="zh">3. 系统通过 PancakeSwap 自动兑换并即时发送代币给你</p>
+
+                <p style="margin-top:20px; color:#ffe600;" data-lang="en">DYOR • High risk • Meme token • Have fun!</p>
+                <p style="margin-top:20px; color:#ffe600;" data-lang="zh">DYOR • Meme 代币 • 玩得开心！</p>
             </div>
         </div>
 
-        <div class="footer">
+        <div class="footer" data-lang="en">
             BuySOU • Powered by PancakeSwap • SOU Token: 0xb65bD36fef84ebc5114Cfd803A4F25B2b57F7777 • 
             Gas efficient • 100% on-chain • Community driven
+        </div>
+        <div class="footer" data-lang="zh">
+            BuySOU • 由 PancakeSwap 驱动 • SOU 代币: 0xb65bD36fef84ebc5114Cfd803A4F25B2b57F7777 • 
+            低 Gas • 完全链上 • 社区驱动
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
     <script>
         const FACTORY_ADDRESS = '0x2684Bf35e4D7A7E89238885bA8f67262fC4BbFD6';
-        const WBNB = '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c';
-        const SOU = '0xb65bD36fef84ebc5114Cfd803A4F25B2b57F7777';
 
         const factoryAbi = [
             {"inputs":[],"name":"createBuySOU","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"nonpayable","type":"function"},
@@ -189,24 +243,33 @@
 
         const buySouAbi = [
             {"inputs":[],"name":"totalBNBInvested","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-            {"inputs":[],"name":"totalPurchases","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getUserInfo","outputs":[
-                {"internalType":"uint256","name":"bnbInvested","type":"uint256"},
-                {"internalType":"uint256","name":"purchases","type":"uint256"},
-                {"internalType":"uint256","name":"contractBNB","type":"uint256"},
-                {"internalType":"uint256","name":"contractSOU","type":"uint256"}
-            ],"stateMutability":"view","type":"function"}
+            {"inputs":[],"name":"totalPurchases","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
         ];
 
         let web3, account, factory;
+
+        function setLanguage(lang) {
+            document.body.className = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.setLang === lang);
+            });
+        }
 
         async function init() {
             if (window.ethereum) {
                 web3 = new Web3(window.ethereum);
                 document.getElementById('connectWallet').onclick = connectWallet;
             } else {
-                document.getElementById('walletInfo').textContent = 'Please install MetaMask or compatible wallet';
+                document.getElementById('walletInfo').textContent = 
+                    document.body.className === 'zh' 
+                    ? '请安装 MetaMask 或兼容钱包' 
+                    : 'Please install MetaMask or compatible wallet';
             }
+
+            // Language switch
+            document.querySelectorAll('[data-set-lang]').forEach(btn => {
+                btn.onclick = () => setLanguage(btn.dataset.setLang);
+            });
         }
 
         async function connectWallet() {
@@ -231,11 +294,19 @@
                     }
                 }
 
-                document.getElementById('walletInfo').textContent = `Connected: ${account.slice(0,6)}...${account.slice(-4)}`;
+                const shortAddr = `${account.slice(0,6)}...${account.slice(-4)}`;
+                document.querySelectorAll('#walletInfo').forEach(el => {
+                    el.textContent = document.body.className === 'zh' 
+                        ? `已连接: ${shortAddr}` 
+                        : `Connected: ${shortAddr}`;
+                });
+
                 factory = new web3.eth.Contract(factoryAbi, FACTORY_ADDRESS);
                 loadMyContract();
             } catch (err) {
-                document.getElementById('walletInfo').textContent = 'Connection failed: ' + (err.message || 'Unknown error');
+                document.querySelectorAll('#walletInfo').forEach(el => {
+                    el.textContent = (document.body.className === 'zh' ? '连接失败: ' : 'Connection failed: ') + (err.message || 'Unknown error');
+                });
             }
         }
 
@@ -243,15 +314,17 @@
             if (!account) return;
             document.getElementById('myContractSection').style.display = 'block';
 
-            const status = document.getElementById('status');
-            status.textContent = 'Loading your BuySOU contract...';
+            const statusEls = document.querySelectorAll('#status');
+            statusEls.forEach(el => el.textContent = document.body.className === 'zh' ? '加载你的 BuySOU 合约...' : 'Loading your BuySOU contract...');
 
             try {
                 const has = await factory.methods.hasCreated(account).call();
                 if (!has) {
                     document.getElementById('createBtn').style.display = 'block';
-                    document.getElementById('contractAddr').textContent = 'Not created yet';
-                    status.textContent = 'You haven\'t created a BuySOU contract. Click to create one!';
+                    document.getElementById('contractAddr').textContent = document.body.className === 'zh' ? '尚未创建' : 'Not created yet';
+                    statusEls.forEach(el => el.textContent = document.body.className === 'zh' 
+                        ? '你还没有创建 BuySOU 合约，点击创建！' 
+                        : 'You haven\'t created a BuySOU contract. Click to create one!');
                     return;
                 }
 
@@ -262,27 +335,22 @@
                 document.getElementById('createBtn').style.display = 'none';
 
                 await updateStats(addr);
-                status.textContent = 'Contract loaded! Send BNB to buy $SOU 🔥';
+                statusEls.forEach(el => el.textContent = document.body.className === 'zh' 
+                    ? '合约已加载！转 BNB 即可购买 $SOU 🔥' 
+                    : 'Contract loaded! Send BNB to buy $SOU 🔥');
             } catch (e) {
-                status.textContent = 'Load failed: ' + (e.message || 'Check network');
+                statusEls.forEach(el => el.textContent = (document.body.className === 'zh' ? '加载失败: ' : 'Load failed: ') + (e.message || 'Check network'));
             }
         }
 
         async function updateStats(addr) {
             try {
                 const contract = new web3.eth.Contract(buySouAbi, addr);
-                const userInfo = await contract.methods.getUserInfo(account).call();
-
-                document.getElementById('totalBNB').textContent = web3.utils.fromWei(userInfo[2], 'ether') + ' BNB'; // contractBNB from getUserInfo (index 2)
-                document.getElementById('totalPurchases').textContent = userInfo[1]; // purchases count (but actually totalPurchases is contract level, here use user or total)
-                // Note: getUserInfo returns (userBNB, userPurchases, contractBNB, contractSOU)
-                // If want totalBNBInvested, call totalBNBInvested() separately if needed
                 const totalBNB = await contract.methods.totalBNBInvested().call();
-                document.getElementById('totalBNB').textContent = web3.utils.fromWei(totalBNB, 'ether') + ' BNB';
                 const totalPur = await contract.methods.totalPurchases().call();
+
+                document.getElementById('totalBNB').textContent = web3.utils.fromWei(totalBNB, 'ether') + ' BNB';
                 document.getElementById('totalPurchases').textContent = totalPur;
-                document.getElementById('contractBNB').textContent = web3.utils.fromWei(userInfo[2], 'ether') + ' BNB';
-                document.getElementById('contractSOU').textContent = web3.utils.fromWei(userInfo[3], 'ether') + ' SOU'; // assuming 18 decimals
             } catch (e) {
                 console.error(e);
             }
@@ -290,9 +358,9 @@
 
         document.getElementById('createBtn')?.addEventListener('click', async () => {
             const btn = document.getElementById('createBtn');
-            const status = document.getElementById('status');
+            const statusEls = document.querySelectorAll('#status');
             btn.disabled = true;
-            status.textContent = 'Creating BuySOU contract... (low gas)';
+            statusEls.forEach(el => el.textContent = document.body.className === 'zh' ? '创建中... (Gas 很低)' : 'Creating... (low gas)');
             try {
                 const gasPrice = await web3.eth.getGasPrice();
                 const tx = await factory.methods.createBuySOU().send({ 
@@ -300,10 +368,12 @@
                     gas: 2000000, 
                     gasPrice 
                 });
-                status.textContent = `Created! Tx: ${tx.transactionHash.slice(0,10)}...`;
+                statusEls.forEach(el => el.textContent = document.body.className === 'zh' 
+                    ? `创建成功！交易: ${tx.transactionHash.slice(0,10)}...` 
+                    : `Created! Tx: ${tx.transactionHash.slice(0,10)}...`);
                 loadMyContract();
             } catch (err) {
-                status.textContent = 'Creation failed: ' + (err.message || '');
+                statusEls.forEach(el => el.textContent = (document.body.className === 'zh' ? '创建失败: ' : 'Creation failed: ') + (err.message || ''));
             } finally {
                 btn.disabled = false;
             }
@@ -312,24 +382,25 @@
         document.getElementById('copyAddrBtn')?.addEventListener('click', function() {
             const addr = document.getElementById('contractAddr').textContent;
             navigator.clipboard.writeText(addr);
-            this.textContent = 'Copied!';
+            this.textContent = document.body.className === 'zh' ? '已复制！' : 'Copied!';
             this.classList.add('copied');
             setTimeout(() => { 
-                this.textContent = 'Copy Contract Address'; 
+                this.textContent = document.body.className === 'zh' ? '复制合约地址' : 'Copy Contract Address'; 
                 this.classList.remove('copied'); 
             }, 2000);
         });
 
         document.getElementById('refreshBtn')?.addEventListener('click', async () => {
             const addr = document.getElementById('contractAddr').textContent;
-            if (addr && addr !== 'Not created yet') {
-                document.getElementById('status').textContent = 'Refreshing stats...';
+            if (addr && addr !== 'Not created yet' && addr !== '尚未创建') {
+                document.querySelectorAll('#status').forEach(el => el.textContent = document.body.className === 'zh' ? '刷新中...' : 'Refreshing...');
                 await updateStats(addr);
-                document.getElementById('status').textContent = 'Stats updated!';
+                document.querySelectorAll('#status').forEach(el => el.textContent = document.body.className === 'zh' ? '数据已更新！' : 'Stats updated!');
             }
         });
 
         init();
+        setLanguage('en'); // 默认英文
     </script>
 </body>
 </html>
