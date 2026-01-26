@@ -58,10 +58,6 @@
             margin-bottom: 40px; 
             text-align: center; 
         }
-        .input-group { 
-            max-width: 600px; 
-            margin: 0 auto 30px; 
-        }
         input[type="text"] { 
             width: 100%; 
             padding: 16px; 
@@ -82,6 +78,7 @@
             font-weight: bold; 
             cursor: pointer; 
             transition: all 0.3s; 
+            margin: 20px 10px 0; 
         }
         .check-btn:hover { background: #ffed4a; transform: scale(1.05); }
         .status { 
@@ -119,7 +116,19 @@
             margin: 20px 0; 
             color: #a0aeca; 
             border: 1px dashed #ffe600; 
+            position: relative; 
         }
+        .copy-btn { 
+            margin-top: 12px; 
+            padding: 8px 20px; 
+            background: #252932; 
+            color: #ffe600; 
+            border: none; 
+            border-radius: 50px; 
+            cursor: pointer; 
+        }
+        .copy-btn:hover { background: #353f52; }
+        .copy-btn.copied { background: #22c55e; color: white; }
         .footer { 
             text-align: center; 
             padding: 80px 0 40px; 
@@ -141,14 +150,12 @@
         <h1 data-lang="en">BuySOU Verifier</h1>
         <h1 data-lang="zh">BuySOU 验证器</h1>
 
-        <p class="subtitle" data-lang="en">Check if an address is a legitimate BuySOU contract created by the official factory</p>
-        <p class="subtitle" data-lang="zh">验证一个地址是否是由官方工厂合约创建的合法 BuySOU 实例</p>
+        <p class="subtitle" data-lang="en">Verify if an address is a legitimate BuySOU contract deployed by the official factory</p>
+        <p class="subtitle" data-lang="zh">验证一个地址是否是由官方工厂部署的合法 BuySOU 合约</p>
 
         <div class="input-section">
-            <div class="input-group">
-                <input type="text" id="addressInput" placeholder="Enter contract address to verify">
-            </div>
-            <button id="checkBtn" class="check-btn" data-lang-en="Verify Now" data-lang-zh="立即验证">Verify Now</button>
+            <input type="text" id="addressInput" placeholder="Enter contract address (0x...)">
+            <button id="checkBtn" class="check-btn">Verify Now</button>
         </div>
 
         <div id="status" class="status"></div>
@@ -167,6 +174,7 @@
                 <span class="label" data-lang="en">Contract Address:</span>
                 <span class="label" data-lang="zh">合约地址：</span>
                 <div class="address-box" id="verifiedAddr"></div>
+                <button id="copyAddr" class="copy-btn" style="display:none;" data-lang-en="Copy Address" data-lang-zh="复制地址">Copy Address</button>
             </div>
 
             <div class="info-item">
@@ -183,133 +191,129 @@
         </div>
 
         <div class="footer" data-lang="en">
-            BuySOU • Factory: 0x2684Bf35e4D7A7E89238885bA8f67262fC4BbFD6 • 
-            Official verification tool • DYOR
+            Factory: 0x2684Bf35e4D7A7E89238885bA8f67262fC4BbFD6 • Official verifier • DYOR
         </div>
         <div class="footer" data-lang="zh">
-            BuySOU • 工厂合约: 0x2684Bf35e4D7A7E89238885bA8f67262fC4BbFD6 • 
-            官方验证工具 • 请自行研究
+            工厂合约: 0x2684Bf35e4D7A7E89238885bA8f67262fC4BbFD6 • 官方验证工具 • 请自行研究
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script>
-        const FACTORY_ADDRESS = '0x2684Bf35e4D7A7E89238885bA8f67262fC4BbFD6'.toLowerCase();
+        const FACTORY = '0x2684Bf35e4D7A7E89238885bA8f67262fC4BbFD6'.toLowerCase();
 
-        const factoryAbi = [
-            {
-                "inputs": [{"internalType": "address", "name": "buySOU", "type": "address"}],
-                "name": "getCreatorOf",
-                "outputs": [{"internalType": "address", "name": "", "type": "address"}],
-                "stateMutability": "view",
-                "type": "function"
-            }
-        ];
-
-        const buySouAbi = [
-            {
-                "inputs": [],
-                "name": "totalBNBInvested",
-                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "totalPurchases",
-                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-                "stateMutability": "view",
-                "type": "function"
-            }
-        ];
+        const factoryAbi = [{"inputs":[{"internalType":"address","name":"buySOU","type":"address"}],"name":"getCreatorOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}];
+        const statsAbi   = [{"inputs":[],"name":"totalBNBInvested","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalPurchases","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}];
 
         let web3;
 
-        function setLanguage(lang) {
-            document.body.className = lang;
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.setLang === lang);
-            });
-            const input = document.getElementById('addressInput');
-            input.placeholder = lang === 'zh' 
-                ? '输入要验证的合约地址' 
-                : 'Enter contract address to verify';
-            document.getElementById('checkBtn').textContent = lang === 'zh' ? '立即验证' : 'Verify Now';
+        const RPCS = [
+            'https://bsc-dataseed.binance.org/'
+        ];
+
+        function tryWeb3() {
+            for (let rpc of RPCS) {
+                try {
+                    const provider = new Web3.providers.HttpProvider(rpc);
+                    const tempWeb3 = new Web3(provider);
+                    if (tempWeb3.currentProvider) {
+                        web3 = tempWeb3;
+                        return true;
+                    }
+                } catch {}
+            }
+            return false;
         }
 
-        function initWeb3() {
-            if (window.ethereum || window.web3) {
-                web3 = new Web3(window.ethereum || window.web3.currentProvider);
-            } else {
-                web3 = new Web3('https://bsc-dataseed.binance.org/');
-            }
+        function setLanguage(lang) {
+            document.body.className = lang;
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.setLang === lang));
+            document.getElementById('addressInput').placeholder = lang === 'zh' ? '输入合约地址 (0x...)' : 'Enter contract address (0x...)';
+            document.getElementById('checkBtn').textContent = lang === 'zh' ? '立即验证' : 'Verify Now';
+            document.getElementById('copyAddr').textContent = lang === 'zh' ? '复制地址' : 'Copy Address';
         }
 
         async function checkAddress() {
             const status = document.getElementById('status');
-            const resultCard = document.getElementById('resultCard');
-            const input = document.getElementById('addressInput').value.trim();
+            const result = document.getElementById('resultCard');
+            let input = document.getElementById('addressInput').value.trim().toLowerCase();
             const lang = document.body.className;
 
-            if (!web3.utils.isAddress(input)) {
+            if (!/^0x[a-f0-9]{40}$/i.test(input)) {
                 status.className = 'status error';
-                status.textContent = lang === 'zh' ? '无效的地址格式' : 'Invalid address format';
-                resultCard.style.display = 'none';
+                status.textContent = lang === 'zh' ? '请输入有效的 0x... 地址' : 'Please enter a valid 0x... address';
+                result.style.display = 'none';
                 return;
             }
 
-            const addr = input.toLowerCase();
             status.className = 'status';
             status.textContent = lang === 'zh' ? '验证中...' : 'Verifying...';
 
+            if (!web3) {
+                if (!tryWeb3()) {
+                    status.className = 'status error';
+                    status.textContent = lang === 'zh' ? '无法连接 BSC 网络，请稍后重试' : 'Cannot connect to BSC network, try later';
+                    return;
+                }
+            }
+
             try {
-                const factory = new web3.eth.Contract(factoryAbi, FACTORY_ADDRESS);
-                const creator = await factory.methods.getCreatorOf(addr).call();
+                const factory = new web3.eth.Contract(factoryAbi, FACTORY);
+                const creator = await factory.methods.getCreatorOf(input).call();
 
-                const isLegit = creator && creator !== '0x0000000000000000000000000000000000000000';
+                const isValid = creator && creator !== '0x0000000000000000000000000000000000000000';
 
-                document.getElementById('verifiedAddr').textContent = addr;
-                document.getElementById('verifyStatus').textContent = isLegit 
-                    ? (lang === 'zh' ? '合法 BuySOU 合约 ✓' : 'Legitimate BuySOU Contract ✓')
-                    : (lang === 'zh' ? '非工厂创建的地址 ✗' : 'Not created by factory ✗');
-                document.getElementById('verifyStatus').style.color = isLegit ? '#22c55e' : '#ef4444';
+                document.getElementById('verifiedAddr').textContent = input;
+                document.getElementById('verifyStatus').textContent = isValid
+                    ? (lang === 'zh' ? '合法 BuySOU 合约 ✓' : 'Valid BuySOU Contract ✓')
+                    : (lang === 'zh' ? '非工厂创建 ✗' : 'Not from factory ✗');
+                document.getElementById('verifyStatus').style.color = isValid ? '#22c55e' : '#ef4444';
 
-                if (isLegit) {
-                    const contract = new web3.eth.Contract(buySouAbi, addr);
-                    const totalBNB = await contract.methods.totalBNBInvested().call();
-                    const totalPur = await contract.methods.totalPurchases().call();
+                document.getElementById('copyAddr').style.display = isValid ? 'inline-block' : 'none';
 
-                    document.getElementById('totalBNB').textContent = web3.utils.fromWei(totalBNB, 'ether') + ' BNB';
-                    document.getElementById('totalPurchases').textContent = totalPur.toString();
+                if (isValid) {
+                    const c = new web3.eth.Contract(statsAbi, input);
+                    const bnb = await c.methods.totalBNBInvested().call();
+                    const cnt = await c.methods.totalPurchases().call();
+                    document.getElementById('totalBNB').textContent = web3.utils.fromWei(bnb, 'ether') + ' BNB';
+                    document.getElementById('totalPurchases').textContent = cnt.toString();
                 } else {
                     document.getElementById('totalBNB').textContent = '—';
                     document.getElementById('totalPurchases').textContent = '—';
                 }
 
-                resultCard.style.display = 'block';
+                result.style.display = 'block';
                 status.textContent = '';
-            } catch (err) {
+            } catch (e) {
                 status.className = 'status error';
-                status.textContent = lang === 'zh' 
-                    ? '查询失败：可能是网络问题或地址无效，请重试' 
-                    : 'Query failed: Network issue or invalid address, please try again';
-                resultCard.style.display = 'none';
-                console.error(err);
+                let msg = lang === 'zh' ? '查询失败' : 'Query failed';
+                if (e.message.includes(' Returned values')) msg += lang === 'zh' ? '：合约可能未验证或 ABI 不匹配' : ': contract may not be verified or ABI mismatch';
+                else if (e.message.includes('execution reverted')) msg += lang === 'zh' ? '：该地址不是 BuySOU 合约' : ': address is not a BuySOU contract';
+                else msg += ': ' + (e.reason || e.message || 'unknown error');
+                status.textContent = msg;
+                result.style.display = 'none';
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            initWeb3();
+            tryWeb3();
 
             document.querySelectorAll('[data-set-lang]').forEach(btn => {
                 btn.onclick = () => setLanguage(btn.dataset.setLang);
             });
 
-            document.getElementById('checkBtn').addEventListener('click', checkAddress);
+            document.getElementById('checkBtn').onclick = checkAddress;
+            document.getElementById('addressInput').onkeypress = e => { if (e.key === 'Enter') checkAddress(); };
 
-            document.getElementById('addressInput').addEventListener('keypress', e => {
-                if (e.key === 'Enter') checkAddress();
-            });
+            document.getElementById('copyAddr').onclick = function() {
+                navigator.clipboard.writeText(document.getElementById('verifiedAddr').textContent);
+                this.textContent = document.body.className === 'zh' ? '已复制！' : 'Copied!';
+                this.classList.add('copied');
+                setTimeout(() => {
+                    this.textContent = document.body.className === 'zh' ? '复制地址' : 'Copy Address';
+                    this.classList.remove('copied');
+                }, 2000);
+            };
 
             setLanguage('en');
         });
