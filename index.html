@@ -146,48 +146,47 @@
 
         <div class="input-section">
             <div class="input-group">
-                <input type="text" id="addressInput" placeholder="0x..." data-lang-en="Enter contract address to verify" data-lang-zh="输入要验证的合约地址">
+                <input type="text" id="addressInput" placeholder="Enter contract address to verify">
             </div>
-            <button id="checkBtn" class="check-btn" data-lang-en="Verify Now">Verify Now</button>
-            <button id="checkBtn" class="check-btn" data-lang-zh="立即验证">立即验证</button>
+            <button id="checkBtn" class="check-btn" data-lang-en="Verify Now" data-lang-zh="立即验证">Verify Now</button>
         </div>
 
         <div id="status" class="status"></div>
 
         <div id="resultCard" class="result-card">
-            <h2 data-lang-en="Verification Result">Verification Result</h2>
-            <h2 data-lang-zh="验证结果">验证结果</h2>
+            <h2 data-lang="en">Verification Result</h2>
+            <h2 data-lang="zh">验证结果</h2>
 
             <div class="info-item">
-                <span class="label" data-lang-en="Status:"></span>
-                <span class="label" data-lang-zh="状态："></span>
+                <span class="label" data-lang="en">Status:</span>
+                <span class="label" data-lang="zh">状态：</span>
                 <div id="verifyStatus" class="value"></div>
             </div>
 
             <div class="info-item">
-                <span class="label" data-lang-en="Contract Address:"></span>
-                <span class="label" data-lang-zh="合约地址："></span>
+                <span class="label" data-lang="en">Contract Address:</span>
+                <span class="label" data-lang="zh">合约地址：</span>
                 <div class="address-box" id="verifiedAddr"></div>
             </div>
 
             <div class="info-item">
-                <span class="label" data-lang-en="Total BNB Invested:"></span>
-                <span class="label" data-lang-zh="总投入 BNB："></span>
+                <span class="label" data-lang="en">Total BNB Invested:</span>
+                <span class="label" data-lang="zh">总投入 BNB：</span>
                 <div class="value" id="totalBNB">—</div>
             </div>
 
             <div class="info-item">
-                <span class="label" data-lang-en="Total Purchases:"></span>
-                <span class="label" data-lang-zh="总购买次数："></span>
+                <span class="label" data-lang="en">Total Purchases:</span>
+                <span class="label" data-lang="zh">总购买次数：</span>
                 <div class="value" id="totalPurchases">—</div>
             </div>
         </div>
 
-        <div class="footer" data-lang-en>
+        <div class="footer" data-lang="en">
             BuySOU • Factory: 0x2684Bf35e4D7A7E89238885bA8f67262fC4BbFD6 • 
             Official verification tool • DYOR
         </div>
-        <div class="footer" data-lang-zh>
+        <div class="footer" data-lang="zh">
             BuySOU • 工厂合约: 0x2684Bf35e4D7A7E89238885bA8f67262fC4BbFD6 • 
             官方验证工具 • 请自行研究
         </div>
@@ -198,12 +197,30 @@
         const FACTORY_ADDRESS = '0x2684Bf35e4D7A7E89238885bA8f67262fC4BbFD6'.toLowerCase();
 
         const factoryAbi = [
-            {"inputs":[{"internalType":"address","name":"buySOU","type":"address"}],"name":"getCreatorOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}
+            {
+                "inputs": [{"internalType": "address", "name": "buySOU", "type": "address"}],
+                "name": "getCreatorOf",
+                "outputs": [{"internalType": "address", "name": "", "type": "address"}],
+                "stateMutability": "view",
+                "type": "function"
+            }
         ];
 
         const buySouAbi = [
-            {"inputs":[],"name":"totalBNBInvested","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-            {"inputs":[],"name":"totalPurchases","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
+            {
+                "inputs": [],
+                "name": "totalBNBInvested",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "totalPurchases",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            }
         ];
 
         let web3;
@@ -215,15 +232,14 @@
             });
             const input = document.getElementById('addressInput');
             input.placeholder = lang === 'zh' 
-                ? input.getAttribute('data-lang-zh') 
-                : input.getAttribute('data-lang-en');
+                ? '输入要验证的合约地址' 
+                : 'Enter contract address to verify';
+            document.getElementById('checkBtn').textContent = lang === 'zh' ? '立即验证' : 'Verify Now';
         }
 
         function initWeb3() {
-            if (window.ethereum) {
-                web3 = new Web3(window.ethereum);
-            } else if (window.web3) {
-                web3 = new Web3(window.web3.currentProvider);
+            if (window.ethereum || window.web3) {
+                web3 = new Web3(window.ethereum || window.web3.currentProvider);
             } else {
                 web3 = new Web3('https://bsc-dataseed.binance.org/');
             }
@@ -250,7 +266,7 @@
                 const factory = new web3.eth.Contract(factoryAbi, FACTORY_ADDRESS);
                 const creator = await factory.methods.getCreatorOf(addr).call();
 
-                const isLegit = creator !== '0x0000000000000000000000000000000000000000';
+                const isLegit = creator && creator !== '0x0000000000000000000000000000000000000000';
 
                 document.getElementById('verifiedAddr').textContent = addr;
                 document.getElementById('verifyStatus').textContent = isLegit 
@@ -264,7 +280,7 @@
                     const totalPur = await contract.methods.totalPurchases().call();
 
                     document.getElementById('totalBNB').textContent = web3.utils.fromWei(totalBNB, 'ether') + ' BNB';
-                    document.getElementById('totalPurchases').textContent = totalPur;
+                    document.getElementById('totalPurchases').textContent = totalPur.toString();
                 } else {
                     document.getElementById('totalBNB').textContent = '—';
                     document.getElementById('totalPurchases').textContent = '—';
@@ -274,8 +290,11 @@
                 status.textContent = '';
             } catch (err) {
                 status.className = 'status error';
-                status.textContent = (lang === 'zh' ? '查询失败：' : 'Query failed: ') + (err.message || 'Unknown error');
+                status.textContent = lang === 'zh' 
+                    ? '查询失败：可能是网络问题或地址无效，请重试' 
+                    : 'Query failed: Network issue or invalid address, please try again';
                 resultCard.style.display = 'none';
+                console.error(err);
             }
         }
 
