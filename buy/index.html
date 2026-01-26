@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuySOU - Launch & Buy SOU Meme Token</title>
+    <link rel="shortcut icon" href="https://woofswap.finance/image/tokens/WOOF.png" type="image/x-icon" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+            background: #000; 
+            color: #e6e6e6; 
+            line-height: 1.6; 
+            min-height: 100vh; 
+        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 30px 20px; }
+        h1 { 
+            text-align: center; 
+            font-size: 3.5rem; 
+            margin: 30px 0 12px; 
+            color: #ffe600; 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+        }
+        .subtitle { 
+            text-align: center; 
+            color: #a0aeca; 
+            font-size: 1.3rem; 
+            margin-bottom: 50px; 
+        }
+        .hero { 
+            background: linear-gradient(135deg, #1a1f2e, #0b0e17); 
+            border-radius: 16px; 
+            padding: 40px 30px; 
+            text-align: center; 
+            margin-bottom: 60px; 
+            border: 1px solid #252932; 
+        }
+        .hero p { font-size: 1.2rem; margin: 20px 0; color: #c9d1d9; }
+        .stat { 
+            font-size: 2.2rem; 
+            color: #ffe600; 
+            font-weight: bold; 
+            margin: 10px 0; 
+        }
+        .connect-btn { 
+            display: block; 
+            margin: 30px auto; 
+            padding: 16px 40px; 
+            background: #ffe600; 
+            color: #000; 
+            border: none; 
+            border-radius: 50px; 
+            font-size: 1.3rem; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+        }
+        .connect-btn:hover { background: #ffed4a; transform: scale(1.05); }
+        .status { text-align: center; margin: 20px 0; color: #9ca3af; font-size: 1.1rem; }
+        .token-card { 
+            background: #141721; 
+            border-radius: 16px; 
+            padding: 30px; 
+            border: 1px solid #252932; 
+            max-width: 600px; 
+            margin: 0 auto 40px; 
+            text-align: center; 
+        }
+        .token-card h2 { color: #ffe600; font-size: 2rem; margin-bottom: 20px; }
+        .info-item { 
+            margin: 20px 0; 
+            font-size: 1.2rem; 
+        }
+        .label { color: #9ca3af; font-weight: bold; }
+        .value { color: #ffe600; font-weight: bold; font-size: 1.4rem; }
+        .address-box { 
+            background: #1f2633; 
+            padding: 16px; 
+            border-radius: 12px; 
+            font-family: monospace; 
+            font-size: 1rem; 
+            word-break: break-all; 
+            margin: 20px 0; 
+            color: #a0aeca; 
+            border: 1px dashed #ffe600; 
+        }
+        .copy-btn { 
+            padding: 12px 30px; 
+            background: #252932; 
+            color: #ffe600; 
+            border: none; 
+            border-radius: 50px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            margin-top: 20px; 
+        }
+        .copy-btn:hover { background: #353f52; }
+        .copy-btn.copied { background: #22c55e; color: white; }
+        .buy-guide { 
+            margin-top: 50px; 
+            padding: 30px; 
+            background: #141721; 
+            border-radius: 16px; 
+            border: 1px solid #252932; 
+            text-align: center; 
+        }
+        .buy-guide h3 { color: #ffe600; font-size: 1.8rem; margin-bottom: 20px; }
+        .footer { 
+            text-align: center; 
+            padding: 60px 0 40px; 
+            color: #4e5969; 
+            font-size: 0.95rem; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BuySOU</h1>
+        <p class="subtitle">Fastest way to buy $SOU on BSC • Send BNB directly • No presale • Instant swap 🔥🚀</p>
+
+        <div class="hero">
+            <p>Join the SOU revolution! Connect wallet and create your personal BuySOU contract.</p>
+            <p>Simply send BNB to your contract address to buy $SOU with 5% slippage protection.</p>
+            <button id="connectWallet" class="connect-btn">Connect Wallet (BSC Mainnet)</button>
+            <p id="walletInfo" class="status">Not connected • Please connect MetaMask to BSC</p>
+        </div>
+
+        <div id="status" class="status"></div>
+
+        <div id="myContractSection" style="display:none;">
+            <div class="token-card">
+                <h2>Your BuySOU Contract</h2>
+                <div class="info-item">
+                    <span class="label">Contract Address:</span><br>
+                    <div class="address-box" id="contractAddr">Not created yet</div>
+                </div>
+                <div class="info-item">
+                    <span class="label">Total BNB Invested:</span>
+                    <div class="value" id="totalBNB">0 BNB</div>
+                </div>
+                <div class="info-item">
+                    <span class="label">Total Purchases:</span>
+                    <div class="value" id="totalPurchases">0</div>
+                </div>
+                <div class="info-item">
+                    <span class="label">Contract BNB Balance:</span>
+                    <div class="value" id="contractBNB">0 BNB</div>
+                </div>
+                <div class="info-item">
+                    <span class="label">Contract SOU Balance:</span>
+                    <div class="value" id="contractSOU">0 SOU</div>
+                </div>
+
+                <button id="createBtn" class="copy-btn" style="display:none;">Create Your BuySOU Contract 🚀</button>
+                <button id="copyAddrBtn" class="copy-btn" style="display:none;">Copy Contract Address</button>
+                <button id="refreshBtn" class="copy-btn" style="margin-left:10px; display:none;">Refresh Stats</button>
+            </div>
+
+            <div class="buy-guide">
+                <h3>How to Buy $SOU</h3>
+                <p>1. Copy your personal BuySOU contract address above</p>
+                <p>2. Send any amount of BNB to that address from your wallet</p>
+                <p>3. Tokens are automatically swapped via PancakeSwap and sent to you instantly</p>
+                <p style="margin-top:20px; color:#ffe600;">DYOR • High risk • Meme token • Have fun!</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            BuySOU • Powered by PancakeSwap • SOU Token: 0xb65bD36fef84ebc5114Cfd803A4F25B2b57F7777 • 
+            Gas efficient • 100% on-chain • Community driven
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
+    <script>
+        const FACTORY_ADDRESS = '0x2684Bf35e4D7A7E89238885bA8f67262fC4BbFD6';
+        const WBNB = '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c';
+        const SOU = '0xb65bD36fef84ebc5114Cfd803A4F25B2b57F7777';
+
+        const factoryAbi = [
+            {"inputs":[],"name":"createBuySOU","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"creator","type":"address"}],"name":"getBuySOUOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"hasCreated","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}
+        ];
+
+        const buySouAbi = [
+            {"inputs":[],"name":"totalBNBInvested","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"totalPurchases","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getUserInfo","outputs":[
+                {"internalType":"uint256","name":"bnbInvested","type":"uint256"},
+                {"internalType":"uint256","name":"purchases","type":"uint256"},
+                {"internalType":"uint256","name":"contractBNB","type":"uint256"},
+                {"internalType":"uint256","name":"contractSOU","type":"uint256"}
+            ],"stateMutability":"view","type":"function"}
+        ];
+
+        let web3, account, factory;
+
+        async function init() {
+            if (window.ethereum) {
+                web3 = new Web3(window.ethereum);
+                document.getElementById('connectWallet').onclick = connectWallet;
+            } else {
+                document.getElementById('walletInfo').textContent = 'Please install MetaMask or compatible wallet';
+            }
+        }
+
+        async function connectWallet() {
+            try {
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                account = (await web3.eth.getAccounts())[0];
+
+                try {
+                    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x38' }] });
+                } catch (switchErr) {
+                    if (switchErr.code === 4902) {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{ 
+                                chainId: '0x38', 
+                                chainName: 'BNB Smart Chain', 
+                                nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 }, 
+                                rpcUrls: ['https://bsc-dataseed.binance.org/'], 
+                                blockExplorerUrls: ['https://bscscan.com'] 
+                            }]
+                        });
+                    }
+                }
+
+                document.getElementById('walletInfo').textContent = `Connected: ${account.slice(0,6)}...${account.slice(-4)}`;
+                factory = new web3.eth.Contract(factoryAbi, FACTORY_ADDRESS);
+                loadMyContract();
+            } catch (err) {
+                document.getElementById('walletInfo').textContent = 'Connection failed: ' + (err.message || 'Unknown error');
+            }
+        }
+
+        async function loadMyContract() {
+            if (!account) return;
+            document.getElementById('myContractSection').style.display = 'block';
+
+            const status = document.getElementById('status');
+            status.textContent = 'Loading your BuySOU contract...';
+
+            try {
+                const has = await factory.methods.hasCreated(account).call();
+                if (!has) {
+                    document.getElementById('createBtn').style.display = 'block';
+                    document.getElementById('contractAddr').textContent = 'Not created yet';
+                    status.textContent = 'You haven\'t created a BuySOU contract. Click to create one!';
+                    return;
+                }
+
+                const addr = await factory.methods.getBuySOUOf(account).call();
+                document.getElementById('contractAddr').textContent = addr;
+                document.getElementById('copyAddrBtn').style.display = 'inline-block';
+                document.getElementById('refreshBtn').style.display = 'inline-block';
+                document.getElementById('createBtn').style.display = 'none';
+
+                await updateStats(addr);
+                status.textContent = 'Contract loaded! Send BNB to buy $SOU 🔥';
+            } catch (e) {
+                status.textContent = 'Load failed: ' + (e.message || 'Check network');
+            }
+        }
+
+        async function updateStats(addr) {
+            try {
+                const contract = new web3.eth.Contract(buySouAbi, addr);
+                const userInfo = await contract.methods.getUserInfo(account).call();
+
+                document.getElementById('totalBNB').textContent = web3.utils.fromWei(userInfo[2], 'ether') + ' BNB'; // contractBNB from getUserInfo (index 2)
+                document.getElementById('totalPurchases').textContent = userInfo[1]; // purchases count (but actually totalPurchases is contract level, here use user or total)
+                // Note: getUserInfo returns (userBNB, userPurchases, contractBNB, contractSOU)
+                // If want totalBNBInvested, call totalBNBInvested() separately if needed
+                const totalBNB = await contract.methods.totalBNBInvested().call();
+                document.getElementById('totalBNB').textContent = web3.utils.fromWei(totalBNB, 'ether') + ' BNB';
+                const totalPur = await contract.methods.totalPurchases().call();
+                document.getElementById('totalPurchases').textContent = totalPur;
+                document.getElementById('contractBNB').textContent = web3.utils.fromWei(userInfo[2], 'ether') + ' BNB';
+                document.getElementById('contractSOU').textContent = web3.utils.fromWei(userInfo[3], 'ether') + ' SOU'; // assuming 18 decimals
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        document.getElementById('createBtn')?.addEventListener('click', async () => {
+            const btn = document.getElementById('createBtn');
+            const status = document.getElementById('status');
+            btn.disabled = true;
+            status.textContent = 'Creating BuySOU contract... (low gas)';
+            try {
+                const gasPrice = await web3.eth.getGasPrice();
+                const tx = await factory.methods.createBuySOU().send({ 
+                    from: account, 
+                    gas: 2000000, 
+                    gasPrice 
+                });
+                status.textContent = `Created! Tx: ${tx.transactionHash.slice(0,10)}...`;
+                loadMyContract();
+            } catch (err) {
+                status.textContent = 'Creation failed: ' + (err.message || '');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        document.getElementById('copyAddrBtn')?.addEventListener('click', function() {
+            const addr = document.getElementById('contractAddr').textContent;
+            navigator.clipboard.writeText(addr);
+            this.textContent = 'Copied!';
+            this.classList.add('copied');
+            setTimeout(() => { 
+                this.textContent = 'Copy Contract Address'; 
+                this.classList.remove('copied'); 
+            }, 2000);
+        });
+
+        document.getElementById('refreshBtn')?.addEventListener('click', async () => {
+            const addr = document.getElementById('contractAddr').textContent;
+            if (addr && addr !== 'Not created yet') {
+                document.getElementById('status').textContent = 'Refreshing stats...';
+                await updateStats(addr);
+                document.getElementById('status').textContent = 'Stats updated!';
+            }
+        });
+
+        init();
+    </script>
+</body>
+</html>
