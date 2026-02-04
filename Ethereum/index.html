@@ -104,6 +104,21 @@
             font-size: 1em;
             text-align: right;
         }
+        .percentage-buttons {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        .percentage-buttons button {
+            padding: 5px 10px;
+            background: #4a4f7a;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: var(--text-color);
+            flex: 1;
+        }
+        .percentage-buttons button:hover { background: #5a5f8a; }
         .swap-button {
             padding: 15px;
             background: var(--primary-color);
@@ -150,6 +165,7 @@
             body { padding: 10px; }
             .container { padding: 15px; }
             .header { font-size: 1.1em; }
+            .percentage-buttons button { padding: 5px; }
             .dog-section img { width: 50px; height: 50px; }
             .dog-message { font-size: 0.8em; }
         }
@@ -175,6 +191,12 @@
                 </div>
             </div>
             <input type="number" id="fromAmount" placeholder="0.0" step="0.01">
+            <div class="percentage-buttons">
+                <button onclick="setPercentage(25)">25%</button>
+                <button onclick="setPercentage(50)">50%</button>
+                <button onclick="setPercentage(75)">75%</button>
+                <button onclick="setPercentage(100)">MAX</button>
+            </div>
         </div>
         <div class="swap-box">
             <div class="balance-row">
@@ -224,7 +246,7 @@ const chains = {
     }
 };
 
-const routerAbi = [{"inputs":[{"internalType":"address","name":"wrappedNative","type":"address"},{"internalType":"address","name":"armProxy","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"BadARMSignal","type":"error"},{"inputs":[],"name":"FailedToSendValue","type":"error"},{"inputs":[],"name":"InsufficientFeeTokenAmount","type":"error"},{"inputs":[],"name":"InvalidMsgValue","type":"error"},{"inputs":[{"internalType":"address","name":"to","type":"address"}],"name":"InvalidRecipientAddress","type":"error"},{"inputs":[{"internalType":"uint64","name":"chainSelector","type":"uint64"},{"internalType":"address","name":"offRamp","type":"address"}],"name":"OffRampMismatch","type":"error"},{"inputs":[],"name":"OnlyOffRamp","type":"error"},{"inputs":[{"internalType":"uint64","name":"destChainSelector","type":"uint64"}],"name":"UnsupportedDestinationChain","type":"error"},{"inputs":[{"internalType":"uint64","name":"destinationChainSelector","type":"uint64"},{"components":[{"internalType":"bytes","name":"receiver","type":"bytes"},{"internalType":"bytes","name":"data","type":"bytes"},{"components":[{"internalType":"address","name":"token","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"internalType":"struct Client.EVMTokenAmount[]","name":"tokenAmounts","type":"tuple[]"},{"internalType":"address","name":"feeToken","type":"address"},{"internalType":"bytes","name":"extraArgs","type":"bytes"}],"internalType":"struct Client.EVM2AnyMessage","name":"message","type":"tuple"}],"name":"ccipSend","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint64","name":"destinationChainSelector","type":"uint64"},{"components":[{"internalType":"bytes","name":"receiver","type":"bytes"},{"internalType":"bytes","name":"data","type":"bytes"},{"components":[{"internalType":"address","name":"token","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"internalType":"struct Client.EVMTokenAmount[]","name":"tokenAmounts","type":"tuple[]"},{"internalType":"address","name":"feeToken","type":"address"},{"internalType":"bytes","name":"extraArgs","type":"bytes"}],"internalType":"struct Client.EVM2AnyMessage","name":"message","type":"tuple"}],"name":"getFee","outputs":[{"internalType":"uint256","name":"fee","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint64","name":"chainSelector","type":"uint64"}],"name":"isChainSupported","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}];
+const routerAbi = [{"inputs":[{"internalType":"address","name":"wrappedNative","type":"address"},{"internalType":"address","name":"armProxy","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"BadARMSignal","type":"error"},{"inputs":[],"name":"FailedToSendValue","type":"error"},{"inputs":[],"name":"InsufficientFeeTokenAmount","type":"error"},{"inputs":[],"name":"InvalidMsgValue","type":"error"},{"inputs":[{"internalType":"address","name":"to","type":"address"}],"name":"InvalidRecipientAddress","type":"error"},{"inputs":[{"internalType":"uint64","name":"chainSelector","type":"uint64"},{"internalType":"address","name":"offRamp","type":"address"}],"name":"OffRampMismatch","type":"error"},{"inputs":[],"name":"OnlyOffRamp","type":"error"},{"inputs":[{"internalType":"uint64","name":"destChainSelector","type":"uint64"}],"name":"UnsupportedDestinationChain","type":"error"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"bytes32","name":"messageId","type":"bytes32"},{"indexed":false,"internalType":"uint64","name":"sourceChainSelector","type":"uint64"},{"indexed":false,"internalType":"address","name":"offRamp","type":"address"},{"indexed":false,"internalType":"bytes32","name":"calldataHash","type":"bytes32"}],"name":"MessageExecuted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint64","name":"sourceChainSelector","type":"uint64"},{"indexed":false,"internalType":"address","name":"offRamp","type":"address"}],"name":"OffRampAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint64","name":"sourceChainSelector","type":"uint64"},{"indexed":false,"internalType":"address","name":"offRamp","type":"address"}],"name":"OffRampRemoved","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint64","name":"destChainSelector","type":"uint64"},{"indexed":false,"internalType":"address","name":"onRamp","type":"address"}],"name":"OnRampSet","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"}],"name":"OwnershipTransferRequested","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"inputs":[],"name":"MAX_RET_BYTES","outputs":[{"internalType":"uint16","name":"","type":"uint16"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"acceptOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"components":[{"internalType":"uint64","name":"destChainSelector","type":"uint64"},{"internalType":"address","name":"onRamp","type":"address"}],"internalType":"struct Router.OnRamp[]","name":"onRampUpdates","type":"tuple[]"},{"components":[{"internalType":"uint64","name":"sourceChainSelector","type":"uint64"},{"internalType":"address","name":"offRamp","type":"address"}],"internalType":"struct Router.OffRamp[]","name":"offRampRemoves","type":"tuple[]"},{"components":[{"internalType":"uint64","name":"sourceChainSelector","type":"uint64"},{"internalType":"address","name":"offRamp","type":"address"}],"internalType":"struct Router.OffRamp[]","name":"offRampAdds","type":"tuple[]"}],"name":"applyRampUpdates","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint64","name":"destinationChainSelector","type":"uint64"},{"components":[{"internalType":"bytes","name":"receiver","type":"bytes"},{"internalType":"bytes","name":"data","type":"bytes"},{"components":[{"internalType":"address","name":"token","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"internalType":"struct Client.EVMTokenAmount[]","name":"tokenAmounts","type":"tuple[]"},{"internalType":"address","name":"feeToken","type":"address"},{"internalType":"bytes","name":"extraArgs","type":"bytes"}],"internalType":"struct Client.EVM2AnyMessage","name":"message","type":"tuple"}],"name":"ccipSend","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"getArmProxy","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint64","name":"destinationChainSelector","type":"uint64"},{"components":[{"internalType":"bytes","name":"receiver","type":"bytes"},{"internalType":"bytes","name":"data","type":"bytes"},{"components":[{"internalType":"address","name":"token","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"internalType":"struct Client.EVMTokenAmount[]","name":"tokenAmounts","type":"tuple[]"},{"internalType":"address","name":"feeToken","type":"address"},{"internalType":"bytes","name":"extraArgs","type":"bytes"}],"internalType":"struct Client.EVM2AnyMessage","name":"message","type":"tuple"}],"name":"getFee","outputs":[{"internalType":"uint256","name":"fee","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getOffRamps","outputs":[{"components":[{"internalType":"uint64","name":"sourceChainSelector","type":"uint64"},{"internalType":"address","name":"offRamp","type":"address"}],"internalType":"struct Router.OffRamp[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint64","name":"destChainSelector","type":"uint64"}],"name":"getOnRamp","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint64","name":"chainSelector","type":"uint64"}],"name":"getSupportedTokens","outputs":[{"internalType":"address[]","name":"","type":"address[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getWrappedNative","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint64","name":"chainSelector","type":"uint64"}],"name":"isChainSupported","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint64","name":"sourceChainSelector","type":"uint64"},{"internalType":"address","name":"offRamp","type":"address"}],"name":"isOffRamp","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"tokenAddress","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"recoverTokens","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"wrappedNative","type":"address"}],"name":"setWrappedNative","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"typeAndVersion","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}];
 
 const erc20Abi = [
     {"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"},
@@ -315,12 +337,48 @@ async function updateBalances() {
     }
 }
 
-async function approveToken(amountWei) {
+async function setPercentage(percentage) {
+    if (!fromBalance) return;
+    const amount = (parseFloat(fromBalance) * percentage) / 100;
+    document.getElementById('fromAmount').value = amount.toFixed(4);
+}
+
+async function waitForTransaction(txHash) {
+    let receipt = null;
+    const maxAttempts = 30;
+    let attempts = 0;
+    while (attempts < maxAttempts) {
+        receipt = await web3.eth.getTransactionReceipt(txHash);
+        if (receipt) {
+            if (receipt.status) return receipt;
+            else throw new Error(`Transaction ${txHash} failed`);
+        }
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        attempts++;
+    }
+    throw new Error(`Transaction ${txHash} not confirmed`);
+}
+
+async function waitForAllowance(tokenContract, owner, spender, requiredAmount) {
+    const maxAttempts = 10;
+    let attempts = 0;
+    while (attempts < maxAttempts) {
+        const allowance = await tokenContract.methods.allowance(owner, spender).call();
+        if (web3.utils.toBN(allowance).gte(web3.utils.toBN(requiredAmount))) return;
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        attempts++;
+    }
+    throw new Error("Allowance not updated");
+}
+
+async function approveToken(amount) {
     const routerAddress = chains[fromChain].routerAddress;
     const allowance = await currentTokenContract.methods.allowance(account, routerAddress).call();
-    if (web3.utils.toBN(allowance).lt(web3.utils.toBN(amountWei))) {
+    if (web3.utils.toBN(allowance).lt(web3.utils.toBN(amount))) {
         const maxUint256 = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-        await currentTokenContract.methods.approve(routerAddress, maxUint256).send({ from: account });
+        const approveTx = await currentTokenContract.methods.approve(routerAddress, maxUint256).send({ from: account });
+        await waitForTransaction(approveTx.transactionHash);
+        await waitForAllowance(currentTokenContract, account, routerAddress, amount);
     }
 }
 
@@ -356,36 +414,42 @@ async function initiateCrossChainTransfer() {
         status.innerText = "Checking chain support...";
         dogMessage.innerText = getRandomMessage('transferStart');
 
-        const destSelector = chains[toChain].chainSelector;
-        const isSupported = await currentRouterContract.methods.isChainSupported(destSelector).call();
-        if (!isSupported) throw new Error(`Target chain not supported.`);
+        const destinationChainSelector = chains[toChain].chainSelector;
+        const isSupported = await currentRouterContract.methods.isChainSupported(destinationChainSelector).call();
+        if (!isSupported) throw new Error(`Target chain ${toChain} not supported.`);
 
-        const onRamp = await currentRouterContract.methods.getOnRamp(destSelector).call();
-        if (onRamp === '0x0000000000000000000000000000000000000000') throw new Error('OnRamp not configured.');
+        const onRampAddress = await currentRouterContract.methods.getOnRamp(destinationChainSelector).call();
+        if (onRampAddress === '0x0000000000000000000000000000000000000000') throw new Error(`OnRamp not configured for ${toChain}.`);
 
         await approveToken(amountWei);
 
         status.innerText = "Estimating fees...";
         const message = {
-            receiver: web3.utils.padLeft(receiver.toLowerCase(), 64),
+            receiver: web3.utils.padLeft(receiver, 64),
             data: '0x',
             tokenAmounts: [{ token: token.Ethereum.tokenAddress, amount: amountWei }],
             feeToken: '0x0000000000000000000000000000000000000000',
             extraArgs: '0x'
         };
-        const fee = await currentRouterContract.methods.getFee(destSelector, message).call();
+        const fee = await currentRouterContract.methods.getFee(destinationChainSelector, message).call();
 
-        status.innerText = "Initiating transfer...";
-        const tx = await currentRouterContract.methods.ccipSend(destSelector, message).send({
+        status.innerText = "Initiating cross-chain transfer...";
+        const tx = await currentRouterContract.methods.ccipSend(destinationChainSelector, message).send({
             from: account,
-            value: fee
+            value: fee,
+            gas: web3.utils.toHex(3000000)
         });
 
-        status.innerText = `Transfer initiated! Tx: ${tx.transactionHash}`;
+        status.innerText = `Transfer initiated! Tx Hash: ${tx.transactionHash}`;
         dogMessage.innerText = getRandomMessage('transferSuccess');
     } catch (error) {
-        status.innerText = "Transfer failed: " + (error.message || 'Unknown error');
-        dogMessage.innerText = error.code === 4001 ? getRandomMessage('userDenied') : getRandomMessage('transferFail');
+        if (error.code === 4001) {
+            status.innerText = "Transaction canceled by user.";
+            dogMessage.innerText = getRandomMessage('userDenied');
+        } else {
+            status.innerText = "Transfer failed: " + (error.message || '');
+            dogMessage.innerText = getRandomMessage('transferFail');
+        }
     } finally {
         swapButton.disabled = false;
     }
