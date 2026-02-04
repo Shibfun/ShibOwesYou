@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Woofswap - Ethereum to BSC Bridge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff9100;
+            --secondary-color: #ff6f61;
+            --gradient-bg: linear-gradient(180deg, #1e1e2f 0%, #2a2a3d 100%);
+            --card-bg: #2c2f48;
+            --input-bg: #373b5c;
+            --text-color: #ffffff;
+            --border-radius: 15px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--gradient-bg);
+            color: var(--text-color);
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: var(--border-radius);
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(90deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            padding: 12px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .connect-section button {
+            padding: 12px;
+            background: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: background 0.2s;
+            margin-bottom: 10px;
+        }
+        .connect-section button:hover { background: #e68a00; }
+        .swap-box {
+            background: var(--input-bg);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+        }
+        .balance-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            color: #ff9100;
+        }
+        .chain-display {
+            padding: 10px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .token-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .token-display div {
+            display: flex;
+            align-items: center;
+        }
+        .token-display img {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            background: var(--input-bg);
+            border: none;
+            border-radius: 10px;
+            color: var(--text-color);
+            font-size: 1em;
+            text-align: right;
+        }
+        .swap-button {
+            padding: 15px;
+            background: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        .swap-button:disabled {
+            background: #4a4f7a;
+            cursor: not-allowed;
+        }
+        .swap-button:hover:not(:disabled) { background: #e68a00; }
+        .status {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: var(--primary-color);
+            text-align: center;
+        }
+        .swap-note {
+            font-size: 0.9em;
+            color: #ff9100;
+            margin-top: 5px;
+            text-align: left;
+        }
+        .dog-section {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .dog-section img {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 10px;
+        }
+        .dog-message {
+            font-size: 0.9em;
+            color: var(--secondary-color);
+            font-style: italic;
+        }
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .container { padding: 15px; }
+            .header { font-size: 1.1em; }
+            .dog-section img { width: 50px; height: 50px; }
+            .dog-message { font-size: 0.8em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">Woofswap - Ethereum to BSC Bridge</div>
+        <div class="connect-section">
+            <button id="connectWalletButton">Connect Wallet</button>
+            <div id="networkStatus" class="status">Click to connect...</div>
+        </div>
+        <div class="swap-box">
+            <div class="balance-row">
+                <span>From</span>
+                <span id="fromBalance">Balance: 0</span>
+            </div>
+            <div class="chain-display">Ethereum</div>
+            <div class="token-display">
+                <div>
+                    <img src="https://woofswap.finance/image/tokens/sou.png" alt="SOU">
+                    <span>SOU</span>
+                </div>
+            </div>
+            <input type="number" id="fromAmount" placeholder="0.0" step="0.01">
+        </div>
+        <div class="swap-box">
+            <div class="balance-row">
+                <span>To</span>
+            </div>
+            <div class="chain-display">BSC (BNB Chain)</div>
+            <div class="token-display">
+                <div>
+                    <img src="https://woofswap.finance/image/tokens/sou.png" alt="SOU">
+                    <span>SOU</span>
+                </div>
+            </div>
+            <input type="text" id="receiverAddress" placeholder="Receiver Address (defaults to your address)">
+            <div class="swap-note">Cross-chain transfer powered by Chainlink CCIP</div>
+        </div>
+        <button class="swap-button" id="swapButton" onclick="initiateCrossChainTransfer()">Initiate Transfer</button>
+        <div class="dog-section">
+            <img src="https://www.woofswap.finance/image/tokens/shiba.gif" alt="Shiba Dog">
+            <div class="dog-message" id="dogMessage">"Woof! Connect your wallet to start bridging, pup!"</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
+    <script>
+const token = {
+    logo: 'https://woofswap.finance/image/tokens/sou.png',
+    name: 'SOU',
+    Ethereum: {
+        tokenAddress: '0xdea2a2a166e2fdc47b934bee68e6032f8f1ca09c'
+    }
+};
+
+const chains = {
+    Ethereum: {
+        chainId: 1,
+        chainName: 'Ethereum',
+        rpcUrl: 'https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID', // Replace with your Infura/Alchemy key
+        chainSelector: '5009297550715157269',
+        routerAddress: '0x80226fc0Ee2b096224EeAc085Bb9a8cba1146f7D'
+    },
+    BSC: {
+        chainId: 56,
+        chainName: 'BNB Smart Chain',
+        rpcUrl: 'https://bsc-dataseed.binance.org',
+        chainSelector: '11344663589394136015',
+        routerAddress: '0x34B03Cb9086d7D758AC55af71584F81A598759FE'
+    }
+};
+
+const routerAbi = [{"inputs":[{"internalType":"address","name":"wrappedNative","type":"address"},{"internalType":"address","name":"armProxy","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"BadARMSignal","type":"error"},{"inputs":[],"name":"FailedToSendValue","type":"error"},{"inputs":[],"name":"InsufficientFeeTokenAmount","type":"error"},{"inputs":[],"name":"InvalidMsgValue","type":"error"},{"inputs":[{"internalType":"address","name":"to","type":"address"}],"name":"InvalidRecipientAddress","type":"error"},{"inputs":[{"internalType":"uint64","name":"chainSelector","type":"uint64"},{"internalType":"address","name":"offRamp","type":"address"}],"name":"OffRampMismatch","type":"error"},{"inputs":[],"name":"OnlyOffRamp","type":"error"},{"inputs":[{"internalType":"uint64","name":"destChainSelector","type":"uint64"}],"name":"UnsupportedDestinationChain","type":"error"},{"inputs":[{"internalType":"uint64","name":"destinationChainSelector","type":"uint64"},{"components":[{"internalType":"bytes","name":"receiver","type":"bytes"},{"internalType":"bytes","name":"data","type":"bytes"},{"components":[{"internalType":"address","name":"token","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"internalType":"struct Client.EVMTokenAmount[]","name":"tokenAmounts","type":"tuple[]"},{"internalType":"address","name":"feeToken","type":"address"},{"internalType":"bytes","name":"extraArgs","type":"bytes"}],"internalType":"struct Client.EVM2AnyMessage","name":"message","type":"tuple"}],"name":"ccipSend","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint64","name":"destinationChainSelector","type":"uint64"},{"components":[{"internalType":"bytes","name":"receiver","type":"bytes"},{"internalType":"bytes","name":"data","type":"bytes"},{"components":[{"internalType":"address","name":"token","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"internalType":"struct Client.EVMTokenAmount[]","name":"tokenAmounts","type":"tuple[]"},{"internalType":"address","name":"feeToken","type":"address"},{"internalType":"bytes","name":"extraArgs","type":"bytes"}],"internalType":"struct Client.EVM2AnyMessage","name":"message","type":"tuple"}],"name":"getFee","outputs":[{"internalType":"uint256","name":"fee","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint64","name":"chainSelector","type":"uint64"}],"name":"isChainSupported","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}];
+
+const erc20Abi = [
+    {"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"},
+    {"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"success","type":"bool"}],"type":"function"},
+    {"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"remaining","type":"uint256"}],"type":"function"}
+];
+
+let web3, account, currentRouterContract, currentTokenContract, fromBalance = '0';
+const fromChain = 'Ethereum';
+const toChain = 'BSC';
+
+const dogMessages = {
+    connectSuccess: ["Woof! Wallet connected, ready to bridge, pup!"],
+    connectFail: ["Woof! Couldn't connect wallet, try again, pup!"],
+    transferStart: ["Woof! Bridging your SOU, hold tight, pup!"],
+    transferSuccess: ["Woof! Transfer initiated, your SOU is on its way!"],
+    transferFail: ["Woof! Transfer failed, check the details, pup!"],
+    transferNoAmount: ["Woof! Enter an amount to bridge, pup!"],
+    userDenied: ["Woof! You canceled the transaction, pup!"]
+};
+
+function getRandomMessage(type) {
+    return dogMessages[type][0];
+}
+
+async function initializeWeb3() {
+    if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+        try {
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const accounts = await web3.eth.getAccounts();
+            account = accounts[0];
+            document.getElementById('connectWalletButton').innerText = `Connected: ${account.slice(0,6)}...${account.slice(-4)}`;
+            await switchNetwork(fromChain);
+            await initializeContracts();
+            await updateBalances();
+            document.getElementById('networkStatus').innerText = `Connected to ${fromChain}`;
+            document.getElementById('dogMessage').innerText = getRandomMessage('connectSuccess');
+        } catch (error) {
+            document.getElementById('networkStatus').innerText = 'Failed to connect wallet';
+            document.getElementById('dogMessage').innerText = getRandomMessage('connectFail');
+        }
+    } else {
+        document.getElementById('networkStatus').innerText = 'Please install MetaMask';
+        document.getElementById('dogMessage').innerText = 'Woof! MetaMask not found, pup!';
+    }
+}
+
+async function switchNetwork(chain) {
+    const chainConfig = chains[chain];
+    try {
+        await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: `0x${chainConfig.chainId.toString(16)}` }]
+        });
+    } catch (switchError) {
+        if (switchError.code === 4902) {
+            await window.ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params: [{
+                    chainId: `0x${chainConfig.chainId.toString(16)}`,
+                    chainName: chainConfig.chainName,
+                    rpcUrls: [chainConfig.rpcUrl],
+                    nativeCurrency: { name: chain === 'Ethereum' ? 'ETH' : 'BNB', symbol: chain === 'Ethereum' ? 'ETH' : 'BNB', decimals: 18 },
+                    blockExplorerUrls: [chain === 'Ethereum' ? 'https://etherscan.io' : 'https://bscscan.com']
+                }]
+            });
+        } else {
+            throw switchError;
+        }
+    }
+    await initializeContracts();
+}
+
+async function initializeContracts() {
+    currentRouterContract = new web3.eth.Contract(routerAbi, chains[fromChain].routerAddress);
+    currentTokenContract = new web3.eth.Contract(erc20Abi, token.Ethereum.tokenAddress);
+}
+
+async function updateBalances() {
+    if (!web3 || !account) return;
+    try {
+        const balanceRaw = await currentTokenContract.methods.balanceOf(account).call();
+        fromBalance = web3.utils.fromWei(balanceRaw, 'ether');
+        document.getElementById('fromBalance').innerText = `Balance: ${parseFloat(fromBalance).toFixed(4)} SOU`;
+    } catch (error) {
+        document.getElementById('fromBalance').innerText = 'Balance: Error';
+    }
+}
+
+async function approveToken(amountWei) {
+    const routerAddress = chains[fromChain].routerAddress;
+    const allowance = await currentTokenContract.methods.allowance(account, routerAddress).call();
+    if (web3.utils.toBN(allowance).lt(web3.utils.toBN(amountWei))) {
+        const maxUint256 = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+        await currentTokenContract.methods.approve(routerAddress, maxUint256).send({ from: account });
+    }
+}
+
+async function initiateCrossChainTransfer() {
+    const status = document.getElementById('networkStatus');
+    const swapButton = document.getElementById('swapButton');
+    const dogMessage = document.getElementById('dogMessage');
+
+    if (!web3 || !account) {
+        status.innerText = "Please connect wallet first.";
+        dogMessage.innerText = getRandomMessage('connectFail');
+        return;
+    }
+
+    const amount = parseFloat(document.getElementById('fromAmount').value);
+    if (!amount || amount <= 0 || isNaN(amount)) {
+        status.innerText = "Please enter a valid amount.";
+        dogMessage.innerText = getRandomMessage('transferNoAmount');
+        return;
+    }
+
+    let receiver = document.getElementById('receiverAddress').value.trim() || account;
+    if (!web3.utils.isAddress(receiver)) {
+        status.innerText = "Invalid receiver address.";
+        dogMessage.innerText = "Woof! Invalid address, pup!";
+        return;
+    }
+
+    const amountWei = web3.utils.toWei(amount.toString(), 'ether');
+
+    try {
+        swapButton.disabled = true;
+        status.innerText = "Checking chain support...";
+        dogMessage.innerText = getRandomMessage('transferStart');
+
+        const destSelector = chains[toChain].chainSelector;
+        const isSupported = await currentRouterContract.methods.isChainSupported(destSelector).call();
+        if (!isSupported) throw new Error(`Target chain not supported.`);
+
+        const onRamp = await currentRouterContract.methods.getOnRamp(destSelector).call();
+        if (onRamp === '0x0000000000000000000000000000000000000000') throw new Error('OnRamp not configured.');
+
+        await approveToken(amountWei);
+
+        status.innerText = "Estimating fees...";
+        const message = {
+            receiver: web3.utils.padLeft(receiver.toLowerCase(), 64),
+            data: '0x',
+            tokenAmounts: [{ token: token.Ethereum.tokenAddress, amount: amountWei }],
+            feeToken: '0x0000000000000000000000000000000000000000',
+            extraArgs: '0x'
+        };
+        const fee = await currentRouterContract.methods.getFee(destSelector, message).call();
+
+        status.innerText = "Initiating transfer...";
+        const tx = await currentRouterContract.methods.ccipSend(destSelector, message).send({
+            from: account,
+            value: fee
+        });
+
+        status.innerText = `Transfer initiated! Tx: ${tx.transactionHash}`;
+        dogMessage.innerText = getRandomMessage('transferSuccess');
+    } catch (error) {
+        status.innerText = "Transfer failed: " + (error.message || 'Unknown error');
+        dogMessage.innerText = error.code === 4001 ? getRandomMessage('userDenied') : getRandomMessage('transferFail');
+    } finally {
+        swapButton.disabled = false;
+    }
+}
+
+document.getElementById('connectWalletButton').addEventListener('click', initializeWeb3);
+    </script>
+</body>
+</html>
