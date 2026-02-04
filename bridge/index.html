@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOU Cross-Chain Bridge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent-color: #667eea;
+            --accent-light: #8b9eff;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --input-bg: #334155;
+            --border-color: #475569;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #94a3b8;
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            overflow: hidden;
+        }
+
+        /* Header Section */
+        .header {
+            background: var(--primary-gradient);
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .content {
+            padding: 30px;
+        }
+
+        /* Connect Section */
+        .connect-section {
+            margin-bottom: 30px;
+        }
+
+        .connect-button {
+            width: 100%;
+            padding: 14px 20px;
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .connect-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .connect-button:active {
+            transform: translateY(0);
+        }
+
+        .connect-button.connected {
+            background: var(--success-color);
+        }
+
+        .status-info {
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            font-size: 13px;
+            color: var(--accent-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Chain Selector */
+        .chain-selector {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+            background: rgba(148, 163, 184, 0.05);
+            padding: 8px;
+            border-radius: 12px;
+        }
+
+        .chain-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: 2px solid transparent;
+            background: transparent;
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .chain-btn.active {
+            background: var(--card-bg);
+            border-color: var(--accent-color);
+            color: var(--accent-light);
+        }
+
+        .chain-btn:hover:not(.active) {
+            color: var(--text-primary);
+        }
+
+        /* Bridge Direction */
+        .bridge-direction {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .chain-box {
+            flex: 1;
+            background: rgba(102, 126, 234, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .chain-box.from {
+            border-color: var(--accent-color);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .chain-name {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .chain-label {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .arrow-icon {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            animation: slideArrow 2s infinite;
+        }
+
+        @keyframes slideArrow {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(5px); }
+        }
+
+        /* Input Section */
+        .input-section {
+            margin-bottom: 25px;
+        }
+
+        .input-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .balance-display {
+            color: var(--accent-light);
+            font-size: 12px;
+        }
+
+        .input-box {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+        }
+
+        .input-box:focus-within {
+            border-color: var(--accent-color);
+            background: rgba(102, 126, 234, 0.05);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .token-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+
+        .token-logo {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .token-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="number"],
+        input[type="text"] {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 600;
+            outline: none;
+            font-family: 'Space Mono', monospace;
+        }
+
+        input[type="number"]::placeholder,
+        input[type="text"]::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        /* Percentage Buttons */
+        .percentage-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .percentage-btn {
+            flex: 1;
+            padding: 8px;
+            background: rgba(148, 163, 184, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .percentage-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: var(--accent-color);
+            color: var(--accent-light);
+        }
+
+        /* Action Button */
+        .action-button {
+            width: 100%;
+            padding: 16px 20px;
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            margin-bottom: 15px;
+        }
+
+        .action-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .action-button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .action-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Message Section */
+        .message-section {
+            padding: 16px;
+            background: rgba(102, 126, 234, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 10px;
+            font-size: 13px;
+            color: var(--accent-light);
+            text-align: center;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .message-section.success {
+            background: rgba(16, 185, 129, 0.05);
+            border-color: rgba(16, 185, 129, 0.2);
+            color: var(--success-color);
+        }
+
+        .message-section.error {
+            background: rgba(239, 68, 68, 0.05);
+            border-color: rgba(239, 68, 68, 0.2);
+            color: var(--error-color);
+        }
+
+        .message-section.warning {
+            background: rgba(245, 158, 11, 0.05);
+            border-color: rgba(245, 158, 11, 0.2);
+            color: var(--warning-color);
+        }
+
+        /* Footer */
+        .footer {
+            padding: 20px 30px;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .footer-note {
+            margin-bottom: 10px;
+        }
+
+        .powered-by {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 11px;
+        }
+
+        /* Loading Animation */
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-top-color: var(--accent-light);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container {
+                border-radius: 20px;
+            }
+
+            .header {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .bridge-direction {
+                margin-bottom: 25px;
+            }
+
+            .chain-box {
+                padding: 12px;
+            }
+
+            .chain-label {
+                font-size: 14px;
+            }
+
+            .input-box {
+                padding: 12px;
+            }
+
+            .action-button {
+                padding: 14px 16px;
+                font-size: 15px;
+            }
+
+            .percentage-buttons {
+                gap: 6px;
+            }
+
+            .percentage-btn {
+                padding: 6px;
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-img">S</div>
+                    <span>SOU Bridge</span>
+                </div>
+                <h1>Cross-Chain Bridge</h1>
+                <p>Seamless token transfer between blockchains</p>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Connect Wallet -->
+            <div class="connect-section">
+                <button class="connect-button" id="connectWalletButton">Connect Wallet</button>
+                <div class="status-info" id="statusInfo" style="display: none;">
+                    <span class="status-dot"></span>
+                    <span id="statusText">Connecting...</span>
+                </div>
+            </div>
+
+            <!-- Chain Direction Selector -->
+            <div class="chain-selector">
+                <button class="chain-btn active" data-direction="bsc-to-eth">BSC → Ethereum</button>
+                <button class="chain-btn" data-direction="eth-to-bsc">Ethereum → BSC</button>
+            </div>
+
+            <!-- Bridge Direction Display -->
+            <div class="bridge-direction">
+                <div class="chain-box from">
+                    <div class="chain-name">From</div>
+                    <div class="chain-label" id="fromChainDisplay">BSC</div>
+                </div>
+                <div class="arrow-icon">→</div>
+                <div class="chain-box">
+                    <div class="chain-name">To</div>
+                    <div class="chain-label" id="toChainDisplay">Ethereum</div>
+                </div>
+            </div>
+
+            <!-- From Amount Input -->
+            <div class="input-section">
+                <div class="input-label">
+                    <span>Amount to Send</span>
+                    <span class="balance-display" id="balanceDisplay">Balance: 0 SOU</span>
+                </div>
+                <div class="input-box">
+                    <input type="number" id="fromAmount" placeholder="0.0" step="0.0001" min="0">
+                    <div class="token-display">
+                        <div class="token-logo">S</div>
+                        <span class="token-name">SOU</span>
+                    </div>
+                </div>
+                <div class="percentage-buttons">
+                    <button class="percentage-btn" onclick="setPercentage(25)">25%</button>
+                    <button class="percentage-btn" onclick="setPercentage(50)">50%</button>
+                    <button class="percentage-btn" onclick="setPercentage(75)">75%</button>
+                    <button class="percentage-btn" onclick="setPercentage(100)">MAX</button>
+                </div>
+            </div>
+
+            <!-- Receiver Address Input -->
+            <div class="input-section">
+                <div class="input-label">
+                    <span>Recipient Address</span>
+                    <span style="color: var(--text-tertiary); font-weight: 400;">Optional</span>
+                </div>
+                <div class="input-box">
+                    <input type="text" id="receiverAddress" placeholder="Leave empty to use your wallet address">
+                </div>
+            </div>
+
+            <!-- Bridge Button -->
+            <button class="action-button" id="bridgeButton" onclick="initiateCrossChainTransfer()">Initiate Cross-Chain Transfer</button>
+
+            <!-- Status Message -->
+            <div class="message-section" id="messageSection">
+                Ready to bridge your SOU tokens
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-note">
+                Powered by Chainlink CCIP • Secure Cross-Chain Communication
+            </div>
+            <div class="powered-by">
+                <span>🔗 Bridging BSC ↔ Ethereum</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Web3 Library -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+    <script>
+        // ============================================================================
+        // Configuration
+        // ============================================================================
+        const TOKEN_CONFIG = {
+            name: 'SOU',
+            logo: 'https://woofswap.finance/image/tokens/sou.png',
+            addresses: {
+                BSC: '0xb65bd36fef84ebc5114cfd803a4f25b2b57f7777',
+                Ethereum: '0xdea2a2a166e2fdc47b934bee68e6032f8f1ca09c'
+            }
+        };
+
+        const CHAINS = {
+            BSC: {
+                chainId: 56,
+                chainName: 'BNB Smart Chain',
+                rpcUrl: 'https://bsc-dataseed.binance.org',
+                chainSelector: '11344663589394136015',
+                routerAddress: '0x34B03Cb9086d7D758AC55af71584F81A598759FE',
+                explorerUrl: 'https://bscscan.com'
+            },
+            Ethereum: {
+                chainId: 1,
+                chainName: 'Ethereum',
+                rpcUrl: 'https://mainnet.infura.io',
+                chainSelector: '5009297550715157269',
+                routerAddress: '0x80226fc0Ee2b096224EeAc085Bb9a8cba1146f7D',
+                explorerUrl: 'https://etherscan.io'
+            }
+        };
+
+        // Router ABI for CCIP
+        const ROUTER_ABI = [
+            {
+                "inputs": [
+                    { "internalType": "uint64", "name": "destinationChainSelector", "type": "uint64" },
+                    {
+                        "components": [
+                            { "internalType": "bytes", "name": "receiver", "type": "bytes" },
+                            { "internalType": "bytes", "name": "data", "type": "bytes" },
+                            {
+                                "components": [
+                                    { "internalType": "address", "name": "token", "type": "address" },
+                                    { "internalType": "uint256", "name": "amount", "type": "uint256" }
+                                ],
+                                "internalType": "struct Client.EVMTokenAmount[]",
+                                "name": "tokenAmounts",
+                                "type": "tuple[]"
+                            },
+                            { "internalType": "address", "name": "feeToken", "type": "address" },
+                            { "internalType": "bytes", "name": "extraArgs", "type": "bytes" }
+                        ],
+                        "internalType": "struct Client.EVM2AnyMessage",
+                        "name": "message",
+                        "type": "tuple"
+                    }
+                ],
+                "name": "ccipSend",
+                "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    { "internalType": "uint64", "name": "destinationChainSelector", "type": "uint64" },
+                    {
+                        "components": [
+                            { "internalType": "bytes", "name": "receiver", "type": "bytes" },
+                            { "internalType": "bytes", "name": "data", "type": "bytes" },
+                            {
+                                "components": [
+                                    { "internalType": "address", "name": "token", "type": "address" },
+                                    { "internalType": "uint256", "name": "amount", "type": "uint256" }
+                                ],
+                                "internalType": "struct Client.EVMTokenAmount[]",
+                                "name": "tokenAmounts",
+                                "type": "tuple[]"
+                            },
+                            { "internalType": "address", "name": "feeToken", "type": "address" },
+                            { "internalType": "bytes", "name": "extraArgs", "type": "bytes" }
+                        ],
+                        "internalType": "struct Client.EVM2AnyMessage",
+                        "name": "message",
+                        "type": "tuple"
+                    }
+                ],
+                "name": "getFee",
+                "outputs": [{ "internalType": "uint256", "name": "fee", "type": "uint256" }],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{ "internalType": "uint64", "name": "chainSelector", "type": "uint64" }],
+                "name": "isChainSupported",
+                "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ];
+
+        // ERC20 ABI
+        const ERC20_ABI = [
+            {
+                "constant": true,
+                "inputs": [{ "name": "_owner", "type": "address" }],
+                "name": "balanceOf",
+                "outputs": [{ "name": "balance", "type": "uint256" }],
+                "type": "function"
+            },
+            {
+                "constant": false,
+                "inputs": [
+                    { "name": "_spender", "type": "address" },
+                    { "name": "_value", "type": "uint256" }
+                ],
+                "name": "approve",
+                "outputs": [{ "name": "success", "type": "bool" }],
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [
+                    { "name": "_owner", "type": "address" },
+                    { "name": "_spender", "type": "address" }
+                ],
+                "name": "allowance",
+                "outputs": [{ "name": "remaining", "type": "uint256" }],
+                "type": "function"
+            }
+        ];
+
+        // ============================================================================
+        // Global State
+        // ============================================================================
+        let web3 = null;
+        let account = null;
+        let currentDirection = 'bsc-to-eth'; // 'bsc-to-eth' or 'eth-to-bsc'
+        let fromChain = 'BSC';
+        let toChain = 'Ethereum';
+        let fromBalance = '0';
+        let routerContract = null;
+        let tokenContract = null;
+
+        // ============================================================================
+        // UI Utilities
+        // ============================================================================
+        function updateMessage(text, type = 'info') {
+            const messageSection = document.getElementById('messageSection');
+            messageSection.textContent = text;
+            messageSection.className = `message-section ${type}`;
+        }
+
+        function showStatus(text) {
+            const statusInfo = document.getElementById('statusInfo');
+            const statusText = document.getElementById('statusText');
+            statusText.textContent = text;
+            statusInfo.style.display = 'flex';
+        }
+
+        function hideStatus() {
+            document.getElementById('statusInfo').style.display = 'none';
+        }
+
+        function setLoading(isLoading) {
+            const bridgeButton = document.getElementById('bridgeButton');
+            bridgeButton.disabled = isLoading;
+            if (isLoading) {
+                bridgeButton.innerHTML = '<span class="spinner"></span> Processing...';
+            } else {
+                bridgeButton.innerHTML = 'Initiate Cross-Chain Transfer';
+            }
+        }
+
+        function updateChainDisplay() {
+            document.getElementById('fromChainDisplay').textContent = fromChain;
+            document.getElementById('toChainDisplay').textContent = toChain;
+        }
+
+        // ============================================================================
+        // Chain Management
+        // ============================================================================
+        async function switchNetwork(chain) {
+            const chainConfig = CHAINS[chain];
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: `0x${chainConfig.chainId.toString(16)}` }]
+                });
+            } catch (switchError) {
+                if (switchError.code === 4902) {
+                    // Chain not added to wallet, add it
+                    await window.ethereum.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [{
+                            chainId: `0x${chainConfig.chainId.toString(16)}`,
+                            chainName: chainConfig.chainName,
+                            rpcUrls: [chainConfig.rpcUrl],
+                            nativeCurrency: {
+                                name: chain === 'BSC' ? 'BNB' : 'ETH',
+                                symbol: chain === 'BSC' ? 'BNB' : 'ETH',
+                                decimals: 18
+                            },
+                            blockExplorerUrls: [chainConfig.explorerUrl]
+                        }]
+                    });
+                } else {
+                    throw switchError;
+                }
+            }
+        }
+
+        async function initializeContracts() {
+            const chainConfig = CHAINS[fromChain];
+            routerContract = new web3.eth.Contract(ROUTER_ABI, chainConfig.routerAddress);
+            const tokenAddress = TOKEN_CONFIG.addresses[fromChain];
+            tokenContract = new web3.eth.Contract(ERC20_ABI, tokenAddress);
+        }
+
+        // ============================================================================
+        // Balance Management
+        // ============================================================================
+        async function updateBalance() {
+            if (!web3 || !account) return;
+            try {
+                const balanceRaw = await tokenContract.methods.balanceOf(account).call();
+                fromBalance = web3.utils.fromWei(balanceRaw, 'ether');
+                document.getElementById('balanceDisplay').textContent = `Balance: ${parseFloat(fromBalance).toFixed(4)} SOU`;
+            } catch (error) {
+                console.error('Error fetching balance:', error);
+                document.getElementById('balanceDisplay').textContent = 'Balance: Error';
+            }
+        }
+
+        function setPercentage(percentage) {
+            if (!fromBalance || fromBalance === '0') return;
+            const amount = (parseFloat(fromBalance) * percentage) / 100;
+            document.getElementById('fromAmount').value = amount.toFixed(4);
+        }
+
+        // ============================================================================
+        // Token Approval
+        // ============================================================================
+        async function approveToken(amountWei) {
+            const chainConfig = CHAINS[fromChain];
+            const routerAddress = chainConfig.routerAddress;
+            
+            try {
+                const allowance = await tokenContract.methods.allowance(account, routerAddress).call();
+                if (web3.utils.toBN(allowance).lt(web3.utils.toBN(amountWei))) {
+                    updateMessage('Approving token spending...', 'warning');
+                    const maxUint256 = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+                    const approveTx = await tokenContract.methods.approve(routerAddress, maxUint256).send({ from: account });
+                    updateMessage('Token approved! Proceeding with transfer...', 'success');
+                    return approveTx;
+                }
+            } catch (error) {
+                throw new Error(`Approval failed: ${error.message}`);
+            }
+        }
+
+        // ============================================================================
+        // Wallet Connection
+        // ============================================================================
+        async function connectWallet() {
+            try {
+                if (!window.ethereum) {
+                    updateMessage('MetaMask not installed. Please install MetaMask.', 'error');
+                    return;
+                }
+
+                showStatus('Connecting wallet...');
+                web3 = new Web3(window.ethereum);
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                account = accounts[0];
+
+                // Switch to the correct network
+                await switchNetwork(fromChain);
+                await initializeContracts();
+                await updateBalance();
+
+                // Update UI
+                const connectButton = document.getElementById('connectWalletButton');
+                connectButton.textContent = `Connected: ${account.slice(0, 6)}...${account.slice(-4)}`;
+                connectButton.classList.add('connected');
+
+                showStatus(`Connected to ${fromChain}`);
+                updateMessage(`Wallet connected! Ready to bridge SOU tokens.`, 'success');
+
+                // Auto-hide status after 3 seconds
+                setTimeout(hideStatus, 3000);
+
+            } catch (error) {
+                console.error('Connection error:', error);
+                if (error.code === 4001) {
+                    updateMessage('Connection rejected by user.', 'error');
+                } else {
+                    updateMessage(`Connection failed: ${error.message}`, 'error');
+                }
+                hideStatus();
+            }
+        }
+
+        // ============================================================================
+        // Cross-Chain Transfer
+        // ============================================================================
+        async function initiateCrossChainTransfer() {
+            if (!web3 || !account) {
+                updateMessage('Please connect your wallet first.', 'error');
+                return;
+            }
+
+            const amount = parseFloat(document.getElementById('fromAmount').value);
+            if (!amount || amount <= 0 || isNaN(amount)) {
+                updateMessage('Please enter a valid amount to transfer.', 'error');
+                return;
+            }
+
+            let receiver = document.getElementById('receiverAddress').value.trim() || account;
+            if (!web3.utils.isAddress(receiver)) {
+                updateMessage('Invalid receiver address.', 'error');
+                return;
+            }
+
+            const amountWei = web3.utils.toWei(amount.toString(), 'ether');
+
+            try {
+                setLoading(true);
+                updateMessage('Initiating cross-chain transfer...', 'warning');
+
+                // Check if destination chain is supported
+                const destChainConfig = CHAINS[toChain];
+                const isSupported = await routerContract.methods.isChainSupported(destChainConfig.chainSelector).call();
+                if (!isSupported) {
+                    throw new Error(`${toChain} is not supported as a destination chain.`);
+                }
+
+                // Approve token if necessary
+                await approveToken(amountWei);
+
+                // Estimate fees
+                updateMessage('Estimating transfer fees...', 'warning');
+                const message = {
+                    receiver: web3.utils.padLeft(receiver.toLowerCase(), 64),
+                    data: '0x',
+                    tokenAmounts: [{ token: TOKEN_CONFIG.addresses[fromChain], amount: amountWei }],
+                    feeToken: '0x0000000000000000000000000000000000000000',
+                    extraArgs: '0x'
+                };
+                const fee = await routerContract.methods.getFee(destChainConfig.chainSelector, message).call();
+
+                // Execute transfer
+                updateMessage('Sending cross-chain transfer...', 'warning');
+                const tx = await routerContract.methods.ccipSend(destChainConfig.chainSelector, message).send({
+                    from: account,
+                    value: fee,
+                    gas: web3.utils.toHex(3000000)
+                });
+
+                // Success
+                updateMessage(
+                    `✓ Transfer initiated! Transaction: ${tx.transactionHash.slice(0, 10)}...${tx.transactionHash.slice(-8)}`,
+                    'success'
+                );
+                document.getElementById('fromAmount').value = '';
+
+                // Refresh balance
+                await updateBalance();
+
+            } catch (error) {
+                console.error('Transfer error:', error);
+                if (error.code === 4001) {
+                    updateMessage('Transaction rejected by user.', 'error');
+                } else {
+                    updateMessage(`Transfer failed: ${error.message}`, 'error');
+                }
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // ============================================================================
+        // Direction Switcher
+        // ============================================================================
+        function switchDirection(direction) {
+            currentDirection = direction;
+            if (direction === 'bsc-to-eth') {
+                fromChain = 'BSC';
+                toChain = 'Ethereum';
+            } else {
+                fromChain = 'Ethereum';
+                toChain = 'BSC';
+            }
+
+            updateChainDisplay();
+            document.getElementById('fromAmount').value = '';
+            document.getElementById('receiverAddress').value = '';
+            updateMessage('Ready to bridge your SOU tokens', 'info');
+
+            // Update button states
+            document.querySelectorAll('.chain-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.direction === direction) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Reconnect to the new chain if wallet is connected
+            if (web3 && account) {
+                switchNetwork(fromChain).then(() => {
+                    initializeContracts();
+                    updateBalance();
+                    showStatus(`Switched to ${fromChain}`);
+                    setTimeout(hideStatus, 2000);
+                }).catch(error => {
+                    console.error('Failed to switch network:', error);
+                });
+            }
+        }
+
+        // ============================================================================
+        // Event Listeners
+        // ============================================================================
+        document.getElementById('connectWalletButton').addEventListener('click', connectWallet);
+
+        document.querySelectorAll('.chain-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                switchDirection(btn.dataset.direction);
+            });
+        });
+
+        // Listen for account changes
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length === 0) {
+                    account = null;
+                    document.getElementById('connectWalletButton').textContent = 'Connect Wallet';
+                    document.getElementById('connectWalletButton').classList.remove('connected');
+                    hideStatus();
+                    updateMessage('Wallet disconnected', 'warning');
+                } else {
+                    account = accounts[0];
+                    updateBalance();
+                }
+            });
+
+            window.ethereum.on('chainChanged', () => {
+                window.location.reload();
+            });
+        }
+
+        // Initialize
+        updateChainDisplay();
+    </script>
+</body>
+</html>
