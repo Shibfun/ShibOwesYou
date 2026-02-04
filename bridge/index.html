@@ -1249,7 +1249,12 @@
         // ============================================================================
         // Chain Management
         // ============================================================================
+        let isSwitchingNetwork = false;
+        
         async function switchNetwork(chain) {
+            if (isSwitchingNetwork) return;
+            isSwitchingNetwork = true;
+            
             const chainConfig = CHAINS[chain];
             try {
                 await window.ethereum.request({
@@ -1258,31 +1263,43 @@
                 });
             } catch (switchError) {
                 if (switchError.code === 4902) {
-                    await window.ethereum.request({
-                        method: 'wallet_addEthereumChain',
-                        params: [{
-                            chainId: `0x${chainConfig.chainId.toString(16)}`,
-                            chainName: chainConfig.chainName,
-                            rpcUrls: [chainConfig.rpcUrl],
-                            nativeCurrency: {
-                                name: chain === 'BSC' ? 'BNB' : 'ETH',
-                                symbol: chain === 'BSC' ? 'BNB' : 'ETH',
-                                decimals: 18
-                            },
-                            blockExplorerUrls: [chainConfig.explorerUrl]
-                        }]
-                    });
-                } else {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: `0x${chainConfig.chainId.toString(16)}`,
+                                chainName: chainConfig.chainName,
+                                rpcUrls: [chainConfig.rpcUrl],
+                                nativeCurrency: {
+                                    name: chain === 'BSC' ? 'BNB' : 'ETH',
+                                    symbol: chain === 'BSC' ? 'BNB' : 'ETH',
+                                    decimals: 18
+                                },
+                                blockExplorerUrls: [chainConfig.explorerUrl]
+                            }]
+                        });
+                    } catch (addError) {
+                        isSwitchingNetwork = false;
+                        throw addError;
+                    }
+                } else if (switchError.code !== 4001) {
+                    isSwitchingNetwork = false;
                     throw switchError;
                 }
+            } finally {
+                isSwitchingNetwork = false;
             }
         }
 
         async function initializeContracts() {
-            const chainConfig = CHAINS[fromChain];
-            routerContract = new web3.eth.Contract(ROUTER_ABI, chainConfig.routerAddress);
-            const tokenAddress = TOKEN_CONFIG.addresses[fromChain];
-            tokenContract = new web3.eth.Contract(ERC20_ABI, tokenAddress);
+            try {
+                const chainConfig = CHAINS[fromChain];
+                routerContract = new web3.eth.Contract(ROUTER_ABI, chainConfig.routerAddress);
+                const tokenAddress = TOKEN_CONFIG.addresses[fromChain];
+                tokenContract = new web3.eth.Contract(ERC20_ABI, tokenAddress);
+            } catch (error) {
+                console.error('Error initializing contracts:', error);
+            }
         }
 
         // ============================================================================
@@ -1302,7 +1319,11 @@
 
         function setPercentage(percentage) {
             if (!fromBalance || fromBalance === '0') return;
-            const amount = (parseFloat(fromBalance) * percentage) / 100;
+            let amount = (parseFloat(fromBalance) * percentage) / 100;
+            // Reserve 0.1 SOU for MAX button
+            if (percentage === 100) {
+                amount = Math.max(0, parseFloat(fromBalance) - 0.1);
+            }
             document.getElementById('fromAmount').value = amount.toFixed(4);
         }
 
@@ -1457,14 +1478,20 @@
             });
 
             if (web3 && account) {
-                switchNetwork(fromChain).then(() => {
-                    initializeContracts();
-                    updateBalance();
-                    showStatus(`Switched to ${fromChain}`);
-                    setTimeout(hideStatus, 2000);
-                }).catch(error => {
-                    console.error('Failed to switch network:', error);
-                });
+                // Debounce network switch to prevent multiple rapid requests
+                if (!isSwitchingNetwork) {
+                    switchNetwork(fromChain).then(() => {
+                        initializeContracts();
+                        updateBalance();
+                        showStatus(`Switched to ${fromChain}`);
+                        setTimeout(hideStatus, 2000);
+                    }).catch(error => {
+                        if (error.code !== 4001) {
+                            console.error('Failed to switch network:', error);
+                            updateMessage('Failed to switch network', 'error');
+                        }
+                    });
+                }
             }
         }
 
@@ -1494,7 +1521,12 @@
             });
 
             window.ethereum.on('chainChanged', () => {
-                window.location.reload();
+                // Smooth chain change without full reload
+                isSwitchingNetwork = false;
+                initializeContracts();
+                updateBalance();
+                showStatus(`Network changed to ${fromChain}`);
+                setTimeout(hideStatus, 1500);
             });
         }
 
