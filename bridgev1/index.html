@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOU Cross-Chain Bridge & Swap</title>
+    <link rel="icon" type="image/png" href="https://www.woofswap.finance/image/tokens/sou.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #667eea; --primary-light: #8b9eff; --primary-dark: #5568d3;
+            --accent: #764ba2; --accent-light: #9b7ec4; --success: #10b981;
+            --warning: #f59e0b; --error: #ef4444; --dark-1: #0a0e27;
+            --dark-2: #0f1629; --dark-3: #1a1f3a; --dark-4: #232d4d;
+            --text-primary: #f8fafc; --text-secondary: #cbd5e1; --text-tertiary: #94a3b8;
+            --border: #334155; --border-light: #475569; --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { width: 100%; height: 100%; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, var(--dark-1) 0%, var(--dark-2) 50%, var(--dark-3) 100%);
+            color: var(--text-primary); min-height: 100vh; position: relative;
+            overflow-x: hidden; display: flex; flex-direction: column;
+        }
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.08) 0%, transparent 50%);
+            pointer-events: none; z-index: 0;
+        }
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(20px); border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+            padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; z-index: 1000;
+        }
+        .logo-nav { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 800; color: var(--text-primary); text-decoration: none; }
+        .logo-nav img { width: 32px; height: 32px; border-radius: 8px; }
+        .nav-links { display: flex; gap: 40px; align-items: center; }
+        .nav-links a { color: var(--text-secondary); text-decoration: none; font-weight: 500; font-size: 14px; transition: var(--transition); }
+        .nav-links a:hover { color: var(--primary-light); }
+        .wrapper { position: relative; z-index: 1; padding-top: 80px; flex: 1; }
+        .hero { padding: 80px 40px; text-align: center; max-width: 1200px; margin: 0 auto; }
+        .hero-content { margin-bottom: 60px; }
+        .hero-badge { display: inline-block; padding: 8px 16px; background: rgba(102, 126, 234, 0.15); border: 1px solid rgba(102, 126, 234, 0.3); border-radius: 20px; font-size: 12px; font-weight: 600; color: var(--primary-light); margin-bottom: 20px; letter-spacing: 0.5px; }
+        .hero h1 { font-size: 56px; font-weight: 800; line-height: 1.2; margin-bottom: 20px; background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero p { font-size: 18px; color: var(--text-secondary); max-width: 600px; margin: 0 auto 40px; line-height: 1.6; }
+        .btn-primary { padding: 16px 40px; background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); border: none; border-radius: 12px; color: white; font-size: 16px; font-weight: 700; cursor: pointer; transition: var(--transition); box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4); font-family: 'Outfit', sans-serif; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6); }
+        .app-container { max-width: 560px; margin: 0 auto; padding: 0 40px 80px; display: flex; flex-direction: column; gap: 32px; }
+        .bridge-card { background: rgba(26, 31, 58, 0.85); backdrop-filter: blur(30px); border-radius: 24px; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1); border: 1px solid rgba(102, 126, 234, 0.15); overflow: hidden; }
+        .bridge-header { background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); padding: 40px; text-align: center; position: relative; overflow: hidden; }
+        .bridge-header::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2) 0%, transparent 40%), radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 40%); pointer-events: none; }
+        .bridge-header-content { position: relative; z-index: 1; }
+        .bridge-title { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+        .bridge-subtitle { font-size: 13px; opacity: 0.9; font-weight: 500; }
+        .bridge-content { padding: 40px; }
+        .connect-button { width: 100%; padding: 16px 24px; background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); border: none; border-radius: 12px; color: white; font-size: 16px; font-weight: 700; cursor: pointer; transition: var(--transition); box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4); font-family: 'Outfit', sans-serif; }
+        .connect-button:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(102, 126, 234, 0.6); }
+        .connect-button.connected { background: linear-gradient(135deg, var(--success) 0%, #059669 100%); }
+        .status-info { margin-top: 12px; padding: 12px 16px; background: rgba(102, 126, 234, 0.12); border: 1px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 13px; color: var(--primary-light); display: none; align-items: center; gap: 10px; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary-light); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .chain-selector { margin-bottom: 28px; display: flex; gap: 10px; background: rgba(35, 45, 77, 0.6); padding: 8px; border-radius: 12px; border: 1px solid var(--border); }
+        .chain-btn { flex: 1; padding: 10px 14px; border: 2px solid transparent; background: transparent; border-radius: 10px; color: var(--text-secondary); font-size: 12px; font-weight: 700; cursor: pointer; transition: var(--transition); font-family: 'Outfit', sans-serif; }
+        .chain-btn.active { background: linear-gradient(135deg, rgba(102, 126, 234, 0.25) 0%, rgba(118, 75, 162, 0.25) 100%); border-color: var(--primary); color: var(--primary-light); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2); }
+        .chain-btn:hover:not(.active) { color: var(--text-primary); background: rgba(102, 126, 234, 0.08); }
+        .bridge-direction { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; gap: 12px; }
+        .chain-box { flex: 1; background: rgba(35, 45, 77, 0.6); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
+        .chain-box.from { border: 2px solid var(--primary); background: rgba(102, 126, 234, 0.1); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15); }
+        .chain-name { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 6px; font-weight: 700; }
+        .chain-label { font-size: 16px; font-weight: 800; color: var(--text-primary); }
+        .arrow-icon { flex-shrink: 0; width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3); animation: slideArrow 2s infinite; }
+        @keyframes slideArrow { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(5px); } }
+        .input-section { margin-bottom: 24px; }
+        .input-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 11px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; }
+        .balance-display { color: var(--primary-light); font-size: 11px; font-weight: 700; }
+        .input-box { background: rgba(35, 45, 77, 0.6); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; transition: var(--transition); }
+        .input-box:focus-within { border-color: var(--primary); background: rgba(102, 126, 234, 0.08); box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+        .token-display { display: flex; align-items: center; gap: 8px; padding: 7px 11px; background: rgba(102, 126, 234, 0.15); border-radius: 10px; white-space: nowrap; border: 1px solid rgba(102, 126, 234, 0.3); }
+        .token-logo { width: 26px; height: 26px; border-radius: 50%; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .token-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .token-name { font-weight: 700; font-size: 13px; color: var(--text-primary); }
+        input[type="number"] { flex: 1; background: transparent; border: none; color: var(--text-primary); font-size: 16px; font-weight: 700; outline: none; font-family: 'Space Mono', monospace; }
+        input[type="number"]::placeholder { color: var(--text-tertiary); }
+        .percentage-buttons { display: flex; gap: 8px; margin-top: 10px; }
+        .percentage-btn { flex: 1; padding: 8px 10px; background: rgba(35, 45, 77, 0.6); border: 1px solid var(--border); border-radius: 10px; color: var(--text-secondary); font-size: 11px; font-weight: 700; cursor: pointer; transition: var(--transition); font-family: 'Outfit', sans-serif; }
+        .percentage-btn:hover { background: rgba(102, 126, 234, 0.15); border-color: var(--primary); color: var(--primary-light); box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2); }
+        .action-button { width: 100%; padding: 16px 20px; background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); border: none; border-radius: 12px; color: white; font-size: 15px; font-weight: 700; cursor: pointer; transition: var(--transition); box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4); margin-bottom: 14px; font-family: 'Outfit', sans-serif; }
+        .action-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(102, 126, 234, 0.6); }
+        .action-button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .message-section { padding: 13px 15px; background: rgba(102, 126, 234, 0.1); border: 1px solid rgba(102, 126, 234, 0.3); border-radius: 11px; font-size: 12px; color: var(--primary-light); text-align: center; min-height: 42px; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+        .message-section.success { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); color: var(--success); }
+        .message-section.error { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: var(--error); }
+        .message-section.warning { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); color: var(--warning); }
+        .footer { background: linear-gradient(135deg, rgba(10, 14, 39, 0.95) 0%, rgba(15, 22, 41, 0.95) 100%); border-top: 1px solid rgba(102, 126, 234, 0.1); padding: 60px 40px; margin-top: auto; position: relative; z-index: 1; }
+        .footer-content { max-width: 1200px; margin: 0 auto; }
+        .footer-top { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px; padding-bottom: 40px; border-bottom: 1px solid rgba(102, 126, 234, 0.1); }
+        .footer-section h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--text-primary); }
+        .footer-section p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+        .social-links { display: flex; gap: 12px; flex-wrap: wrap; }
+        .social-link { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: rgba(102, 126, 234, 0.12); border: 1px solid rgba(102, 126, 234, 0.3); border-radius: 10px; color: var(--primary-light); text-decoration: none; font-size: 12px; font-weight: 600; transition: var(--transition); }
+        .social-link:hover { background: rgba(102, 126, 234, 0.25); border-color: var(--primary); color: var(--text-primary); transform: translateY(-2px); }
+        .footer-bottom { text-align: center; padding-top: 20px; }
+        .footer-bottom p { font-size: 12px; color: var(--text-tertiary); margin-bottom: 8px; }
+        .footer-powered { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; color: var(--primary-light); font-weight: 600; }
+        .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(102, 126, 234, 0.3); border-top-color: var(--primary-light); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 768px) {
+            nav { padding: 12px 20px; }
+            .hero h1 { font-size: 36px; }
+            .hero p { font-size: 16px; }
+            .app-container { padding: 0 20px 60px; }
+            .bridge-header { padding: 30px; }
+            .bridge-content { padding: 28px; }
+            .chain-selector { gap: 8px; padding: 6px; }
+            .chain-btn { padding: 8px 10px; font-size: 11px; }
+            .bridge-direction { gap: 10px; margin-bottom: 24px; }
+            .chain-box { padding: 12px; }
+            .chain-label { font-size: 14px; }
+            .arrow-icon { width: 36px; height: 36px; font-size: 16px; }
+            .input-box { padding: 12px 14px; }
+            .token-display { padding: 6px 10px; }
+            .token-logo { width: 24px; height: 24px; }
+            .token-name { font-size: 12px; }
+            input[type="number"] { font-size: 14px; }
+            .percentage-btn { padding: 7px 8px; font-size: 10px; }
+            .action-button { padding: 14px 16px; font-size: 14px; }
+            .message-section { padding: 12px 14px; font-size: 11px; min-height: 40px; }
+            .footer { padding: 40px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="#" class="logo-nav">
+            <img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU">
+            SOU Bridge
+        </a>
+        <div class="nav-links">
+            <a href="#app-container" onclick="event.preventDefault(); document.getElementById('app-container').scrollIntoView({ behavior: 'smooth' });">App</a>
+            <a href="https://docs.chain.link/ccip" target="_blank">CCIP Docs</a>
+        </div>
+    </nav>
+
+    <div class="wrapper">
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-badge">🚀 Cross-Chain Powered by Chainlink CCIP</div>
+                <h1>SOU Cross-Chain Swap & Bridge</h1>
+                <p>Swap SOU to WSOU, then bridge your tokens between Ethereum and Shibarium with industry-leading security and speed.</p>
+                <button class="btn-primary" onclick="document.getElementById('app-container').scrollIntoView({ behavior: 'smooth' })">Launch App</button>
+            </div>
+        </section>
+
+        <div id="app-container" class="app-container">
+            <div class="bridge-card">
+                 <div class="bridge-content" style="padding-bottom: 20px;">
+                    <div class="connect-section" style="margin-bottom: 0;">
+                        <button class="connect-button" id="connectWalletButton">Connect Wallet</button>
+                        <div class="status-info" id="statusInfo">
+                            <span class="status-dot"></span>
+                            <span id="statusText">Connecting...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <section id="swap-section" class="bridge-card">
+                <div class="bridge-header">
+                    <div class="bridge-header-content">
+                        <div style="font-size: 32px; margin-bottom: 12px;">🔄</div>
+                        <h2 class="bridge-title">Step 1: Swap SOU for WSOU</h2>
+                        <p class="bridge-subtitle">WSOU is required for bridging. Swaps occur on Ethereum.</p>
+                    </div>
+                </div>
+                <div class="bridge-content">
+                    <div class="input-section">
+                        <div class="input-label">
+                            <span>Amount to Swap</span>
+                            <span class="balance-display" id="souBalanceDisplay">SOU Balance: 0</span>
+                        </div>
+                        <div class="input-box">
+                            <input type="number" id="swapAmount" placeholder="0.0" step="any" min="0">
+                            <div class="token-display">
+                                <div class="token-logo"><img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU"></div>
+                                <span class="token-name">SOU</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="action-button" id="swapButton">Swap for WSOU</button>
+                    <div class="message-section" id="swapMessageSection">
+                        Enter an amount to swap
+                    </div>
+                </div>
+            </section>
+
+            <section id="bridge-section" class="bridge-card">
+                <div class="bridge-header">
+                    <div class="bridge-header-content">
+                        <div style="font-size: 32px; margin-bottom: 12px;">🌉</div>
+                        <h2 class="bridge-title">Step 2: Bridge WSOU</h2>
+                        <p class="bridge-subtitle">Transfer WSOU tokens between Ethereum and Shibarium</p>
+                    </div>
+                </div>
+                <div class="bridge-content">
+                    <div class="chain-selector">
+                        <button class="chain-btn active" data-direction="eth-to-shib">ETH → Shibarium</button>
+                        <button class="chain-btn" data-direction="shib-to-eth">Shibarium → ETH</button>
+                    </div>
+                    <div class="bridge-direction">
+                        <div class="chain-box from">
+                            <div class="chain-name">From</div>
+                            <div class="chain-label" id="fromChainDisplay">ETH</div>
+                        </div>
+                        <div class="arrow-icon">→</div>
+                        <div class="chain-box">
+                            <div class="chain-name">To</div>
+                            <div class="chain-label" id="toChainDisplay">Shibarium</div>
+                        </div>
+                    </div>
+                    <div class="input-section">
+                        <div class="input-label">
+                            <span>Amount to Bridge</span>
+                            <span class="balance-display" id="wsouBalanceDisplay">WSOU Balance: 0</span>
+                        </div>
+                        <div class="input-box">
+                            <input type="number" id="bridgeAmount" placeholder="0.0" step="any" min="0">
+                            <div class="token-display">
+                                <div class="token-logo"><img src="https://www.woofswap.finance/image/tokens/sou.png" alt="WSOU"></div>
+                                <span class="token-name">WSOU</span>
+                            </div>
+                        </div>
+                        <div class="percentage-buttons">
+                            <button class="percentage-btn" data-token="wsou" data-percentage="25">25%</button>
+                            <button class="percentage-btn" data-token="wsou" data-percentage="50">50%</button>
+                            <button class="percentage-btn" data-token="wsou" data-percentage="75">75%</button>
+                            <button class="percentage-btn" data-token="wsou" data-percentage="100">MAX</button>
+                        </div>
+                    </div>
+                    <button class="action-button" id="bridgeButton">Initiate Bridge</button>
+                    <div class="message-section" id="bridgeMessageSection">
+                        Ready to bridge your WSOU tokens
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-top">
+                <div class="footer-section">
+                    <h3>About SOU Bridge</h3>
+                    <p>Securely swap SOU and bridge WSOU tokens between Ethereum and Shibarium, powered by Chainlink CCIP.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Community</h3>
+                    <div class="social-links">
+                        <a href="https://x.com/ShibOwesYou" target="_blank" class="social-link">𝕏 Twitter</a>
+                        <a href="https://t.me/ShibOwesYou" target="_blank" class="social-link">📱 Telegram</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-powered">
+                    <span>🔗 Powered by Chainlink CCIP</span>
+                </div>
+                <p>🔒 Secure Cross-Chain Swap & Bridge</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <script>
+        const SOU_TOKEN_ADDRESS = '0xDEA2a2A166e2FDC47b934bee68E6032F8f1Ca09C';
+        const WSOU_ETH_ADDRESS = '0x5c005d074e25b89db97a32087c06d154d8cb2d5b';
+        const WSOU_SHIB_ADDRESS = '0x5e1aee526d1aa049b4d95e5b68ae7bb556e2d799';
+        
+        const CHAINS = {
+            Ethereum: {
+                chainId: 1,
+                chainName: 'Ethereum',
+                rpcUrl: 'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa44561',
+                router: '0x80226fc0Ee2b096224EeAc085Bb9a8cba1146f7D',
+                selector: '5009297550715157269',
+                token: WSOU_ETH_ADDRESS
+            },
+            Shibarium: {
+                chainId: 109,
+                chainName: 'Shibarium',
+                rpcUrl: 'https://rpc.shibrpc.com',
+                router: '0xc2CA5d5C17911e4B838194b51585DdF8fe5116C1',
+                selector: '3993510008929295315',
+                token: WSOU_SHIB_ADDRESS
+            }
+        };
+
+        const ERC20_ABI = [
+            { "constant": true, "inputs": [{ "name": "_owner", "type": "address" }], "name": "balanceOf", "outputs": [{ "name": "balance", "type": "uint256" }], "type": "function" },
+            { "constant": false, "inputs": [{ "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" }], "name": "approve", "outputs": [{ "name": "success", "type": "bool" }], "type": "function" },
+            { "constant": true, "inputs": [{ "name": "_owner", "type": "address" }, { "name": "_spender", "type": "address" }], "name": "allowance", "outputs": [{ "name": "remaining", "type": "uint256" }], "type": "function" }
+        ];
+
+        const WSOU_ABI = [
+            ...ERC20_ABI,
+            { "inputs": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }], "name": "swapIn", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+            { "inputs": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }], "name": "swapOut", "outputs": [], "stateMutability": "nonpayable", "type": "function" }
+        ];
+
+        const ROUTER_ABI = [
+            { "inputs": [{ "internalType": "uint64", "name": "destinationChainSelector", "type": "uint64" }, { "components": [{ "internalType": "bytes", "name": "receiver", "type": "bytes" }, { "internalType": "bytes", "name": "data", "type": "bytes" }, { "components": [{ "internalType": "address", "name": "token", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }], "internalType": "struct Client.EVMTokenAmount[]", "name": "tokenAmounts", "type": "tuple[]" }, { "internalType": "address", "name": "feeToken", "type": "address" }, { "internalType": "bytes", "name": "extraArgs", "type": "bytes" }], "internalType": "struct Client.EVM2AnyMessage", "name": "message", "type": "tuple" }], "name": "ccipSend", "outputs": [{ "internalType": "bytes32", "name": "messageId", "type": "bytes32" }], "stateMutability": "payable", "type": "function" },
+            { "inputs": [{ "internalType": "uint64", "name": "destinationChainSelector", "type": "uint64" }, { "components": [{ "internalType": "bytes", "name": "receiver", "type": "bytes" }, { "internalType": "bytes", "name": "data", "type": "bytes" }, { "components": [{ "internalType": "address", "name": "token", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }], "internalType": "struct Client.EVMTokenAmount[]", "name": "tokenAmounts", "type": "tuple[]" }, { "internalType": "address", "name": "feeToken", "type": "address" }, { "internalType": "bytes", "name": "extraArgs", "type": "bytes" }], "internalType": "struct Client.EVM2AnyMessage", "name": "message", "type": "tuple" }], "name": "getFee", "outputs": [{ "internalType": "uint256", "name": "fee", "type": "uint256" }], "stateMutability": "view", "type": "function" }
+        ];
+
+        let web3, account, fromChain = 'Ethereum', toChain = 'Shibarium';
+
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    account = accounts[0];
+                    web3 = new Web3(window.ethereum);
+                    document.getElementById('connectWalletButton').textContent = account.substring(0, 6) + '...' + account.substring(38);
+                    document.getElementById('connectWalletButton').classList.add('connected');
+                    updateBalances();
+                } catch (err) { console.error(err); }
+            } else { alert('Please install MetaMask'); }
+        }
+
+        async function updateBalances() {
+            if (!account) return;
+            const souContract = new web3.eth.Contract(ERC20_ABI, SOU_TOKEN_ADDRESS);
+            const wsouContract = new web3.eth.Contract(ERC20_ABI, CHAINS[fromChain].token);
+            
+            const souBal = await souContract.methods.balanceOf(account).call();
+            const wsouBal = await wsouContract.methods.balanceOf(account).call();
+            
+            document.getElementById('souBalanceDisplay').textContent = `SOU Balance: ${parseFloat(web3.utils.fromWei(souBal)).toFixed(4)}`;
+            document.getElementById('wsouBalanceDisplay').textContent = `WSOU Balance: ${parseFloat(web3.utils.fromWei(wsouBal)).toFixed(4)}`;
+        }
+
+        async function switchDirection(dir) {
+            if (dir === 'eth-to-shib') {
+                fromChain = 'Ethereum'; toChain = 'Shibarium';
+            } else {
+                fromChain = 'Shibarium'; toChain = 'Ethereum';
+            }
+            document.querySelectorAll('.chain-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-direction="${dir}"]`).classList.add('active');
+            document.getElementById('fromChainDisplay').textContent = fromChain;
+            document.getElementById('toChainDisplay').textContent = toChain;
+            updateBalances();
+        }
+
+        async function handleSwap() {
+            if (!account) return alert('Connect wallet');
+            const amount = document.getElementById('swapAmount').value;
+            if (!amount || amount <= 0) return;
+            const weiAmount = web3.utils.toWei(amount, 'ether');
+            const souContract = new web3.eth.Contract(ERC20_ABI, SOU_TOKEN_ADDRESS);
+            const wsouContract = new web3.eth.Contract(WSOU_ABI, WSOU_ETH_ADDRESS);
+            
+            try {
+                const allowance = await souContract.methods.allowance(account, WSOU_ETH_ADDRESS).call();
+                if (BigInt(allowance) < BigInt(weiAmount)) {
+                    await souContract.methods.approve(WSOU_ETH_ADDRESS, weiAmount).send({ from: account });
+                }
+                await wsouContract.methods.swapIn(weiAmount).send({ from: account });
+                updateBalances();
+            } catch (err) { console.error(err); }
+        }
+
+        async function handleBridge() {
+            if (!account) return alert('Connect wallet');
+            const amount = document.getElementById('bridgeAmount').value;
+            if (!amount || amount <= 0) return;
+            const weiAmount = web3.utils.toWei(amount, 'ether');
+            const config = CHAINS[fromChain];
+            const destConfig = CHAINS[toChain];
+            
+            const tokenContract = new web3.eth.Contract(ERC20_ABI, config.token);
+            const routerContract = new web3.eth.Contract(ROUTER_ABI, config.router);
+            
+            try {
+                const allowance = await tokenContract.methods.allowance(account, config.router).call();
+                if (BigInt(allowance) < BigInt(weiAmount)) {
+                    await tokenContract.methods.approve(config.router, weiAmount).send({ from: account });
+                }
+                
+                const message = {
+                    receiver: web3.eth.abi.encodeParameter('address', account),
+                    data: '0x',
+                    tokenAmounts: [{ token: config.token, amount: weiAmount }],
+                    feeToken: '0x0000000000000000000000000000000000000000',
+                    extraArgs: '0x97a657c90000000000000000000000000000000000000000000000000000000000030d40'
+                };
+                
+                const fee = await routerContract.methods.getFee(destConfig.selector, message).call();
+                await routerContract.methods.ccipSend(destConfig.selector, message).send({ from: account, value: fee });
+                updateBalances();
+            } catch (err) { console.error(err); }
+        }
+
+        document.getElementById('connectWalletButton').addEventListener('click', connectWallet);
+        document.getElementById('swapButton').addEventListener('click', handleSwap);
+        document.getElementById('bridgeButton').addEventListener('click', handleBridge);
+        document.querySelectorAll('.chain-btn').forEach(btn => btn.addEventListener('click', () => switchDirection(btn.dataset.direction)));
+    </script>
+</body>
+</html>
