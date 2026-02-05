@@ -110,7 +110,7 @@
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script>
         const CHAINS = {
-            ETH: { id: '0x1', name: 'Ethereum', rpc: 'https://mainnet.infura.io', selector: '5009297550715157269' },
+            ETH: { id: '0x1', name: 'Ethereum', rpc: 'https://cloudflare-eth.com', selector: '5009297550715157269' },
             SHIB: { id: '0x6d', name: 'Shibarium', rpc: 'https://www.shibrpc.com', selector: '3993510008929295315' }
         };
         // Ethereum Config
@@ -224,7 +224,7 @@
             const val = document.getElementById('swapInput').value; if (!val || val <= 0) return;
             const wei = web3.utils.toWei(val, 'ether');
             try {
-                document.getElementById('swapMsg').innerHTML = '<span class="spinner"></span> Approving...';
+                document.getElementById('swapMsg').innerHTML = '<span class="spinner"></span> Processing...';
                 await new web3.eth.Contract(ERC20_ABI, isSouToWsou?SOU_ETH:WSOU_ETH).methods.approve(WSOU_ETH, wei).send({ from: account });
                 const wsou = new web3.eth.Contract(WSOU_ABI, WSOU_ETH);
                 document.getElementById('swapMsg').innerHTML = '<span class="spinner"></span> Swapping...';
