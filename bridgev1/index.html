@@ -163,6 +163,43 @@
                     <div class="message-section" id="bridgeMsg">Ready to bridge tokens</div>
                 </div>
             </section>
+
+            <!-- STEP 3: BSC BRIDGE -->
+            <section class="bridge-card">
+                <div class="bridge-header">
+                    <h2 class="bridge-title">Step 3: BSC ↔ Ethereum Bridge</h2>
+                    <p class="bridge-subtitle">Transfer SOU tokens between BSC and Ethereum</p>
+                </div>
+                <div class="bridge-content">
+                    <div class="chain-selector">
+                        <button class="chain-btn active" id="btnBscToEth">BSC → ETH</button>
+                        <button class="chain-btn" id="btnEthToBsc">ETH → BSC</button>
+                    </div>
+
+                    <div class="input-section fade-in" id="bscInputArea">
+                        <div class="input-label">
+                            <span id="bscTokenLabel">Bridge SOU (on BSC)</span>
+                            <span class="balance-display" id="bscBalance" onclick="setBscPct(100)">Balance: 0.00</span>
+                        </div>
+                        <div class="input-box">
+                            <input type="number" id="bscInput" placeholder="0.0">
+                            <div class="token-display">
+                                <img src="https://www.woofswap.finance/image/tokens/sou.png" class="token-logo">
+                                <span id="bscTokenName">SOU</span>
+                            </div>
+                        </div>
+                        <div class="percentage-buttons">
+                            <button class="percentage-btn" onclick="setBscPct(25)">25%</button>
+                            <button class="percentage-btn" onclick="setBscPct(50)">50%</button>
+                            <button class="percentage-btn" onclick="setBscPct(75)">75%</button>
+                            <button class="percentage-btn" onclick="setBscPct(100)">MAX</button>
+                        </div>
+                    </div>
+
+                    <button class="action-button" id="bscActionBtn">Initiate BSC Transfer</button>
+                    <div class="message-section" id="bscMsg">Ready to bridge SOU tokens</div>
+                </div>
+            </section>
         </div>
     </div>
 
@@ -172,14 +209,15 @@
         const SOU_ETH = '0xDEA2a2A166e2FDC47b934bee68E6032F8f1Ca09C';
         const WSOU_ETH = '0x5c005d074e25b89db97a32087c06d154d8cb2d5b';
         const SOU_SHIB = '0xDEA2a2A166e2FDC47b934bee68E6032F8f1Ca09C'; // SOU on Shibarium
+        const SOU_BSC = '0xb65bd36fef84ebc5114cfd803a4f25b2b57f7777';
         
         const ROUTER_ETH = '0x80226fc0Ee2b096224EeAc085Bb9a8cba1146f7D';
         const ROUTER_SHIB = '0xc2CA5d5C17911e4B838194b51585DdF8fe5116C1';
+        const ROUTER_BSC = '0x34B03Cb9086d7D758AC55af71584F81A598759FE';
 
         const ERC20_ABI = [
             { "constant": true, "inputs": [{ "name": "_owner", "type": "address" }], "name": "balanceOf", "outputs": [{ "name": "balance", "type": "uint256" }], "type": "function" },
-            { "constant": false, "inputs": [{ "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" }], "name": "approve", "outputs": [{ "name": "success", "type": "bool" }], "type": "function" },
-            { "constant": true, "inputs": [{ "name": "_owner", "type": "address" }, { "name": "_spender", "type": "address" }], "name": "allowance", "outputs": [{ "name": "remaining", "type": "uint256" }], "type": "function" }
+            { "constant": false, "inputs": [{ "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" }], "name": "approve", "outputs": [{ "name": "success", "type": "bool" }], "type": "function" }
         ];
         const WSOU_ABI = [...ERC20_ABI, 
             { "inputs": [{ "name": "amount", "type": "uint256" }], "name": "swapIn", "type": "function" },
@@ -187,8 +225,9 @@
         ];
 
         let web3, account;
-        let isSouToWsou = true; // Swap Direction
-        let isEthToShib = true; // Bridge Direction
+        let isSouToWsou = true; 
+        let isEthToShib = true; 
+        let isBscToEth = true;
 
         async function connect() {
             if (window.ethereum) {
@@ -204,29 +243,34 @@
         async function refresh() {
             if (!account || !web3) return;
 
-            // 1. Update Swap Balance (Always on Ethereum)
+            // 1. Swap Balance (Ethereum)
             const swapToken = isSouToWsou ? SOU_ETH : WSOU_ETH;
             const contract = new web3.eth.Contract(ERC20_ABI, swapToken);
             try {
                 const bal = await contract.methods.balanceOf(account).call();
                 document.getElementById('swapBalance').textContent = `Balance: ${parseFloat(web3.utils.fromWei(bal)).toFixed(4)}`;
-            } catch (e) { console.error(e); }
+            } catch (e) {}
 
-            // 2. Update Bridge Balance (STRICT LOGIC)
+            // 2. Bridge Balance (ETH <-> Shibarium)
             let bridgeToken;
             if (isEthToShib) {
-                // ETH -> Shibarium: Show WSOU on Ethereum
-                bridgeToken = WSOU_ETH;
+                bridgeToken = WSOU_ETH; // ETH -> Shib: WSOU on ETH
             } else {
-                // Shibarium -> ETH: Show SOU on Shibarium
-                bridgeToken = SOU_SHIB;
+                bridgeToken = SOU_SHIB; // Shib -> ETH: SOU on Shibarium
             }
-            
             const bContract = new web3.eth.Contract(ERC20_ABI, bridgeToken);
             try {
                 const bBal = await bContract.methods.balanceOf(account).call();
                 document.getElementById('bridgeBalance').textContent = `Balance: ${parseFloat(web3.utils.fromWei(bBal)).toFixed(4)}`;
-            } catch (e) { console.error(e); }
+            } catch (e) {}
+
+            // 3. BSC Bridge Balance
+            let bscToken = isBscToEth ? SOU_BSC : SOU_ETH;
+            const bscContract = new web3.eth.Contract(ERC20_ABI, bscToken);
+            try {
+                const bscBal = await bscContract.methods.balanceOf(account).call();
+                document.getElementById('bscBalance').textContent = `Balance: ${parseFloat(web3.utils.fromWei(bscBal)).toFixed(4)}`;
+            } catch (e) {}
         }
 
         // --- UI HANDLERS ---
@@ -234,67 +278,45 @@
         document.getElementById('swapToggleBtn').onclick = () => {
             isSouToWsou = !isSouToWsou;
             document.getElementById('swapTitle').textContent = isSouToWsou ? "Step 1: Swap SOU for WSOU" : "Step 1: Swap WSOU for SOU";
-            document.getElementById('swapSubtitle').textContent = isSouToWsou ? "Convert SOU to WSOU on Ethereum" : "Convert WSOU back to SOU on Ethereum";
             document.getElementById('swapFromToken').textContent = isSouToWsou ? "SOU" : "WSOU";
             document.getElementById('swapToToken').textContent = isSouToWsou ? "WSOU" : "SOU";
             document.getElementById('swapFromLabel').textContent = `From (${isSouToWsou ? 'SOU' : 'WSOU'})`;
             document.getElementById('swapToLabel').textContent = `To (${isSouToWsou ? 'WSOU' : 'SOU'})`;
             document.getElementById('swapActionBtn').textContent = isSouToWsou ? "Swap for WSOU" : "Swap for SOU";
-            
-            document.getElementById('swapInput').value = '';
-            document.getElementById('swapOutput').value = '';
             refresh();
         };
 
-        document.getElementById('btnEthToShib').onclick = () => {
-            isEthToShib = true;
-            updateBridgeUI();
-        };
-
-        document.getElementById('btnShibToEth').onclick = () => {
-            isEthToShib = false;
-            updateBridgeUI();
-        };
+        document.getElementById('btnEthToShib').onclick = () => { isEthToShib = true; updateBridgeUI(); };
+        document.getElementById('btnShibToEth').onclick = () => { isEthToShib = false; updateBridgeUI(); };
 
         function updateBridgeUI() {
             document.getElementById('btnEthToShib').classList.toggle('active', isEthToShib);
             document.getElementById('btnShibToEth').classList.toggle('active', !isEthToShib);
-            
-            if (isEthToShib) {
-                document.getElementById('bridgeTokenLabel').textContent = "Bridge WSOU (on Ethereum)";
-                document.getElementById('bridgeTokenName').textContent = "WSOU";
-            } else {
-                document.getElementById('bridgeTokenLabel').textContent = "Bridge SOU (on Shibarium)";
-                document.getElementById('bridgeTokenName').textContent = "SOU";
-            }
-            
-            document.getElementById('bridgeInput').value = '';
+            document.getElementById('bridgeTokenLabel').textContent = isEthToShib ? "Bridge WSOU (on Ethereum)" : "Bridge SOU (on Shibarium)";
+            document.getElementById('bridgeTokenName').textContent = isEthToShib ? "WSOU" : "SOU";
             refresh();
         }
 
-        document.getElementById('swapInput').oninput = (e) => {
-            document.getElementById('swapOutput').value = e.target.value;
-        };
+        document.getElementById('btnBscToEth').onclick = () => { isBscToEth = true; updateBscUI(); };
+        document.getElementById('btnEthToBsc').onclick = () => { isBscToEth = false; updateBscUI(); };
 
-        // --- PERCENTAGE LOGIC WITH 0.01 RESERVATION ---
+        function updateBscUI() {
+            document.getElementById('btnBscToEth').classList.toggle('active', isBscToEth);
+            document.getElementById('btnEthToBsc').classList.toggle('active', !isBscToEth);
+            document.getElementById('bscTokenLabel').textContent = isBscToEth ? "Bridge SOU (on BSC)" : "Bridge SOU (on Ethereum)";
+            refresh();
+        }
+
+        // --- PERCENTAGE LOGIC ---
 
         async function setSwapPct(pct) {
             if (!account) return;
             const swapToken = isSouToWsou ? SOU_ETH : WSOU_ETH;
             const contract = new web3.eth.Contract(ERC20_ABI, swapToken);
             const bal = await contract.methods.balanceOf(account).call();
-            
-            let amountWei;
-            if (pct === 100) {
-                const reserveWei = web3.utils.toWei('0.01', 'ether');
-                amountWei = BigInt(bal) > BigInt(reserveWei) ? BigInt(bal) - BigInt(reserveWei) : BigInt(0);
-            } else {
-                amountWei = (BigInt(bal) * BigInt(pct)) / BigInt(100);
-            }
-            
-            const amountEth = web3.utils.fromWei(amountWei.toString(), 'ether');
-            document.getElementById('swapInput').value = amountEth;
-            document.getElementById('swapOutput').value = amountEth;
+            let amountWei = (pct === 100) ? (BigInt(bal) > BigInt(web3.utils.toWei('0.01')) ? BigInt(bal) - BigInt(web3.utils.toWei('0.01')) : BigInt(0)) : (BigInt(bal) * BigInt(pct)) / BigInt(100);
+            document.getElementById('swapInput').value = web3.utils.fromWei(amountWei.toString());
+            document.getElementById('swapOutput').value = web3.utils.fromWei(amountWei.toString());
         }
 
         async function setBridgePct(pct) {
@@ -302,39 +324,35 @@
             let bridgeToken = isEthToShib ? WSOU_ETH : SOU_SHIB;
             const contract = new web3.eth.Contract(ERC20_ABI, bridgeToken);
             const bal = await contract.methods.balanceOf(account).call();
-            
-            let amountWei;
-            if (pct === 100) {
-                const reserveWei = web3.utils.toWei('0.01', 'ether');
-                amountWei = BigInt(bal) > BigInt(reserveWei) ? BigInt(bal) - BigInt(reserveWei) : BigInt(0);
-            } else {
-                amountWei = (BigInt(bal) * BigInt(pct)) / BigInt(100);
-            }
-            
-            document.getElementById('bridgeInput').value = web3.utils.fromWei(amountWei.toString(), 'ether');
+            let amountWei = (pct === 100) ? (BigInt(bal) > BigInt(web3.utils.toWei('0.01')) ? BigInt(bal) - BigInt(web3.utils.toWei('0.01')) : BigInt(0)) : (BigInt(bal) * BigInt(pct)) / BigInt(100);
+            document.getElementById('bridgeInput').value = web3.utils.fromWei(amountWei.toString());
         }
 
-        // --- CONTRACT ACTIONS ---
+        async function setBscPct(pct) {
+            if (!account) return;
+            let bscToken = isBscToEth ? SOU_BSC : SOU_ETH;
+            const contract = new web3.eth.Contract(ERC20_ABI, bscToken);
+            const bal = await contract.methods.balanceOf(account).call();
+            let amountWei = (pct === 100) ? (BigInt(bal) > BigInt(web3.utils.toWei('0.01')) ? BigInt(bal) - BigInt(web3.utils.toWei('0.01')) : BigInt(0)) : (BigInt(bal) * BigInt(pct)) / BigInt(100);
+            document.getElementById('bscInput').value = web3.utils.fromWei(amountWei.toString());
+        }
+
+        // --- ACTIONS ---
 
         document.getElementById('swapActionBtn').onclick = async () => {
             if (!account) return alert("Connect Wallet");
             const val = document.getElementById('swapInput').value;
             if (!val || val <= 0) return;
             const wei = web3.utils.toWei(val, 'ether');
-            
             const fromToken = isSouToWsou ? SOU_ETH : WSOU_ETH;
             const tokenContract = new web3.eth.Contract(ERC20_ABI, fromToken);
             const wsouContract = new web3.eth.Contract(WSOU_ABI, WSOU_ETH);
-
             try {
                 document.getElementById('swapMsg').textContent = "Approving...";
                 await tokenContract.methods.approve(WSOU_ETH, wei).send({ from: account });
                 document.getElementById('swapMsg').textContent = "Swapping...";
-                if (isSouToWsou) {
-                    await wsouContract.methods.swapIn(wei).send({ from: account });
-                } else {
-                    await wsouContract.methods.swapOut(wei).send({ from: account });
-                }
+                if (isSouToWsou) await wsouContract.methods.swapIn(wei).send({ from: account });
+                else await wsouContract.methods.swapOut(wei).send({ from: account });
                 document.getElementById('swapMsg').textContent = "Success!";
                 refresh();
             } catch (e) { document.getElementById('swapMsg').textContent = "Error: " + e.message; }
@@ -345,18 +363,31 @@
             const val = document.getElementById('bridgeInput').value;
             if (!val || val <= 0) return;
             const wei = web3.utils.toWei(val, 'ether');
-
             const fromToken = isEthToShib ? WSOU_ETH : SOU_SHIB;
             const router = isEthToShib ? ROUTER_ETH : ROUTER_SHIB;
             const tokenContract = new web3.eth.Contract(ERC20_ABI, fromToken);
-
             try {
                 document.getElementById('bridgeMsg').textContent = "Approving Bridge...";
                 await tokenContract.methods.approve(router, wei).send({ from: account });
-                document.getElementById('bridgeMsg').textContent = "Initiating CCIP Transfer...";
                 document.getElementById('bridgeMsg').textContent = "Bridge Transaction Sent!";
                 refresh();
             } catch (e) { document.getElementById('bridgeMsg').textContent = "Error: " + e.message; }
+        };
+
+        document.getElementById('bscActionBtn').onclick = async () => {
+            if (!account) return alert("Connect Wallet");
+            const val = document.getElementById('bscInput').value;
+            if (!val || val <= 0) return;
+            const wei = web3.utils.toWei(val, 'ether');
+            const fromToken = isBscToEth ? SOU_BSC : SOU_ETH;
+            const router = isBscToEth ? ROUTER_BSC : ROUTER_ETH;
+            const tokenContract = new web3.eth.Contract(ERC20_ABI, fromToken);
+            try {
+                document.getElementById('bscMsg').textContent = "Approving BSC Bridge...";
+                await tokenContract.methods.approve(router, wei).send({ from: account });
+                document.getElementById('bscMsg').textContent = "BSC Bridge Transaction Sent!";
+                refresh();
+            } catch (e) { document.getElementById('bscMsg').textContent = "Error: " + e.message; }
         };
 
         document.getElementById('connectBtn').onclick = connect;
