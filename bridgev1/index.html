@@ -8,339 +8,117 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #667eea;
-            --primary-light: #8b9eff;
-            --primary-dark: #5568d3;
-            --accent: #764ba2;
-            --accent-light: #9b7ec4;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --error: #ef4444;
-            --dark-1: #0a0e27;
-            --dark-2: #0f1629;
-            --dark-3: #1a1f3a;
-            --dark-4: #232d4d;
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --text-tertiary: #94a3b8;
-            --border: #334155;
-            --border-light: #475569;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --primary: #667eea; --primary-light: #8b9eff; --primary-dark: #5568d3;
+            --accent: #764ba2; --accent-light: #9b7ec4; --success: #10b981;
+            --warning: #f59e0b; --error: #ef4444; --dark-1: #0a0e27;
+            --dark-2: #0f1629; --dark-3: #1a1f3a; --dark-4: #232d4d;
+            --text-primary: #f8fafc; --text-secondary: #cbd5e1; --text-tertiary: #94a3b8;
+            --border: #334155; --border-light: #475569; --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { width: 100%; height: 100%; }
         body {
             font-family: 'Outfit', sans-serif;
             background: linear-gradient(135deg, var(--dark-1) 0%, var(--dark-2) 50%, var(--dark-3) 100%);
-            color: var(--text-primary);
-            min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
+            color: var(--text-primary); min-height: 100vh; position: relative;
+            overflow-x: hidden; display: flex; flex-direction: column;
         }
-
         body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.08) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.08) 0%, transparent 50%);
+            pointer-events: none; z-index: 0;
         }
-
         nav {
-            position: fixed; top: 0; left: 0; right: 0;
-            background: rgba(10, 14, 39, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
-            padding: 16px 40px;
-            display: flex; justify-content: space-between; align-items: center;
-            z-index: 1000;
+            position: fixed; top: 0; left: 0; right: 0; background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(20px); border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+            padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; z-index: 1000;
         }
-
-        .logo-nav {
-            display: flex; align-items: center; gap: 12px;
-            font-size: 20px; font-weight: 800; color: var(--text-primary); text-decoration: none;
-        }
-
+        .logo-nav { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 800; color: var(--text-primary); text-decoration: none; }
         .logo-nav img { width: 32px; height: 32px; border-radius: 8px; }
-
         .wrapper { position: relative; z-index: 1; padding-top: 80px; flex: 1; }
-
-        .app-container {
-            max-width: 560px;
-            margin: 0 auto;
-            padding: 40px 20px 80px;
-            display: flex;
-            flex-direction: column;
-            gap: 32px;
-        }
-
-        .card {
-            background: rgba(26, 31, 58, 0.85);
-            backdrop-filter: blur(30px);
-            border-radius: 24px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(102, 126, 234, 0.15);
-            overflow: hidden;
-        }
-
-        .card-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            padding: 30px;
-            text-align: center;
-            position: relative;
-        }
-
+        .app-container { max-width: 560px; margin: 0 auto; padding: 40px 20px 80px; display: flex; flex-direction: column; gap: 32px; }
+        .card { background: rgba(26, 31, 58, 0.85); backdrop-filter: blur(30px); border-radius: 24px; border: 1px solid rgba(102, 126, 234, 0.15); overflow: hidden; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6); }
+        .card-header { background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); padding: 30px; text-align: center; }
         .card-title { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
-        .card-subtitle { font-size: 12px; opacity: 0.9; font-weight: 500; }
-
+        .card-subtitle { font-size: 12px; opacity: 0.9; }
         .card-content { padding: 30px; }
-
-        .connect-button {
-            width: 100%; padding: 16px;
-            background: var(--dark-3);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: white; font-weight: 700; cursor: pointer;
-            transition: var(--transition);
-        }
-        .connect-button.connected { border-color: var(--success); color: var(--success); }
-        .connect-button:hover { background: var(--dark-4); }
-
         .input-section { margin-bottom: 20px; }
         .input-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; color: var(--text-secondary); font-weight: 600; }
         .balance-display { color: var(--primary-light); cursor: pointer; }
-
-        .input-box {
-            background: rgba(35, 45, 77, 0.6);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 14px 16px;
-            display: flex; align-items: center; gap: 12px;
-        }
-
-        .token-display {
-            display: flex; align-items: center; gap: 8px;
-            padding: 6px 12px; background: rgba(102, 126, 234, 0.15);
-            border-radius: 10px; border: 1px solid rgba(102, 126, 234, 0.3);
-        }
-
+        .input-box { background: rgba(35, 45, 77, 0.6); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+        .token-display { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(102, 126, 234, 0.15); border-radius: 10px; border: 1px solid rgba(102, 126, 234, 0.3); }
         .token-logo { width: 24px; height: 24px; border-radius: 50%; }
-
-        input[type="number"] {
-            flex: 1; background: transparent; border: none;
-            color: var(--text-primary); font-size: 18px; font-weight: 700;
-            outline: none; font-family: 'Space Mono', monospace;
-        }
-
+        input[type="number"] { flex: 1; background: transparent; border: none; color: var(--text-primary); font-size: 18px; font-weight: 700; outline: none; font-family: 'Space Mono', monospace; }
         .percentage-buttons { display: flex; gap: 8px; margin-top: 10px; }
-        .percentage-btn {
-            flex: 1; padding: 8px; background: rgba(35, 45, 77, 0.6);
-            border: 1px solid var(--border); border-radius: 10px;
-            color: var(--text-secondary); font-size: 11px; font-weight: 700;
-            cursor: pointer; transition: var(--transition);
-        }
+        .percentage-btn { flex: 1; padding: 8px; background: rgba(35, 45, 77, 0.6); border: 1px solid var(--border); border-radius: 10px; color: var(--text-secondary); font-size: 11px; font-weight: 700; cursor: pointer; transition: var(--transition); }
         .percentage-btn:hover { border-color: var(--primary); color: var(--primary-light); }
-
-        .action-button {
-            width: 100%; padding: 16px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            border: none; border-radius: 12px;
-            color: white; font-size: 16px; font-weight: 700;
-            cursor: pointer; transition: var(--transition);
-            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-        }
+        .action-button { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); border: none; border-radius: 12px; color: white; font-size: 16px; font-weight: 700; cursor: pointer; transition: var(--transition); box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4); }
         .action-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(102, 126, 234, 0.6); }
         .action-button:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .message-section {
-            margin-top: 15px; padding: 12px;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 10px; font-size: 12px; text-align: center;
-            color: var(--primary-light); min-height: 40px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 600;
-        }
-
-        .chain-selector {
-            display: flex; gap: 8px; background: rgba(35, 45, 77, 0.6);
-            padding: 6px; border-radius: 12px; margin-bottom: 20px;
-        }
-        .chain-btn {
-            flex: 1; padding: 10px; border: none; background: transparent;
-            border-radius: 8px; color: var(--text-secondary); font-weight: 700;
-            cursor: pointer; transition: var(--transition);
-        }
+        .message-section { margin-top: 15px; padding: 12px; background: rgba(102, 126, 234, 0.1); border-radius: 10px; font-size: 12px; text-align: center; color: var(--primary-light); min-height: 40px; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+        .chain-selector { display: flex; gap: 8px; background: rgba(35, 45, 77, 0.6); padding: 6px; border-radius: 12px; margin-bottom: 20px; }
+        .chain-btn { flex: 1; padding: 10px; border: none; background: transparent; border-radius: 8px; color: var(--text-secondary); font-weight: 700; cursor: pointer; transition: var(--transition); }
         .chain-btn.active { background: var(--primary); color: white; }
-
         .swap-toggle { display: flex; justify-content: center; margin: -10px 0 10px; }
-        .toggle-icon {
-            width: 36px; height: 36px; background: var(--dark-4);
-            border: 2px solid var(--border); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: var(--transition); z-index: 2;
-        }
+        .toggle-icon { width: 36px; height: 36px; background: var(--dark-4); border: 2px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); z-index: 2; }
         .toggle-icon:hover { border-color: var(--primary); color: var(--primary-light); }
-
-        .network-warning {
-            background: rgba(239, 68, 68, 0.1); color: var(--error);
-            border: 1px solid rgba(239, 68, 68, 0.2); padding: 10px;
-            border-radius: 10px; font-size: 12px; margin-bottom: 15px;
-            text-align: center; cursor: pointer; display: none;
-        }
-
-        .spinner {
-            display: inline-block; width: 12px; height: 12px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: #fff; border-radius: 50%;
-            animation: spin 0.8s linear infinite; margin-right: 8px;
-        }
+        .connect-button { width: 100%; padding: 14px; background: var(--dark-3); border: 1px solid var(--border); border-radius: 12px; color: white; font-weight: 700; cursor: pointer; }
+        .connect-button.connected { border-color: var(--success); color: var(--success); }
+        .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(255, 255, 255, 0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        @media (max-width: 768px) {
-            nav { padding: 12px 20px; }
-            .app-container { padding: 20px 15px; }
-        }
     </style>
 </head>
 <body>
-    <nav>
-        <a href="#" class="logo-nav">
-            <img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU">
-            SOU Ecosystem
-        </a>
-    </nav>
-
+    <nav><a href="#" class="logo-nav"><img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU">SOU Ecosystem</a></nav>
     <div class="wrapper">
         <div class="app-container">
-            <!-- Wallet Connection -->
-            <div class="card">
-                <div class="card-content">
-                    <button class="connect-button" id="connectBtn">Connect Wallet</button>
-                </div>
-            </div>
-
-            <!-- STEP 1: SWAP (SOU <-> WSOU) -->
+            <div class="card"><div class="card-content"><button class="connect-button" id="connectBtn">Connect Wallet</button></div></div>
+            <!-- SWAP -->
             <section class="card">
-                <div class="card-header">
-                    <h2 class="card-title" id="swapTitle">Step 1: Swap SOU for WSOU</h2>
-                    <p class="card-subtitle" id="swapSubtitle">Convert SOU to WSOU on Ethereum for bridging</p>
-                </div>
+                <div class="card-header"><h2 class="card-title" id="swapTitle">Step 1: Swap SOU for WSOU</h2><p class="card-subtitle" id="swapSubtitle">Convert SOU to WSOU on Ethereum</p></div>
                 <div class="card-content">
-                    <div id="swapNetworkWarning" class="network-warning">Please switch to Ethereum Mainnet</div>
                     <div class="input-section">
-                        <div class="input-label">
-                            <span id="swapFromLabel">From (SOU)</span>
-                            <span class="balance-display" id="swapBalance" onclick="setSwapPct(100)">Balance: 0.00</span>
-                        </div>
-                        <div class="input-box">
-                            <input type="number" id="swapInput" placeholder="0.0">
-                            <div class="token-display">
-                                <img src="https://www.woofswap.finance/image/tokens/sou.png" class="token-logo" id="swapFromLogo">
-                                <span id="swapFromToken">SOU</span>
-                            </div>
-                        </div>
-                        <div class="percentage-buttons">
-                            <button class="percentage-btn" onclick="setSwapPct(25)">25%</button>
-                            <button class="percentage-btn" onclick="setSwapPct(50)">50%</button>
-                            <button class="percentage-btn" onclick="setSwapPct(75)">75%</button>
-                            <button class="percentage-btn" onclick="setSwapPct(100)">MAX</button>
-                        </div>
+                        <div class="input-label"><span id="swapFromLabel">From (SOU)</span><span class="balance-display" id="swapBalance" onclick="setSwapPct(100)">Balance: 0.00</span></div>
+                        <div class="input-box"><input type="number" id="swapInput" placeholder="0.0"><div class="token-display"><img src="https://www.woofswap.finance/image/tokens/sou.png" class="token-logo"><span id="swapFromToken">SOU</span></div></div>
+                        <div class="percentage-buttons"><button class="percentage-btn" onclick="setSwapPct(25)">25%</button><button class="percentage-btn" onclick="setSwapPct(50)">50%</button><button class="percentage-btn" onclick="setSwapPct(75)">75%</button><button class="percentage-btn" onclick="setSwapPct(100)">MAX</button></div>
                     </div>
-
-                    <div class="swap-toggle">
-                        <div class="toggle-icon" id="swapToggleBtn">⇅</div>
-                    </div>
-
+                    <div class="swap-toggle"><div class="toggle-icon" id="swapToggleBtn">⇅</div></div>
                     <div class="input-section">
-                        <div class="input-label">
-                            <span id="swapToLabel">To (WSOU)</span>
-                        </div>
-                        <div class="input-box">
-                            <input type="number" id="swapOutput" placeholder="0.0" disabled>
-                            <div class="token-display">
-                                <img src="https://www.woofswap.finance/image/tokens/sou.png" class="token-logo" id="swapToLogo">
-                                <span id="swapToToken">WSOU</span>
-                            </div>
-                        </div>
+                        <div class="input-label"><span id="swapToLabel">To (WSOU)</span></div>
+                        <div class="input-box"><input type="number" id="swapOutput" placeholder="0.0" disabled><div class="token-display"><img src="https://www.woofswap.finance/image/tokens/sou.png" class="token-logo"><span id="swapToToken">WSOU</span></div></div>
                     </div>
-
                     <button class="action-button" id="swapActionBtn">Swap for WSOU</button>
-                    <div class="message-section" id="swapMsg">Select an amount to swap</div>
+                    <div class="message-section" id="swapMsg">Ready to swap</div>
                 </div>
             </section>
-
-            <!-- STEP 2: BRIDGE -->
+            <!-- BRIDGE -->
             <section class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Step 2: Cross-Chain Bridge</h2>
-                    <p class="card-subtitle">Transfer tokens between Ethereum and Shibarium</p>
-                </div>
+                <div class="card-header"><h2 class="card-title">Step 2: Cross-Chain Bridge</h2><p class="card-subtitle">Transfer tokens between Ethereum and Shibarium</p></div>
                 <div class="card-content">
-                    <div class="chain-selector">
-                        <button class="chain-btn active" id="btnEthToShib">ETH → Shibarium</button>
-                        <button class="chain-btn" id="btnShibToEth">Shibarium → ETH</button>
-                    </div>
-
-                    <div id="bridgeNetworkWarning" class="network-warning">Please switch to the correct network</div>
-
+                    <div class="chain-selector"><button class="chain-btn active" id="btnEthToShib">ETH → Shibarium</button><button class="chain-btn" id="btnShibToEth">Shibarium → ETH</button></div>
                     <div class="input-section">
-                        <div class="input-label">
-                            <span id="bridgeTokenLabel">Bridge WSOU (on Ethereum)</span>
-                            <span class="balance-display" id="bridgeBalance" onclick="setBridgePct(100)">Balance: 0.00</span>
-                        </div>
-                        <div class="input-box">
-                            <input type="number" id="bridgeInput" placeholder="0.0">
-                            <div class="token-display">
-                                <img src="https://www.woofswap.finance/image/tokens/sou.png" class="token-logo">
-                                <span id="bridgeTokenName">WSOU</span>
-                            </div>
-                        </div>
-                        <div class="percentage-buttons">
-                            <button class="percentage-btn" onclick="setBridgePct(25)">25%</button>
-                            <button class="percentage-btn" onclick="setBridgePct(50)">50%</button>
-                            <button class="percentage-btn" onclick="setBridgePct(75)">75%</button>
-                            <button class="percentage-btn" onclick="setBridgePct(100)">MAX</button>
-                        </div>
+                        <div class="input-label"><span id="bridgeTokenLabel">Bridge WSOU (on Ethereum)</span><span class="balance-display" id="bridgeBalance" onclick="setBridgePct(100)">Balance: 0.00</span></div>
+                        <div class="input-box"><input type="number" id="bridgeInput" placeholder="0.0"><div class="token-display"><img src="https://www.woofswap.finance/image/tokens/sou.png" class="token-logo"><span id="bridgeTokenName">WSOU</span></div></div>
+                        <div class="percentage-buttons"><button class="percentage-btn" onclick="setBridgePct(25)">25%</button><button class="percentage-btn" onclick="setBridgePct(50)">50%</button><button class="percentage-btn" onclick="setBridgePct(75)">75%</button><button class="percentage-btn" onclick="setBridgePct(100)">MAX</button></div>
                     </div>
-
                     <button class="action-button" id="bridgeActionBtn">Initiate Bridge</button>
-                    <div class="message-section" id="bridgeMsg">Ready to bridge tokens</div>
+                    <div class="message-section" id="bridgeMsg">Ready to bridge</div>
                 </div>
             </section>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script>
-        // --- CONFIGURATION ---
         const CHAINS = {
-            ETH: {
-                id: '0x1',
-                name: 'Ethereum Mainnet',
-                rpc: 'https://eth.llamarpc.com',
-                explorer: 'https://etherscan.io',
-                selector: '5009297550715157269'
-            },
-            SHIB: {
-                id: '0x6d', // 109
-                name: 'Shibarium Mainnet',
-                rpc: 'https://www.shibrpc.com',
-                explorer: 'https://shibariumscan.io',
-                selector: '0' // Placeholder if needed
-            }
+            ETH: { id: '0x1', name: 'Ethereum', rpc: 'https://eth.llamarpc.com', selector: '5009297550715157269' },
+            SHIB: { id: '0x6d', name: 'Shibarium', rpc: 'https://www.shibrpc.com', selector: '3993510008929295315' }
         };
-
+        // Ethereum Config
         const SOU_ETH = '0xDEA2a2A166e2FDC47b934bee68E6032F8f1Ca09C';
         const WSOU_ETH = '0x5c005d074e25b89db97a32087c06d154d8cb2d5b';
-        const SOU_SHIB = '0xDEA2a2A166e2FDC47b934bee68E6032F8f1Ca09C';
-        
         const ROUTER_ETH = '0x80226fc0Ee2b096224EeAc085Bb9a8cba1146f7D';
+        // Shibarium Config
+        const SOU_SHIB = '0x5e1aee526d1aa049b4d95e5b68ae7bb556e2d799';
         const ROUTER_SHIB = '0xc2CA5d5C17911e4B838194b51585DdF8fe5116C1';
 
         const ERC20_ABI = [
@@ -348,210 +126,139 @@
             { "constant": false, "inputs": [{ "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" }], "name": "approve", "outputs": [{ "name": "success", "type": "bool" }], "type": "function" },
             { "constant": true, "inputs": [{ "name": "_owner", "type": "address" }, { "name": "_spender", "type": "address" }], "name": "allowance", "outputs": [{ "name": "remaining", "type": "uint256" }], "type": "function" }
         ];
-        const WSOU_ABI = [...ERC20_ABI, 
-            { "inputs": [{ "name": "amount", "type": "uint256" }], "name": "swapIn", "type": "function" },
-            { "inputs": [{ "name": "amount", "type": "uint256" }], "name": "swapOut", "type": "function" }
-        ];
+        const WSOU_ABI = [...ERC20_ABI, { "inputs": [{ "name": "amount", "type": "uint256" }], "name": "swapIn", "type": "function" }, { "inputs": [{ "name": "amount", "type": "uint256" }], "name": "swapOut", "type": "function" }];
+        const ROUTER_ABI = [{ "inputs": [{ "internalType": "uint64", "name": "destinationChainSelector", "type": "uint64" }, { "components": [{ "internalType": "bytes", "name": "receiver", "type": "bytes" }, { "internalType": "bytes", "name": "data", "type": "bytes" }, { "components": [{ "internalType": "address", "name": "token", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }], "internalType": "struct Client.EVMTokenAmount[]", "name": "tokenAmounts", "type": "tuple[]" }, { "internalType": "address", "name": "feeToken", "type": "address" }, { "internalType": "bytes", "name": "extraArgs", "type": "bytes" }], "internalType": "struct Client.EVM2AnyMessage", "name": "message", "type": "tuple" }], "name": "ccipSend", "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }], "stateMutability": "payable", "type": "function" }, { "inputs": [{ "internalType": "uint64", "name": "destinationChainSelector", "type": "uint64" }, { "components": [{ "internalType": "bytes", "name": "receiver", "type": "bytes" }, { "internalType": "bytes", "name": "data", "type": "bytes" }, { "components": [{ "internalType": "address", "name": "token", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }], "internalType": "struct Client.EVMTokenAmount[]", "name": "tokenAmounts", "type": "tuple[]" }, { "internalType": "address", "name": "feeToken", "type": "address" }, { "internalType": "bytes", "name": "extraArgs", "type": "bytes" }], "internalType": "struct Client.EVM2AnyMessage", "name": "message", "type": "tuple" }], "name": "getFee", "outputs": [{ "internalType": "uint256", "name": "fee", "type": "uint256" }], "stateMutability": "view", "type": "function" }];
 
         let web3, account, currentChainId;
-        let isSouToWsou = true;
-        let isEthToShib = true;
-
-        const web3Eth = new Web3(CHAINS.ETH.rpc);
-        const web3Shib = new Web3(CHAINS.SHIB.rpc);
+        let isSouToWsou = true, isEthToShib = true;
+        const web3Eth = new Web3(CHAINS.ETH.rpc), web3Shib = new Web3(CHAINS.SHIB.rpc);
 
         async function connect() {
-            if (window.ethereum) {
-                try {
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    account = accounts[0];
-                    web3 = new Web3(window.ethereum);
-                    currentChainId = await web3.eth.getChainId();
-                    
-                    document.getElementById('connectBtn').textContent = account.slice(0,6) + '...' + account.slice(-4);
-                    document.getElementById('connectBtn').classList.add('connected');
-                    
-                    window.ethereum.on('accountsChanged', (accs) => { account = accs[0]; refresh(); });
-                    window.ethereum.on('chainChanged', (chainId) => { currentChainId = parseInt(chainId, 16); refresh(); });
-
-                    refresh();
-                } catch (e) { console.error(e); }
-            } else { alert("Install MetaMask"); }
-        }
-
-        async function switchNetwork(targetChain) {
-            if (!window.ethereum) return;
-            try {
-                await window.ethereum.request({
-                    method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: targetChain.id }],
-                });
-            } catch (switchError) {
-                if (switchError.code === 4902) {
-                    try {
-                        await window.ethereum.request({
-                            method: 'wallet_addEthereumChain',
-                            params: [{
-                                chainId: targetChain.id,
-                                chainName: targetChain.name,
-                                rpcUrls: [targetChain.rpc],
-                                blockExplorerUrls: [targetChain.explorer],
-                                nativeCurrency: { name: targetChain.name === 'Ethereum Mainnet' ? 'ETH' : 'BONE', symbol: targetChain.name === 'Ethereum Mainnet' ? 'ETH' : 'BONE', decimals: 18 }
-                            }],
-                        });
-                    } catch (addError) { console.error(addError); }
-                }
-            }
+            if (!window.ethereum) return alert("Install MetaMask");
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            account = accounts[0]; web3 = new Web3(window.ethereum);
+            currentChainId = await web3.eth.getChainId();
+            document.getElementById('connectBtn').textContent = account.slice(0,6) + '...' + account.slice(-4);
+            document.getElementById('connectBtn').classList.add('connected');
+            window.ethereum.on('accountsChanged', (accs) => { account = accs[0]; refresh(); });
+            window.ethereum.on('chainChanged', (chainId) => { currentChainId = parseInt(chainId, 16); refresh(); });
+            refresh();
         }
 
         async function refresh() {
             if (!account) return;
-
-            // Update Swap Balance
-            const swapToken = isSouToWsou ? SOU_ETH : WSOU_ETH;
-            const ethContract = new web3Eth.eth.Contract(ERC20_ABI, swapToken);
+            // Swap Balance (Always on Ethereum)
             try {
-                const bal = await ethContract.methods.balanceOf(account).call();
+                const swapToken = isSouToWsou ? SOU_ETH : WSOU_ETH;
+                const bal = await new web3Eth.eth.Contract(ERC20_ABI, swapToken).methods.balanceOf(account).call();
                 document.getElementById('swapBalance').textContent = `Balance: ${parseFloat(web3Eth.utils.fromWei(bal)).toFixed(4)}`;
-            } catch (e) { console.error(e); }
-
-            // Update Bridge Balance
-            let bridgeToken, bridgeWeb3;
-            if (isEthToShib) {
-                bridgeToken = WSOU_ETH; bridgeWeb3 = web3Eth;
-            } else {
-                bridgeToken = SOU_SHIB; bridgeWeb3 = web3Shib;
-            }
-            
-            const bContract = new bridgeWeb3.eth.Contract(ERC20_ABI, bridgeToken);
+            } catch (e) { console.error("Swap balance error:", e); }
+            // Bridge Balance
             try {
-                const bBal = await bContract.methods.balanceOf(account).call();
+                const bridgeToken = isEthToShib ? WSOU_ETH : SOU_SHIB;
+                const bridgeWeb3 = isEthToShib ? web3Eth : web3Shib;
+                const bBal = await new bridgeWeb3.eth.Contract(ERC20_ABI, bridgeToken).methods.balanceOf(account).call();
                 document.getElementById('bridgeBalance').textContent = `Balance: ${parseFloat(bridgeWeb3.utils.fromWei(bBal)).toFixed(4)}`;
-            } catch (e) { console.error(e); }
-
-            updateWarnings();
+            } catch (e) { console.error("Bridge balance error:", e); }
+            updateUI();
         }
 
-        function updateWarnings() {
-            if (!currentChainId) return;
-
-            const swapWarning = document.getElementById('swapNetworkWarning');
+        function updateUI() {
             const swapBtn = document.getElementById('swapActionBtn');
-            if (currentChainId !== 1) {
-                swapWarning.style.display = 'block';
-                swapWarning.onclick = () => switchNetwork(CHAINS.ETH);
-                swapBtn.disabled = true;
-                swapBtn.textContent = "Switch to Ethereum";
-            } else {
-                swapWarning.style.display = 'none';
-                swapBtn.disabled = false;
-                swapBtn.textContent = isSouToWsou ? "Swap for WSOU" : "Swap for SOU";
-            }
-
-            const bridgeWarning = document.getElementById('bridgeNetworkWarning');
+            if (currentChainId !== 1) { swapBtn.textContent = "Switch to Ethereum"; }
+            else { swapBtn.textContent = isSouToWsou ? "Swap for WSOU" : "Swap for SOU"; }
             const bridgeBtn = document.getElementById('bridgeActionBtn');
-            const targetChainId = isEthToShib ? 1 : 109;
-            const targetChain = isEthToShib ? CHAINS.ETH : CHAINS.SHIB;
+            const targetId = isEthToShib ? 1 : 109;
+            if (currentChainId !== targetId) { bridgeBtn.textContent = `Switch to ${isEthToShib ? 'Ethereum' : 'Shibarium'}`; }
+            else { bridgeBtn.textContent = "Initiate Bridge"; }
+        }
 
-            if (currentChainId !== targetChainId) {
-                bridgeWarning.style.display = 'block';
-                bridgeWarning.textContent = `Please switch to ${targetChain.name}`;
-                bridgeWarning.onclick = () => switchNetwork(targetChain);
-                bridgeBtn.disabled = true;
-                bridgeBtn.textContent = `Switch to ${isEthToShib ? 'Ethereum' : 'Shibarium'}`;
-            } else {
-                bridgeWarning.style.display = 'none';
-                bridgeBtn.disabled = false;
-                bridgeBtn.textContent = "Initiate Bridge";
+        async function switchNetwork(target) {
+            try { await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: target.id }] }); }
+            catch (e) {
+                if (e.code === 4902) {
+                    await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{ chainId: target.id, chainName: target.name, rpcUrls: [target.rpc], nativeCurrency: { name: target.name==='Ethereum'?'ETH':'BONE', symbol: target.name==='Ethereum'?'ETH':'BONE', decimals: 18 }, blockExplorerUrls: [target.explorer] }] });
+                }
             }
         }
 
         document.getElementById('swapToggleBtn').onclick = () => {
             isSouToWsou = !isSouToWsou;
             document.getElementById('swapTitle').textContent = isSouToWsou ? "Step 1: Swap SOU for WSOU" : "Step 1: Swap WSOU for SOU";
-            document.getElementById('swapSubtitle').textContent = isSouToWsou ? "Convert SOU to WSOU on Ethereum" : "Convert WSOU back to SOU on Ethereum";
             document.getElementById('swapFromToken').textContent = isSouToWsou ? "SOU" : "WSOU";
             document.getElementById('swapToToken').textContent = isSouToWsou ? "WSOU" : "SOU";
             document.getElementById('swapFromLabel').textContent = `From (${isSouToWsou ? 'SOU' : 'WSOU'})`;
             document.getElementById('swapToLabel').textContent = `To (${isSouToWsou ? 'WSOU' : 'SOU'})`;
-            document.getElementById('swapInput').value = '';
-            document.getElementById('swapOutput').value = '';
             refresh();
         };
 
         document.getElementById('btnEthToShib').onclick = () => { isEthToShib = true; updateBridgeUI(); };
         document.getElementById('btnShibToEth').onclick = () => { isEthToShib = false; updateBridgeUI(); };
-
         function updateBridgeUI() {
             document.getElementById('btnEthToShib').classList.toggle('active', isEthToShib);
             document.getElementById('btnShibToEth').classList.toggle('active', !isEthToShib);
             document.getElementById('bridgeTokenLabel').textContent = isEthToShib ? "Bridge WSOU (on Ethereum)" : "Bridge SOU (on Shibarium)";
             document.getElementById('bridgeTokenName').textContent = isEthToShib ? "WSOU" : "SOU";
-            document.getElementById('bridgeInput').value = '';
             refresh();
         }
 
         document.getElementById('swapInput').oninput = (e) => { document.getElementById('swapOutput').value = e.target.value; };
 
         async function setSwapPct(pct) {
-            if (!account) return;
             const swapToken = isSouToWsou ? SOU_ETH : WSOU_ETH;
-            const ethContract = new web3Eth.eth.Contract(ERC20_ABI, swapToken);
-            const bal = await ethContract.methods.balanceOf(account).call();
-            const amountWei = (BigInt(bal) * BigInt(pct)) / BigInt(100);
-            const amountEth = web3Eth.utils.fromWei(amountWei.toString(), 'ether');
-            document.getElementById('swapInput').value = amountEth;
-            document.getElementById('swapOutput').value = amountEth;
+            const bal = await new web3Eth.eth.Contract(ERC20_ABI, swapToken).methods.balanceOf(account).call();
+            const amt = web3Eth.utils.fromWei(((BigInt(bal) * BigInt(pct)) / BigInt(100)).toString(), 'ether');
+            document.getElementById('swapInput').value = amt; document.getElementById('swapOutput').value = amt;
         }
 
         async function setBridgePct(pct) {
-            if (!account) return;
-            let bridgeToken, bridgeWeb3;
-            if (isEthToShib) { bridgeToken = WSOU_ETH; bridgeWeb3 = web3Eth; }
-            else { bridgeToken = SOU_SHIB; bridgeWeb3 = web3Shib; }
-            const bContract = new bridgeWeb3.eth.Contract(ERC20_ABI, bridgeToken);
-            const bal = await bContract.methods.balanceOf(account).call();
-            const amountWei = (BigInt(bal) * BigInt(pct)) / BigInt(100);
-            document.getElementById('bridgeInput').value = bridgeWeb3.utils.fromWei(amountWei.toString(), 'ether');
+            const bridgeToken = isEthToShib ? WSOU_ETH : SOU_SHIB;
+            const bridgeWeb3 = isEthToShib ? web3Eth : web3Shib;
+            const bal = await new bridgeWeb3.eth.Contract(ERC20_ABI, bridgeToken).methods.balanceOf(account).call();
+            document.getElementById('bridgeInput').value = bridgeWeb3.utils.fromWei(((BigInt(bal) * BigInt(pct)) / BigInt(100)).toString(), 'ether');
         }
 
         document.getElementById('swapActionBtn').onclick = async () => {
-            if (!account) return alert("Connect Wallet");
+            if (!account) return connect();
             if (currentChainId !== 1) return switchNetwork(CHAINS.ETH);
-            const val = document.getElementById('swapInput').value;
-            if (!val || val <= 0) return;
+            const val = document.getElementById('swapInput').value; if (!val || val <= 0) return;
             const wei = web3.utils.toWei(val, 'ether');
-            const fromToken = isSouToWsou ? SOU_ETH : WSOU_ETH;
-            const tokenContract = new web3.eth.Contract(ERC20_ABI, fromToken);
-            const wsouContract = new web3.eth.Contract(WSOU_ABI, WSOU_ETH);
             try {
                 document.getElementById('swapMsg').innerHTML = '<span class="spinner"></span> Approving...';
-                await tokenContract.methods.approve(WSOU_ETH, wei).send({ from: account });
+                await new web3.eth.Contract(ERC20_ABI, isSouToWsou?SOU_ETH:WSOU_ETH).methods.approve(WSOU_ETH, wei).send({ from: account });
+                const wsou = new web3.eth.Contract(WSOU_ABI, WSOU_ETH);
                 document.getElementById('swapMsg').innerHTML = '<span class="spinner"></span> Swapping...';
-                if (isSouToWsou) await wsouContract.methods.swapIn(wei).send({ from: account });
-                else await wsouContract.methods.swapOut(wei).send({ from: account });
-                document.getElementById('swapMsg').textContent = "Success!";
-                refresh();
+                if (isSouToWsou) await wsou.methods.swapIn(wei).send({ from: account });
+                else await wsou.methods.swapOut(wei).send({ from: account });
+                document.getElementById('swapMsg').textContent = "Success!"; refresh();
             } catch (e) { document.getElementById('swapMsg').textContent = "Error: " + e.message; }
         };
 
         document.getElementById('bridgeActionBtn').onclick = async () => {
-            if (!account) return alert("Connect Wallet");
-            const targetChainId = isEthToShib ? 1 : 109;
-            if (currentChainId !== targetChainId) return switchNetwork(isEthToShib ? CHAINS.ETH : CHAINS.SHIB);
-            const val = document.getElementById('bridgeInput').value;
-            if (!val || val <= 0) return;
+            if (!account) return connect();
+            const target = isEthToShib ? CHAINS.ETH : CHAINS.SHIB;
+            if (currentChainId !== (isEthToShib?1:109)) return switchNetwork(target);
+            const val = document.getElementById('bridgeInput').value; if (!val || val <= 0) return;
             const wei = web3.utils.toWei(val, 'ether');
             const fromToken = isEthToShib ? WSOU_ETH : SOU_SHIB;
-            const router = isEthToShib ? ROUTER_ETH : ROUTER_SHIB;
-            const tokenContract = new web3.eth.Contract(ERC20_ABI, fromToken);
+            const routerAddr = isEthToShib ? ROUTER_ETH : ROUTER_SHIB;
+            const destSelector = isEthToShib ? CHAINS.SHIB.selector : CHAINS.ETH.selector;
             try {
-                document.getElementById('bridgeMsg').innerHTML = '<span class="spinner"></span> Approving Bridge...';
-                await tokenContract.methods.approve(router, wei).send({ from: account });
-                document.getElementById('bridgeMsg').innerHTML = '<span class="spinner"></span> Initiating Bridge...';
-                // CCIP Send logic would go here
-                document.getElementById('bridgeMsg').textContent = "Bridge Transaction Sent!";
-                refresh();
+                document.getElementById('bridgeMsg').innerHTML = '<span class="spinner"></span> Approving...';
+                await new web3.eth.Contract(ERC20_ABI, fromToken).methods.approve(routerAddr, wei).send({ from: account });
+                document.getElementById('bridgeMsg').innerHTML = '<span class="spinner"></span> Estimating Fee...';
+                const router = new web3.eth.Contract(ROUTER_ABI, routerAddr);
+                const message = {
+                    receiver: web3.utils.padLeft(account.toLowerCase(), 64),
+                    data: '0x',
+                    tokenAmounts: [{ token: fromToken, amount: wei }],
+                    feeToken: '0x0000000000000000000000000000000000000000',
+                    extraArgs: '0x'
+                };
+                const fee = await router.methods.getFee(destSelector, message).call();
+                document.getElementById('bridgeMsg').innerHTML = '<span class="spinner"></span> Bridging...';
+                await router.methods.ccipSend(destSelector, message).send({ from: account, value: fee });
+                document.getElementById('bridgeMsg').textContent = "Bridge Sent!"; refresh();
             } catch (e) { document.getElementById('bridgeMsg').textContent = "Error: " + e.message; }
         };
 
