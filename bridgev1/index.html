@@ -108,8 +108,8 @@
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script>
         const CHAINS = {
-            ETH: { id: '0x1', name: 'Ethereum' },
-            SHIB: { id: '0x6d', name: 'Shibarium', selector: '3993510008929295315' }
+            ETH: { id: 1, name: 'Ethereum' },
+            SHIB: { id: 109, name: 'Shibarium', selector: '3993510008929295315' }
         };
         const SOU_ETH = '0xdea2a2a166e2fdc47b934bee68e6032f8f1ca09c';
         const WSOU_ETH = '0x5c005d074e25b89db97a32087c06d154d8cb2d5b';
@@ -124,7 +124,7 @@
         const WSOU_ABI = [...ERC20_ABI, { "inputs": [{ "name": "amount", "type": "uint256" }], "name": "swapIn", "type": "function" }, { "inputs": [{ "name": "amount", "type": "uint256" }], "name": "swapOut", "type": "function" }];
         const ROUTER_ABI = [{ "inputs": [{ "internalType": "uint64", "name": "destinationChainSelector", "type": "uint64" }, { "components": [{ "internalType": "bytes", "name": "receiver", "type": "bytes" }, { "internalType": "bytes", "name": "data", "type": "bytes" }, { "components": [{ "internalType": "address", "name": "token", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }], "internalType": "struct Client.EVMTokenAmount[]", "name": "tokenAmounts", "type": "tuple[]" }, { "internalType": "address", "name": "feeToken", "type": "address" }, { "internalType": "bytes", "name": "extraArgs", "type": "bytes" }], "internalType": "struct Client.EVM2AnyMessage", "name": "message", "type": "tuple" }], "name": "ccipSend", "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }], "stateMutability": "payable", "type": "function" }, { "inputs": [{ "internalType": "uint64", "name": "destinationChainSelector", "type": "uint64" }, { "components": [{ "internalType": "bytes", "name": "receiver", "type": "bytes" }, { "internalType": "bytes", "name": "data", "type": "bytes" }, { "components": [{ "internalType": "address", "name": "token", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }], "internalType": "struct Client.EVMTokenAmount[]", "name": "tokenAmounts", "type": "tuple[]" }, { "internalType": "address", "name": "feeToken", "type": "address" }, { "internalType": "bytes", "name": "extraArgs", "type": "bytes" }], "internalType": "struct Client.EVM2AnyMessage", "name": "message", "type": "tuple" }], "name": "getFee", "outputs": [{ "internalType": "uint256", "name": "fee", "type": "uint256" }], "stateMutability": "view", "type": "function" }];
 
-        let web3, account, currentChainId;
+        let web3, account, currentChainId = 1;
         let isSouToWsou = true, isEthToShib = true;
 
         async function connect() {
@@ -132,11 +132,11 @@
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             account = accounts[0];
             web3 = new Web3(window.ethereum);
-            currentChainId = await web3.eth.getChainId();
+            currentChainId = Number(await web3.eth.getChainId());
             document.getElementById('connectBtn').textContent = account.slice(0,6) + '...' + account.slice(-4);
             document.getElementById('connectBtn').classList.add('connected');
             window.ethereum.on('accountsChanged', (accs) => { account = accs[0] || null; refresh(); });
-            window.ethereum.on('chainChanged', (chainId) => { currentChainId = parseInt(chainId, 16); refresh(); });
+            window.ethereum.on('chainChanged', (chainId) => { currentChainId = Number(chainId); refresh(); });
             refresh();
         }
 
@@ -145,16 +145,18 @@
             try {
                 const swapToken = isSouToWsou ? SOU_ETH : WSOU_ETH;
                 const swapBal = await new web3.eth.Contract(ERC20_ABI, swapToken).methods.balanceOf(account).call();
-                document.getElementById('swapBalance').textContent = `Balance: ${parseFloat(web3.utils.fromWei(swapBal)).toFixed(4)}`;
+                document.getElementById('swapBalance').textContent = `Balance: ${Number(web3.utils.fromWei(swapBal)).toFixed(4)}`;
             } catch (e) {
                 document.getElementById('swapBalance').textContent = 'Balance: Error';
+                console.error('Swap balance fetch failed:', e);
             }
             try {
                 const bridgeToken = isEthToShib ? WSOU_ETH : SOU_SHIB;
                 const bridgeBal = await new web3.eth.Contract(ERC20_ABI, bridgeToken).methods.balanceOf(account).call();
-                document.getElementById('bridgeBalance').textContent = `Balance: ${parseFloat(web3.utils.fromWei(bridgeBal)).toFixed(4)}`;
+                document.getElementById('bridgeBalance').textContent = `Balance: ${Number(web3.utils.fromWei(bridgeBal)).toFixed(4)}`;
             } catch (e) {
                 document.getElementById('bridgeBalance').textContent = 'Balance: Error';
+                console.error('Bridge balance fetch failed:', e);
             }
             updateUI();
         }
@@ -163,27 +165,34 @@
             const swapBtn = document.getElementById('swapActionBtn');
             swapBtn.textContent = currentChainId !== 1 ? "Switch to Ethereum" : (isSouToWsou ? "Swap for WSOU" : "Swap for SOU");
             const bridgeBtn = document.getElementById('bridgeActionBtn');
-            const targetChain = isEthToShib ? 1 : 109;
-            bridgeBtn.textContent = currentChainId !== targetChain ? `Switch to ${isEthToShib ? 'Ethereum' : 'Shibarium'}` : "Initiate Bridge";
+            const target = isEthToShib ? 1 : 109;
+            bridgeBtn.textContent = currentChainId !== target ? `Switch to ${isEthToShib ? 'Ethereum' : 'Shibarium'}` : "Initiate Bridge";
         }
 
         async function switchNetwork(targetId) {
             try {
-                await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x' + targetId.toString(16) }] });
-            } catch (e) {
-                if (e.code === 4902) {
-                    const chain = targetId === 1 ? CHAINS.ETH : CHAINS.SHIB;
-                    await window.ethereum.request({
-                        method: 'wallet_addEthereumChain',
-                        params: [{
-                            chainId: '0x' + targetId.toString(16),
-                            chainName: chain.name,
-                            rpcUrls: [targetId === 1 ? 'https://cloudflare-eth.com' : 'https://www.shibrpc.com'],
-                            nativeCurrency: { name: targetId === 1 ? 'ETH' : 'BONE', symbol: targetId === 1 ? 'ETH' : 'BONE', decimals: 18 }
-                        }]
-                    });
+                await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: `0x${targetId.toString(16)}` }] });
+            } catch (switchError) {
+                if (switchError.code === 4902) {
+                    const params = targetId === 1 ? {
+                        chainId: '0x1',
+                        chainName: 'Ethereum Mainnet',
+                        rpcUrls: ['https://cloudflare-eth.com'],
+                        nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+                        blockExplorerUrls: ['https://etherscan.io']
+                    } : {
+                        chainId: '0x6d',
+                        chainName: 'Shibarium',
+                        rpcUrls: ['https://www.shibrpc.com'],
+                        nativeCurrency: { name: 'BONE', symbol: 'BONE', decimals: 18 },
+                        blockExplorerUrls: ['https://shibariumscan.io']
+                    };
+                    await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [params] });
+                } else {
+                    console.error(switchError);
                 }
             }
+            setTimeout(refresh, 1500); // Give time for chain switch to settle
         }
 
         document.getElementById('swapToggleBtn').onclick = () => {
@@ -249,14 +258,14 @@
 
         document.getElementById('bridgeActionBtn').onclick = async () => {
             if (!account) return connect();
-            const targetId = isEthToShib ? 1 : 109;
-            if (currentChainId !== targetId) return switchNetwork(targetId);
+            const target = isEthToShib ? 1 : 109;
+            if (currentChainId !== target) return switchNetwork(target);
             const val = document.getElementById('bridgeInput').value;
             if (!val || val <= 0) return;
             const wei = web3.utils.toWei(val, 'ether');
             const fromToken = isEthToShib ? WSOU_ETH : SOU_SHIB;
             const routerAddr = isEthToShib ? ROUTER_ETH : ROUTER_SHIB;
-            const destSelector = isEthToShib ? CHAINS.SHIB.selector : '5009297550715157269'; // ETH selector from original
+            const destSelector = isEthToShib ? CHAINS.SHIB.selector : '5009297550715157269';
             try {
                 document.getElementById('bridgeMsg').innerHTML = '<span class="spinner"></span> Approving...';
                 await new web3.eth.Contract(ERC20_ABI, fromToken).methods.approve(routerAddr, wei).send({ from: account });
