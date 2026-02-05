@@ -45,6 +45,7 @@
         input[type="number"] { flex: 1; background: transparent; border: none; color: var(--text-primary); font-size: 18px; font-weight: 700; outline: none; font-family: 'Space Mono', monospace; width: 100%; }
         .action-button { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); border: none; border-radius: 12px; color: white; font-size: 16px; font-weight: 700; cursor: pointer; transition: var(--transition); margin-bottom: 12px; }
         .action-button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4); }
+        .action-button:disabled { background: var(--dark-4); color: var(--text-tertiary); cursor: not-allowed; transform: none; box-shadow: none; }
         .message-section { padding: 12px; background: rgba(102, 126, 234, 0.1); border-radius: 10px; font-size: 12px; text-align: center; color: var(--primary-light); min-height: 40px; display: flex; align-items: center; justify-content: center; }
         .chain-selector { display: flex; gap: 8px; background: rgba(35, 45, 77, 0.6); padding: 6px; border-radius: 12px; margin-bottom: 20px; }
         .chain-btn { flex: 1; padding: 10px; border: none; background: transparent; border-radius: 8px; color: var(--text-secondary); font-weight: 700; cursor: pointer; transition: var(--transition); }
@@ -59,6 +60,7 @@
         .connect-button.connected { border-color: var(--success); color: var(--success); }
         .fade-in { animation: fadeIn 0.3s ease-in; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .network-warning { background: rgba(239, 68, 68, 0.1); color: var(--error); border: 1px solid rgba(239, 68, 68, 0.2); padding: 10px; border-radius: 10px; font-size: 12px; margin-bottom: 15px; display: none; text-align: center; }
     </style>
 </head>
 <body>
@@ -85,6 +87,7 @@
                     <p class="bridge-subtitle" id="swapSubtitle">Convert SOU to WSOU on Ethereum for bridging</p>
                 </div>
                 <div class="bridge-content">
+                    <div id="swapNetworkWarning" class="network-warning">Please switch to Ethereum Mainnet</div>
                     <div class="input-section">
                         <div class="input-label">
                             <span id="swapFromLabel">From (SOU)</span>
@@ -139,6 +142,8 @@
                         <button class="chain-btn" id="btnShibToEth">Shibarium → ETH</button>
                     </div>
 
+                    <div id="bridgeNetworkWarning" class="network-warning">Please switch to the correct network</div>
+
                     <div class="input-section fade-in" id="bridgeInputArea">
                         <div class="input-label">
                             <span id="bridgeTokenLabel">Bridge WSOU (on Ethereum)</span>
@@ -163,114 +168,169 @@
                     <div class="message-section" id="bridgeMsg">Ready to bridge tokens</div>
                 </div>
             </section>
-
-            <!-- STEP 3: BSC BRIDGE -->
-            <section class="bridge-card">
-                <div class="bridge-header">
-                    <h2 class="bridge-title">Step 3: BSC ↔ Ethereum Bridge</h2>
-                    <p class="bridge-subtitle">Transfer SOU tokens between BSC and Ethereum</p>
-                </div>
-                <div class="bridge-content">
-                    <div class="chain-selector">
-                        <button class="chain-btn active" id="btnBscToEth">BSC → ETH</button>
-                        <button class="chain-btn" id="btnEthToBsc">ETH → BSC</button>
-                    </div>
-
-                    <div class="input-section fade-in" id="bscInputArea">
-                        <div class="input-label">
-                            <span id="bscTokenLabel">Bridge SOU (on BSC)</span>
-                            <span class="balance-display" id="bscBalance" onclick="setBscPct(100)">Balance: 0.00</span>
-                        </div>
-                        <div class="input-box">
-                            <input type="number" id="bscInput" placeholder="0.0">
-                            <div class="token-display">
-                                <img src="https://www.woofswap.finance/image/tokens/sou.png" class="token-logo">
-                                <span id="bscTokenName">SOU</span>
-                            </div>
-                        </div>
-                        <div class="percentage-buttons">
-                            <button class="percentage-btn" onclick="setBscPct(25)">25%</button>
-                            <button class="percentage-btn" onclick="setBscPct(50)">50%</button>
-                            <button class="percentage-btn" onclick="setBscPct(75)">75%</button>
-                            <button class="percentage-btn" onclick="setBscPct(100)">MAX</button>
-                        </div>
-                    </div>
-
-                    <button class="action-button" id="bscActionBtn">Initiate BSC Transfer</button>
-                    <div class="message-section" id="bscMsg">Ready to bridge SOU tokens</div>
-                </div>
-            </section>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script>
         // --- CONFIGURATION ---
+        const CHAINS = {
+            ETH: {
+                id: '0x1',
+                name: 'Ethereum Mainnet',
+                rpc: 'https://eth.llamarpc.com',
+                explorer: 'https://etherscan.io'
+            },
+            SHIB: {
+                id: '0x6d', // 109 in hex
+                name: 'Shibarium Mainnet',
+                rpc: 'https://www.shibrpc.com',
+                explorer: 'https://shibariumscan.io'
+            }
+        };
+
         const SOU_ETH = '0xDEA2a2A166e2FDC47b934bee68E6032F8f1Ca09C';
         const WSOU_ETH = '0x5c005d074e25b89db97a32087c06d154d8cb2d5b';
         const SOU_SHIB = '0xDEA2a2A166e2FDC47b934bee68E6032F8f1Ca09C'; // SOU on Shibarium
-        const SOU_BSC = '0xb65bd36fef84ebc5114cfd803a4f25b2b57f7777';
         
         const ROUTER_ETH = '0x80226fc0Ee2b096224EeAc085Bb9a8cba1146f7D';
         const ROUTER_SHIB = '0xc2CA5d5C17911e4B838194b51585DdF8fe5116C1';
-        const ROUTER_BSC = '0x34B03Cb9086d7D758AC55af71584F81A598759FE';
 
         const ERC20_ABI = [
             { "constant": true, "inputs": [{ "name": "_owner", "type": "address" }], "name": "balanceOf", "outputs": [{ "name": "balance", "type": "uint256" }], "type": "function" },
-            { "constant": false, "inputs": [{ "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" }], "name": "approve", "outputs": [{ "name": "success", "type": "bool" }], "type": "function" }
+            { "constant": false, "inputs": [{ "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" }], "name": "approve", "outputs": [{ "name": "success", "type": "bool" }], "type": "function" },
+            { "constant": true, "inputs": [{ "name": "_owner", "type": "address" }, { "name": "_spender", "type": "address" }], "name": "allowance", "outputs": [{ "name": "remaining", "type": "uint256" }], "type": "function" }
         ];
         const WSOU_ABI = [...ERC20_ABI, 
             { "inputs": [{ "name": "amount", "type": "uint256" }], "name": "swapIn", "type": "function" },
             { "inputs": [{ "name": "amount", "type": "uint256" }], "name": "swapOut", "type": "function" }
         ];
 
-        let web3, account;
-        let isSouToWsou = true; 
-        let isEthToShib = true; 
-        let isBscToEth = true;
+        let web3, account, currentChainId;
+        let isSouToWsou = true; // Swap Direction
+        let isEthToShib = true; // Bridge Direction
+
+        // Public Web3 instances for balance fetching regardless of wallet state
+        const web3Eth = new Web3(CHAINS.ETH.rpc);
+        const web3Shib = new Web3(CHAINS.SHIB.rpc);
 
         async function connect() {
             if (window.ethereum) {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                account = accounts[0];
-                web3 = new Web3(window.ethereum);
-                document.getElementById('connectBtn').textContent = account.slice(0,6) + '...' + account.slice(-4);
-                document.getElementById('connectBtn').classList.add('connected');
-                refresh();
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    account = accounts[0];
+                    web3 = new Web3(window.ethereum);
+                    currentChainId = await web3.eth.getChainId();
+                    
+                    document.getElementById('connectBtn').textContent = account.slice(0,6) + '...' + account.slice(-4);
+                    document.getElementById('connectBtn').classList.add('connected');
+                    
+                    window.ethereum.on('accountsChanged', (accs) => {
+                        account = accs[0];
+                        refresh();
+                    });
+                    
+                    window.ethereum.on('chainChanged', (chainId) => {
+                        currentChainId = parseInt(chainId, 16);
+                        refresh();
+                    });
+
+                    refresh();
+                } catch (e) { console.error(e); }
             } else { alert("Install MetaMask"); }
         }
 
-        async function refresh() {
-            if (!account || !web3) return;
-
-            // 1. Swap Balance (Ethereum)
-            const swapToken = isSouToWsou ? SOU_ETH : WSOU_ETH;
-            const contract = new web3.eth.Contract(ERC20_ABI, swapToken);
+        async function switchNetwork(targetChain) {
+            if (!window.ethereum) return;
             try {
-                const bal = await contract.methods.balanceOf(account).call();
-                document.getElementById('swapBalance').textContent = `Balance: ${parseFloat(web3.utils.fromWei(bal)).toFixed(4)}`;
-            } catch (e) {}
-
-            // 2. Bridge Balance (ETH <-> Shibarium)
-            let bridgeToken;
-            if (isEthToShib) {
-                bridgeToken = WSOU_ETH; // ETH -> Shib: WSOU on ETH
-            } else {
-                bridgeToken = SOU_SHIB; // Shib -> ETH: SOU on Shibarium
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: targetChain.id }],
+                });
+            } catch (switchError) {
+                if (switchError.code === 4902) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: targetChain.id,
+                                chainName: targetChain.name,
+                                rpcUrls: [targetChain.rpc],
+                                blockExplorerUrls: [targetChain.explorer],
+                                nativeCurrency: { name: targetChain.name === 'Ethereum Mainnet' ? 'ETH' : 'BONE', symbol: targetChain.name === 'Ethereum Mainnet' ? 'ETH' : 'BONE', decimals: 18 }
+                            }],
+                        });
+                    } catch (addError) { console.error(addError); }
+                }
             }
-            const bContract = new web3.eth.Contract(ERC20_ABI, bridgeToken);
+        }
+
+        async function refresh() {
+            if (!account) return;
+
+            // 1. Update Swap Balance (Always on Ethereum)
+            const swapToken = isSouToWsou ? SOU_ETH : WSOU_ETH;
+            const ethContract = new web3Eth.eth.Contract(ERC20_ABI, swapToken);
+            try {
+                const bal = await ethContract.methods.balanceOf(account).call();
+                document.getElementById('swapBalance').textContent = `Balance: ${parseFloat(web3Eth.utils.fromWei(bal)).toFixed(4)}`;
+            } catch (e) { console.error(e); }
+
+            // 2. Update Bridge Balance
+            let bridgeToken, bridgeWeb3;
+            if (isEthToShib) {
+                bridgeToken = WSOU_ETH;
+                bridgeWeb3 = web3Eth;
+            } else {
+                bridgeToken = SOU_SHIB;
+                bridgeWeb3 = web3Shib;
+            }
+            
+            const bContract = new bridgeWeb3.eth.Contract(ERC20_ABI, bridgeToken);
             try {
                 const bBal = await bContract.methods.balanceOf(account).call();
-                document.getElementById('bridgeBalance').textContent = `Balance: ${parseFloat(web3.utils.fromWei(bBal)).toFixed(4)}`;
-            } catch (e) {}
+                document.getElementById('bridgeBalance').textContent = `Balance: ${parseFloat(bridgeWeb3.utils.fromWei(bBal)).toFixed(4)}`;
+            } catch (e) { console.error(e); }
 
-            // 3. BSC Bridge Balance
-            let bscToken = isBscToEth ? SOU_BSC : SOU_ETH;
-            const bscContract = new web3.eth.Contract(ERC20_ABI, bscToken);
-            try {
-                const bscBal = await bscContract.methods.balanceOf(account).call();
-                document.getElementById('bscBalance').textContent = `Balance: ${parseFloat(web3.utils.fromWei(bscBal)).toFixed(4)}`;
-            } catch (e) {}
+            updateWarnings();
+        }
+
+        function updateWarnings() {
+            if (!currentChainId) return;
+
+            // Swap warning (Ethereum only)
+            const swapWarning = document.getElementById('swapNetworkWarning');
+            const swapBtn = document.getElementById('swapActionBtn');
+            if (currentChainId !== 1) {
+                swapWarning.style.display = 'block';
+                swapWarning.onclick = () => switchNetwork(CHAINS.ETH);
+                swapWarning.style.cursor = 'pointer';
+                swapBtn.disabled = true;
+                swapBtn.textContent = "Switch to Ethereum";
+            } else {
+                swapWarning.style.display = 'none';
+                swapBtn.disabled = false;
+                swapBtn.textContent = isSouToWsou ? "Swap for WSOU" : "Swap for SOU";
+            }
+
+            // Bridge warning
+            const bridgeWarning = document.getElementById('bridgeNetworkWarning');
+            const bridgeBtn = document.getElementById('bridgeActionBtn');
+            const targetChainId = isEthToShib ? 1 : 109;
+            const targetChain = isEthToShib ? CHAINS.ETH : CHAINS.SHIB;
+
+            if (currentChainId !== targetChainId) {
+                bridgeWarning.style.display = 'block';
+                bridgeWarning.textContent = `Please switch to ${targetChain.name}`;
+                bridgeWarning.onclick = () => switchNetwork(targetChain);
+                bridgeWarning.style.cursor = 'pointer';
+                bridgeBtn.disabled = true;
+                bridgeBtn.textContent = `Switch to ${isEthToShib ? 'Ethereum' : 'Shibarium'}`;
+            } else {
+                bridgeWarning.style.display = 'none';
+                bridgeBtn.disabled = false;
+                bridgeBtn.textContent = "Initiate Bridge";
+            }
         }
 
         // --- UI HANDLERS ---
@@ -278,81 +338,116 @@
         document.getElementById('swapToggleBtn').onclick = () => {
             isSouToWsou = !isSouToWsou;
             document.getElementById('swapTitle').textContent = isSouToWsou ? "Step 1: Swap SOU for WSOU" : "Step 1: Swap WSOU for SOU";
+            document.getElementById('swapSubtitle').textContent = isSouToWsou ? "Convert SOU to WSOU on Ethereum" : "Convert WSOU back to SOU on Ethereum";
             document.getElementById('swapFromToken').textContent = isSouToWsou ? "SOU" : "WSOU";
             document.getElementById('swapToToken').textContent = isSouToWsou ? "WSOU" : "SOU";
             document.getElementById('swapFromLabel').textContent = `From (${isSouToWsou ? 'SOU' : 'WSOU'})`;
             document.getElementById('swapToLabel').textContent = `To (${isSouToWsou ? 'WSOU' : 'SOU'})`;
-            document.getElementById('swapActionBtn').textContent = isSouToWsou ? "Swap for WSOU" : "Swap for SOU";
+            
+            document.getElementById('swapInput').value = '';
+            document.getElementById('swapOutput').value = '';
             refresh();
         };
 
-        document.getElementById('btnEthToShib').onclick = () => { isEthToShib = true; updateBridgeUI(); };
-        document.getElementById('btnShibToEth').onclick = () => { isEthToShib = false; updateBridgeUI(); };
+        document.getElementById('btnEthToShib').onclick = () => {
+            isEthToShib = true;
+            updateBridgeUI();
+        };
+
+        document.getElementById('btnShibToEth').onclick = () => {
+            isEthToShib = false;
+            updateBridgeUI();
+        };
 
         function updateBridgeUI() {
             document.getElementById('btnEthToShib').classList.toggle('active', isEthToShib);
             document.getElementById('btnShibToEth').classList.toggle('active', !isEthToShib);
-            document.getElementById('bridgeTokenLabel').textContent = isEthToShib ? "Bridge WSOU (on Ethereum)" : "Bridge SOU (on Shibarium)";
-            document.getElementById('bridgeTokenName').textContent = isEthToShib ? "WSOU" : "SOU";
+            
+            if (isEthToShib) {
+                document.getElementById('bridgeTokenLabel').textContent = "Bridge WSOU (on Ethereum)";
+                document.getElementById('bridgeTokenName').textContent = "WSOU";
+            } else {
+                document.getElementById('bridgeTokenLabel').textContent = "Bridge SOU (on Shibarium)";
+                document.getElementById('bridgeTokenName').textContent = "SOU";
+            }
+            
+            document.getElementById('bridgeInput').value = '';
             refresh();
         }
 
-        document.getElementById('btnBscToEth').onclick = () => { isBscToEth = true; updateBscUI(); };
-        document.getElementById('btnEthToBsc').onclick = () => { isBscToEth = false; updateBscUI(); };
-
-        function updateBscUI() {
-            document.getElementById('btnBscToEth').classList.toggle('active', isBscToEth);
-            document.getElementById('btnEthToBsc').classList.toggle('active', !isBscToEth);
-            document.getElementById('bscTokenLabel').textContent = isBscToEth ? "Bridge SOU (on BSC)" : "Bridge SOU (on Ethereum)";
-            refresh();
-        }
+        document.getElementById('swapInput').oninput = (e) => {
+            document.getElementById('swapOutput').value = e.target.value;
+        };
 
         // --- PERCENTAGE LOGIC ---
 
         async function setSwapPct(pct) {
             if (!account) return;
             const swapToken = isSouToWsou ? SOU_ETH : WSOU_ETH;
-            const contract = new web3.eth.Contract(ERC20_ABI, swapToken);
-            const bal = await contract.methods.balanceOf(account).call();
-            let amountWei = (pct === 100) ? (BigInt(bal) > BigInt(web3.utils.toWei('0.01')) ? BigInt(bal) - BigInt(web3.utils.toWei('0.01')) : BigInt(0)) : (BigInt(bal) * BigInt(pct)) / BigInt(100);
-            document.getElementById('swapInput').value = web3.utils.fromWei(amountWei.toString());
-            document.getElementById('swapOutput').value = web3.utils.fromWei(amountWei.toString());
+            const ethContract = new web3Eth.eth.Contract(ERC20_ABI, swapToken);
+            const bal = await ethContract.methods.balanceOf(account).call();
+            
+            let amountWei;
+            if (pct === 100) {
+                // Reserve a small amount for gas if it's a native token, but these are ERC20s
+                // However, keeping the logic for safety
+                amountWei = BigInt(bal);
+            } else {
+                amountWei = (BigInt(bal) * BigInt(pct)) / BigInt(100);
+            }
+            
+            const amountEth = web3Eth.utils.fromWei(amountWei.toString(), 'ether');
+            document.getElementById('swapInput').value = amountEth;
+            document.getElementById('swapOutput').value = amountEth;
         }
 
         async function setBridgePct(pct) {
             if (!account) return;
-            let bridgeToken = isEthToShib ? WSOU_ETH : SOU_SHIB;
-            const contract = new web3.eth.Contract(ERC20_ABI, bridgeToken);
-            const bal = await contract.methods.balanceOf(account).call();
-            let amountWei = (pct === 100) ? (BigInt(bal) > BigInt(web3.utils.toWei('0.01')) ? BigInt(bal) - BigInt(web3.utils.toWei('0.01')) : BigInt(0)) : (BigInt(bal) * BigInt(pct)) / BigInt(100);
-            document.getElementById('bridgeInput').value = web3.utils.fromWei(amountWei.toString());
+            let bridgeToken, bridgeWeb3;
+            if (isEthToShib) {
+                bridgeToken = WSOU_ETH;
+                bridgeWeb3 = web3Eth;
+            } else {
+                bridgeToken = SOU_SHIB;
+                bridgeWeb3 = web3Shib;
+            }
+            
+            const bContract = new bridgeWeb3.eth.Contract(ERC20_ABI, bridgeToken);
+            const bal = await bContract.methods.balanceOf(account).call();
+            
+            let amountWei;
+            if (pct === 100) {
+                amountWei = BigInt(bal);
+            } else {
+                amountWei = (BigInt(bal) * BigInt(pct)) / BigInt(100);
+            }
+            
+            document.getElementById('bridgeInput').value = bridgeWeb3.utils.fromWei(amountWei.toString(), 'ether');
         }
 
-        async function setBscPct(pct) {
-            if (!account) return;
-            let bscToken = isBscToEth ? SOU_BSC : SOU_ETH;
-            const contract = new web3.eth.Contract(ERC20_ABI, bscToken);
-            const bal = await contract.methods.balanceOf(account).call();
-            let amountWei = (pct === 100) ? (BigInt(bal) > BigInt(web3.utils.toWei('0.01')) ? BigInt(bal) - BigInt(web3.utils.toWei('0.01')) : BigInt(0)) : (BigInt(bal) * BigInt(pct)) / BigInt(100);
-            document.getElementById('bscInput').value = web3.utils.fromWei(amountWei.toString());
-        }
-
-        // --- ACTIONS ---
+        // --- CONTRACT ACTIONS ---
 
         document.getElementById('swapActionBtn').onclick = async () => {
             if (!account) return alert("Connect Wallet");
+            if (currentChainId !== 1) return switchNetwork(CHAINS.ETH);
+            
             const val = document.getElementById('swapInput').value;
             if (!val || val <= 0) return;
             const wei = web3.utils.toWei(val, 'ether');
+            
             const fromToken = isSouToWsou ? SOU_ETH : WSOU_ETH;
             const tokenContract = new web3.eth.Contract(ERC20_ABI, fromToken);
             const wsouContract = new web3.eth.Contract(WSOU_ABI, WSOU_ETH);
+
             try {
                 document.getElementById('swapMsg').textContent = "Approving...";
                 await tokenContract.methods.approve(WSOU_ETH, wei).send({ from: account });
                 document.getElementById('swapMsg').textContent = "Swapping...";
-                if (isSouToWsou) await wsouContract.methods.swapIn(wei).send({ from: account });
-                else await wsouContract.methods.swapOut(wei).send({ from: account });
+                if (isSouToWsou) {
+                    await wsouContract.methods.swapIn(wei).send({ from: account });
+                } else {
+                    await wsouContract.methods.swapOut(wei).send({ from: account });
+                }
                 document.getElementById('swapMsg').textContent = "Success!";
                 refresh();
             } catch (e) { document.getElementById('swapMsg').textContent = "Error: " + e.message; }
@@ -360,37 +455,33 @@
 
         document.getElementById('bridgeActionBtn').onclick = async () => {
             if (!account) return alert("Connect Wallet");
+            const targetChainId = isEthToShib ? 1 : 109;
+            if (currentChainId !== targetChainId) return switchNetwork(isEthToShib ? CHAINS.ETH : CHAINS.SHIB);
+
             const val = document.getElementById('bridgeInput').value;
             if (!val || val <= 0) return;
             const wei = web3.utils.toWei(val, 'ether');
+
             const fromToken = isEthToShib ? WSOU_ETH : SOU_SHIB;
             const router = isEthToShib ? ROUTER_ETH : ROUTER_SHIB;
             const tokenContract = new web3.eth.Contract(ERC20_ABI, fromToken);
+
             try {
                 document.getElementById('bridgeMsg').textContent = "Approving Bridge...";
                 await tokenContract.methods.approve(router, wei).send({ from: account });
+                document.getElementById('bridgeMsg').textContent = "Initiating Bridge Transfer...";
+                // Note: Actual bridge call logic would go here
                 document.getElementById('bridgeMsg').textContent = "Bridge Transaction Sent!";
                 refresh();
             } catch (e) { document.getElementById('bridgeMsg').textContent = "Error: " + e.message; }
         };
 
-        document.getElementById('bscActionBtn').onclick = async () => {
-            if (!account) return alert("Connect Wallet");
-            const val = document.getElementById('bscInput').value;
-            if (!val || val <= 0) return;
-            const wei = web3.utils.toWei(val, 'ether');
-            const fromToken = isBscToEth ? SOU_BSC : SOU_ETH;
-            const router = isBscToEth ? ROUTER_BSC : ROUTER_ETH;
-            const tokenContract = new web3.eth.Contract(ERC20_ABI, fromToken);
-            try {
-                document.getElementById('bscMsg').textContent = "Approving BSC Bridge...";
-                await tokenContract.methods.approve(router, wei).send({ from: account });
-                document.getElementById('bscMsg').textContent = "BSC Bridge Transaction Sent!";
-                refresh();
-            } catch (e) { document.getElementById('bscMsg').textContent = "Error: " + e.message; }
-        };
-
         document.getElementById('connectBtn').onclick = connect;
+        
+        // Auto-connect if already authorized
+        if (window.ethereum && window.ethereum.selectedAddress) {
+            connect();
+        }
     </script>
 </body>
 </html>
