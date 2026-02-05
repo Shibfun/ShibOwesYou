@@ -170,29 +170,25 @@
                 <div class="bridge-header">
                     <div class="bridge-header-content">
                         <div style="font-size: 32px; margin-bottom: 12px;">🔄</div>
-                        <h2 class="bridge-title">Step 1: Swap SOU ↔ WSOU</h2>
+                        <h2 class="bridge-title">Step 1: Swap SOU for WSOU</h2>
                         <p class="bridge-subtitle">WSOU is required for bridging. Swaps occur on Ethereum.</p>
                     </div>
                 </div>
                 <div class="bridge-content">
-                    <div class="chain-selector">
-                        <button class="chain-btn active" id="swapInBtn">Swap In (SOU → WSOU)</button>
-                        <button class="chain-btn" id="swapOutBtn">Swap Out (WSOU → SOU)</button>
-                    </div>
                     <div class="input-section">
                         <div class="input-label">
-                            <span id="swapInputLabel">Amount to Swap</span>
-                            <span class="balance-display" id="swapBalanceDisplay">Balance: 0</span>
+                            <span>Amount to Swap</span>
+                            <span class="balance-display" id="souBalanceDisplay">SOU Balance: 0</span>
                         </div>
                         <div class="input-box">
                             <input type="number" id="swapAmount" placeholder="0.0" step="any" min="0">
                             <div class="token-display">
                                 <div class="token-logo"><img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU"></div>
-                                <span class="token-name" id="swapTokenName">SOU</span>
+                                <span class="token-name">SOU</span>
                             </div>
                         </div>
                     </div>
-                    <button class="action-button" id="swapButton">Swap Tokens</button>
+                    <button class="action-button" id="swapButton">Swap for WSOU</button>
                     <div class="message-section" id="swapMessageSection">
                         Enter an amount to swap
                     </div>
@@ -203,8 +199,8 @@
                 <div class="bridge-header">
                     <div class="bridge-header-content">
                         <div style="font-size: 32px; margin-bottom: 12px;">🌉</div>
-                        <h2 class="bridge-title">Step 2: Bridge WSOU ↔ SOU</h2>
-                        <p class="bridge-subtitle">Transfer tokens between Ethereum (WSOU) and Shibarium (SOU)</p>
+                        <h2 class="bridge-title">Step 2: Bridge WSOU</h2>
+                        <p class="bridge-subtitle">Transfer WSOU tokens between Ethereum and Shibarium</p>
                     </div>
                 </div>
                 <div class="bridge-content">
@@ -226,25 +222,25 @@
                     <div class="input-section">
                         <div class="input-label">
                             <span>Amount to Bridge</span>
-                            <span class="balance-display" id="wsouBalanceDisplay">Balance: 0</span>
+                            <span class="balance-display" id="wsouBalanceDisplay">WSOU Balance: 0</span>
                         </div>
                         <div class="input-box">
                             <input type="number" id="bridgeAmount" placeholder="0.0" step="any" min="0">
                             <div class="token-display">
-                                <div class="token-logo"><img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU"></div>
-                                <span class="token-name" id="bridgeTokenName">WSOU</span>
+                                <div class="token-logo"><img src="https://www.woofswap.finance/image/tokens/sou.png" alt="WSOU"></div>
+                                <span class="token-name">WSOU</span>
                             </div>
                         </div>
                         <div class="percentage-buttons">
-                            <button class="percentage-btn" data-percentage="25">25%</button>
-                            <button class="percentage-btn" data-percentage="50">50%</button>
-                            <button class="percentage-btn" data-percentage="75">75%</button>
-                            <button class="percentage-btn" data-percentage="100">MAX</button>
+                            <button class="percentage-btn" data-token="wsou" data-percentage="25">25%</button>
+                            <button class="percentage-btn" data-token="wsou" data-percentage="50">50%</button>
+                            <button class="percentage-btn" data-token="wsou" data-percentage="75">75%</button>
+                            <button class="percentage-btn" data-token="wsou" data-percentage="100">MAX</button>
                         </div>
                     </div>
                     <button class="action-button" id="bridgeButton">Initiate Bridge</button>
                     <div class="message-section" id="bridgeMessageSection">
-                        Ready to bridge your tokens
+                        Ready to bridge your WSOU tokens
                     </div>
                 </div>
             </section>
@@ -256,21 +252,13 @@
             <div class="footer-top">
                 <div class="footer-section">
                     <h3>About SOU Bridge</h3>
-                    <p>Securely swap SOU and bridge tokens between Ethereum and Shibarium, powered by Chainlink CCIP.</p>
-                </div>
-                <div class="footer-section">
-                    <h3>Quick Links</h3>
-                    <p><a href="#app-container" style="color: var(--primary-light); text-decoration: none;">Bridge</a></p>
-                    <p><a href="https://docs.chain.link/ccip" target="_blank" style="color: var(--primary-light); text-decoration: none;">CCIP Docs</a></p>
+                    <p>Securely swap SOU and bridge WSOU tokens between Ethereum and Shibarium, powered by Chainlink CCIP.</p>
                 </div>
                 <div class="footer-section">
                     <h3>Community</h3>
                     <div class="social-links">
                         <a href="https://x.com/ShibOwesYou" target="_blank" class="social-link">𝕏 Twitter</a>
                         <a href="https://t.me/ShibOwesYou" target="_blank" class="social-link">📱 Telegram</a>
-                        <a href="https://discord.gg/shibowesyou" target="_blank" class="social-link">💬 Discord</a>
-                        <a href="https://www.tiktok.com/@ShibOwesYou" target="_blank" class="social-link">🎵 TikTok</a>
-                        <a href="https://pancakeswap.finance" target="_blank" class="social-link">🔄 PancakeSwap</a>
                     </div>
                 </div>
             </div>
@@ -278,16 +266,16 @@
                 <div class="footer-powered">
                     <span>🔗 Powered by Chainlink CCIP</span>
                 </div>
-                <p>🔒 Secure Cross-Chain Bridge</p>
+                <p>🔒 Secure Cross-Chain Swap & Bridge</p>
             </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script>
-        const SOU_ETH_ADDRESS = '0xDEA2a2A166e2FDC47b934bee68E6032F8f1Ca09C';
+        const SOU_TOKEN_ADDRESS = '0xDEA2a2A166e2FDC47b934bee68E6032F8f1Ca09C';
         const WSOU_ETH_ADDRESS = '0x5c005d074e25b89db97a32087c06d154d8cb2d5b';
-        const SOU_SHIB_ADDRESS = '0x5e1aee526d1aa049b4d95e5b68ae7bb556e2d799';
+        const WSOU_SHIB_ADDRESS = '0x5e1aee526d1aa049b4d95e5b68ae7bb556e2d799';
         
         const CHAINS = {
             Ethereum: {
@@ -296,17 +284,15 @@
                 rpcUrl: 'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa44561',
                 router: '0x80226fc0Ee2b096224EeAc085Bb9a8cba1146f7D',
                 selector: '5009297550715157269',
-                token: WSOU_ETH_ADDRESS,
-                tokenName: 'WSOU'
+                token: WSOU_ETH_ADDRESS
             },
             Shibarium: {
                 chainId: 109,
                 chainName: 'Shibarium',
-                rpcUrl: 'https://www.shibrpc.com',
+                rpcUrl: 'https://rpc.shibrpc.com',
                 router: '0xc2CA5d5C17911e4B838194b51585DdF8fe5116C1',
                 selector: '3993510008929295315',
-                token: SOU_SHIB_ADDRESS,
-                tokenName: 'SOU'
+                token: WSOU_SHIB_ADDRESS
             }
         };
 
@@ -327,7 +313,7 @@
             { "inputs": [{ "internalType": "uint64", "name": "destinationChainSelector", "type": "uint64" }, { "components": [{ "internalType": "bytes", "name": "receiver", "type": "bytes" }, { "internalType": "bytes", "name": "data", "type": "bytes" }, { "components": [{ "internalType": "address", "name": "token", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }], "internalType": "struct Client.EVMTokenAmount[]", "name": "tokenAmounts", "type": "tuple[]" }, { "internalType": "address", "name": "feeToken", "type": "address" }, { "internalType": "bytes", "name": "extraArgs", "type": "bytes" }], "internalType": "struct Client.EVM2AnyMessage", "name": "message", "type": "tuple" }], "name": "getFee", "outputs": [{ "internalType": "uint256", "name": "fee", "type": "uint256" }], "stateMutability": "view", "type": "function" }
         ];
 
-        let web3, account, fromChain = 'Ethereum', toChain = 'Shibarium', swapDirection = 'in';
+        let web3, account, fromChain = 'Ethereum', toChain = 'Shibarium';
 
         async function connectWallet() {
             if (window.ethereum) {
@@ -344,40 +330,14 @@
 
         async function updateBalances() {
             if (!account) return;
+            const souContract = new web3.eth.Contract(ERC20_ABI, SOU_TOKEN_ADDRESS);
+            const wsouContract = new web3.eth.Contract(ERC20_ABI, CHAINS[fromChain].token);
             
-            const ethWeb3 = new Web3(CHAINS.Ethereum.rpcUrl);
-            const shibWeb3 = new Web3(CHAINS.Shibarium.rpcUrl);
+            const souBal = await souContract.methods.balanceOf(account).call();
+            const wsouBal = await wsouContract.methods.balanceOf(account).call();
             
-            const souEthContract = new ethWeb3.eth.Contract(ERC20_ABI, SOU_ETH_ADDRESS);
-            const wsouEthContract = new ethWeb3.eth.Contract(ERC20_ABI, WSOU_ETH_ADDRESS);
-            const souShibContract = new shibWeb3.eth.Contract(ERC20_ABI, SOU_SHIB_ADDRESS);
-            
-            try {
-                if (swapDirection === 'in') {
-                    const bal = await souEthContract.methods.balanceOf(account).call();
-                    document.getElementById('swapBalanceDisplay').textContent = `Balance: ${parseFloat(Web3.utils.fromWei(bal)).toFixed(4)} SOU`;
-                } else {
-                    const bal = await wsouEthContract.methods.balanceOf(account).call();
-                    document.getElementById('swapBalanceDisplay').textContent = `Balance: ${parseFloat(Web3.utils.fromWei(bal)).toFixed(4)} WSOU`;
-                }
-
-                let bridgeBal;
-                if (fromChain === 'Ethereum') {
-                    bridgeBal = await wsouEthContract.methods.balanceOf(account).call();
-                } else {
-                    bridgeBal = await souShibContract.methods.balanceOf(account).call();
-                }
-                document.getElementById('wsouBalanceDisplay').textContent = `Balance: ${parseFloat(Web3.utils.fromWei(bridgeBal)).toFixed(4)} ${CHAINS[fromChain].tokenName}`;
-            } catch (err) { console.error("Balance fetch error:", err); }
-        }
-
-        function setSwapDirection(dir) {
-            swapDirection = dir;
-            document.getElementById('swapInBtn').classList.toggle('active', dir === 'in');
-            document.getElementById('swapOutBtn').classList.toggle('active', dir === 'out');
-            document.getElementById('swapTokenName').textContent = dir === 'in' ? 'SOU' : 'WSOU';
-            document.getElementById('swapInputLabel').textContent = dir === 'in' ? 'Amount to Swap In' : 'Amount to Swap Out';
-            updateBalances();
+            document.getElementById('souBalanceDisplay').textContent = `SOU Balance: ${parseFloat(web3.utils.fromWei(souBal)).toFixed(4)}`;
+            document.getElementById('wsouBalanceDisplay').textContent = `WSOU Balance: ${parseFloat(web3.utils.fromWei(wsouBal)).toFixed(4)}`;
         }
 
         async function switchDirection(dir) {
@@ -386,11 +346,10 @@
             } else {
                 fromChain = 'Shibarium'; toChain = 'Ethereum';
             }
-            document.querySelectorAll('#bridge-section .chain-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.chain-btn').forEach(b => b.classList.remove('active'));
             document.querySelector(`[data-direction="${dir}"]`).classList.add('active');
             document.getElementById('fromChainDisplay').textContent = fromChain;
             document.getElementById('toChainDisplay').textContent = toChain;
-            document.getElementById('bridgeTokenName').textContent = CHAINS[fromChain].tokenName;
             updateBalances();
         }
 
@@ -399,21 +358,15 @@
             const amount = document.getElementById('swapAmount').value;
             if (!amount || amount <= 0) return;
             const weiAmount = web3.utils.toWei(amount, 'ether');
-            
-            const tokenToApprove = swapDirection === 'in' ? SOU_ETH_ADDRESS : WSOU_ETH_ADDRESS;
-            const tokenContract = new web3.eth.Contract(ERC20_ABI, tokenToApprove);
+            const souContract = new web3.eth.Contract(ERC20_ABI, SOU_TOKEN_ADDRESS);
             const wsouContract = new web3.eth.Contract(WSOU_ABI, WSOU_ETH_ADDRESS);
             
             try {
-                const allowance = await tokenContract.methods.allowance(account, WSOU_ETH_ADDRESS).call();
+                const allowance = await souContract.methods.allowance(account, WSOU_ETH_ADDRESS).call();
                 if (BigInt(allowance) < BigInt(weiAmount)) {
-                    await tokenContract.methods.approve(WSOU_ETH_ADDRESS, weiAmount).send({ from: account });
+                    await souContract.methods.approve(WSOU_ETH_ADDRESS, weiAmount).send({ from: account });
                 }
-                if (swapDirection === 'in') {
-                    await wsouContract.methods.swapIn(weiAmount).send({ from: account });
-                } else {
-                    await wsouContract.methods.swapOut(weiAmount).send({ from: account });
-                }
+                await wsouContract.methods.swapIn(weiAmount).send({ from: account });
                 updateBalances();
             } catch (err) { console.error(err); }
         }
@@ -452,23 +405,7 @@
         document.getElementById('connectWalletButton').addEventListener('click', connectWallet);
         document.getElementById('swapButton').addEventListener('click', handleSwap);
         document.getElementById('bridgeButton').addEventListener('click', handleBridge);
-        document.getElementById('swapInBtn').addEventListener('click', () => setSwapDirection('in'));
-        document.getElementById('swapOutBtn').addEventListener('click', () => setSwapDirection('out'));
-        document.querySelectorAll('#bridge-section .chain-btn').forEach(btn => btn.addEventListener('click', () => switchDirection(btn.dataset.direction)));
-        
-        document.querySelectorAll('.percentage-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                if (!account) return alert('Connect wallet');
-                const percentage = parseInt(btn.dataset.percentage);
-                const rpc = fromChain === 'Ethereum' ? CHAINS.Ethereum.rpcUrl : CHAINS.Shibarium.rpcUrl;
-                const token = fromChain === 'Ethereum' ? WSOU_ETH_ADDRESS : SOU_SHIB_ADDRESS;
-                const tempWeb3 = new Web3(rpc);
-                const contract = new tempWeb3.eth.Contract(ERC20_ABI, token);
-                const balance = await contract.methods.balanceOf(account).call();
-                const amount = (BigInt(balance) * BigInt(percentage) / BigInt(100)).toString();
-                document.getElementById('bridgeAmount').value = Web3.utils.fromWei(amount);
-            });
-        });
+        document.querySelectorAll('.chain-btn').forEach(btn => btn.addEventListener('click', () => switchDirection(btn.dataset.direction)));
     </script>
 </body>
 </html>
