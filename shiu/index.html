@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHIU - Premium Mint & Redeem</title>
+    <title>SHIU Swap Pro - Fixed Gas Edition</title>
     <link rel="icon" type="image/png" href="https://www.woofswap.finance/image/tokens/sou.png">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -28,12 +28,7 @@
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Outfit', sans-serif;
             background: linear-gradient(135deg, var(--dark-1) 0%, var(--dark-2) 50%, var(--dark-3) 100%);
@@ -43,8 +38,6 @@
             flex-direction: column;
             overflow-x: hidden;
         }
-
-        /* Smooth Background */
         body::before {
             content: '';
             position: fixed;
@@ -57,7 +50,6 @@
                 radial-gradient(circle at 80% 70%, rgba(118, 75, 162, 0.1) 0%, transparent 50%);
             z-index: -1;
         }
-
         nav {
             position: fixed;
             top: 0;
@@ -71,7 +63,6 @@
             align-items: center;
             z-index: 1000;
         }
-
         .logo {
             font-size: 22px;
             font-weight: 800;
@@ -82,7 +73,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
         .wallet-btn {
             padding: 10px 24px;
             background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
@@ -94,37 +84,11 @@
             transition: var(--transition);
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
-
-        .wallet-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
-        }
-
-        .wrapper {
-            padding-top: 120px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .hero {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .hero h1 {
-            font-size: 48px;
-            margin-bottom: 12px;
-            letter-spacing: -1px;
-        }
-
-        .hero p {
-            color: var(--text-secondary);
-            font-size: 16px;
-        }
-
-        /* Swap Card */
+        .wallet-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5); }
+        .wrapper { padding-top: 120px; flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .hero { text-align: center; margin-bottom: 40px; }
+        .hero h1 { font-size: 48px; margin-bottom: 12px; letter-spacing: -1px; }
+        .hero p { color: var(--text-secondary); font-size: 16px; }
         .swap-card {
             width: 100%;
             max-width: 480px;
@@ -135,215 +99,37 @@
             padding: 32px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
-
-        .tabs {
-            display: flex;
-            background: rgba(10, 14, 39, 0.4);
-            padding: 6px;
-            border-radius: 16px;
-            margin-bottom: 28px;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            font-weight: 700;
-            cursor: pointer;
-            border-radius: 12px;
-            transition: var(--transition);
-        }
-
-        .tab.active {
-            background: var(--dark-3);
-            color: white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-
-        /* Token Toggle Buttons */
-        .token-toggle {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-
-        .toggle-btn {
-            flex: 1;
-            padding: 10px;
-            background: rgba(35, 45, 77, 0.4);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text-secondary);
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .toggle-btn.active {
-            background: rgba(102, 126, 234, 0.2);
-            border-color: var(--primary);
-            color: white;
-        }
-
-        .input-group {
-            background: rgba(10, 14, 39, 0.3);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 12px;
-            transition: var(--transition);
-        }
-
-        .input-group:focus-within {
-            border-color: var(--primary);
-            background: rgba(10, 14, 39, 0.5);
-        }
-
-        .input-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-tertiary);
-        }
-
-        .input-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 28px;
-            font-family: 'Space Mono', monospace;
-            outline: none;
-            width: 100%;
-        }
-
-        .token-label {
-            font-weight: 800;
-            font-size: 18px;
-            color: white;
-            background: rgba(255,255,255,0.05);
-            padding: 6px 12px;
-            border-radius: 10px;
-        }
-
-        /* Percentage Buttons */
-        .percent-row {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
-        }
-
-        .percent-btn {
-            flex: 1;
-            padding: 8px;
-            background: rgba(35, 45, 77, 0.4);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-secondary);
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .percent-btn:hover {
-            border-color: var(--primary);
-            color: white;
-            background: rgba(102, 126, 234, 0.1);
-        }
-
-        .divider {
-            display: flex;
-            justify-content: center;
-            margin: -20px 0;
-            position: relative;
-            z-index: 2;
-        }
-
-        .arrow-circle {
-            width: 40px;
-            height: 40px;
-            background: var(--dark-3);
-            border: 4px solid var(--dark-2);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary-light);
-            font-size: 20px;
-        }
-
-        .action-btn {
-            width: 100%;
-            padding: 20px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            border: none;
-            border-radius: 20px;
-            color: white;
-            font-size: 18px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-top: 10px;
-        }
-
-        .action-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            filter: grayscale(1);
-        }
-
-        .status-msg {
-            margin-top: 20px;
-            padding: 16px;
-            border-radius: 16px;
-            font-size: 13px;
-            font-weight: 600;
-            text-align: center;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(102, 126, 234, 0.05);
-            border: 1px solid rgba(102, 126, 234, 0.1);
-            color: var(--primary-light);
-            word-break: break-all;
-        }
-
+        .tabs { display: flex; background: rgba(10, 14, 39, 0.4); padding: 6px; border-radius: 16px; margin-bottom: 28px; }
+        .tab { flex: 1; padding: 12px; border: none; background: transparent; color: var(--text-secondary); font-weight: 700; cursor: pointer; border-radius: 12px; transition: var(--transition); }
+        .tab.active { background: var(--dark-3); color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .token-toggle { display: flex; gap: 10px; margin-bottom: 16px; }
+        .toggle-btn { flex: 1; padding: 10px; background: rgba(35, 45, 77, 0.4); border: 1px solid var(--border); border-radius: 12px; color: var(--text-secondary); font-weight: 700; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .toggle-btn.active { background: rgba(102, 126, 234, 0.2); border-color: var(--primary); color: white; }
+        .input-group { background: rgba(10, 14, 39, 0.3); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 12px; transition: var(--transition); }
+        .input-group:focus-within { border-color: var(--primary); background: rgba(10, 14, 39, 0.5); }
+        .input-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; font-weight: 600; color: var(--text-tertiary); }
+        .input-row { display: flex; align-items: center; gap: 12px; }
+        input { flex: 1; background: transparent; border: none; color: white; font-size: 28px; font-family: 'Space Mono', monospace; outline: none; width: 100%; }
+        .token-label { font-weight: 800; font-size: 18px; color: white; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 10px; }
+        .percent-row { display: flex; gap: 8px; margin-bottom: 24px; }
+        .percent-btn { flex: 1; padding: 8px; background: rgba(35, 45, 77, 0.4); border: 1px solid var(--border); border-radius: 10px; color: var(--text-secondary); font-size: 12px; font-weight: 700; cursor: pointer; transition: var(--transition); }
+        .percent-btn:hover { border-color: var(--primary); color: white; background: rgba(102, 126, 234, 0.1); }
+        .divider { display: flex; justify-content: center; margin: -20px 0; position: relative; z-index: 2; }
+        .arrow-circle { width: 40px; height: 40px; background: var(--dark-3); border: 4px solid var(--dark-2); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary-light); font-size: 20px; }
+        .action-btn { width: 100%; padding: 20px; background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); border: none; border-radius: 20px; color: white; font-size: 18px; font-weight: 800; cursor: pointer; transition: var(--transition); margin-top: 10px; }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+        .status-msg { margin-top: 20px; padding: 16px; border-radius: 16px; font-size: 13px; font-weight: 600; text-align: center; min-height: 50px; display: flex; align-items: center; justify-content: center; background: rgba(102, 126, 234, 0.05); border: 1px solid rgba(102, 126, 234, 0.1); color: var(--primary-light); word-break: break-all; }
         .status-msg.success { background: rgba(16, 185, 129, 0.1); border-color: var(--success); color: var(--success); }
         .status-msg.error { background: rgba(239, 68, 68, 0.1); border-color: var(--error); color: var(--error); }
         .status-msg.warning { background: rgba(245, 158, 11, 0.1); border-color: var(--warning); color: var(--warning); }
-
-        footer {
-            padding: 40px;
-            text-align: center;
-            color: var(--text-tertiary);
-            font-size: 13px;
-        }
-
-        /* Animations */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .swap-card { animation: fadeIn 0.6s ease-out; }
+        .gas-badge { font-size: 11px; background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 6px; margin-top: 10px; display: inline-block; color: var(--text-tertiary); }
+        footer { padding: 40px; text-align: center; color: var(--text-tertiary); font-size: 13px; }
     </style>
 </head>
 <body>
 
     <nav>
-        <div class="logo">🪙 SHIU</div>
+        <div class="logo">🪙 SHIU SWAP PRO</div>
         <button class="wallet-btn" id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
     </nav>
 
@@ -351,6 +137,7 @@
         <div class="hero">
             <h1>Premium Bridge</h1>
             <p>High-precision 6-decimal stablecoin exchange</p>
+            <div class="gas-badge">⚡ Fixed Gas Price: 0.1 Gwei</div>
         </div>
 
         <div class="swap-card">
@@ -359,13 +146,11 @@
                 <button class="tab" id="redeemTab" onclick="setMode('redeem')">REDEEM</button>
             </div>
 
-            <!-- Token Selection Buttons (Toggle) -->
             <div class="token-toggle" id="tokenToggleContainer">
                 <button class="toggle-btn active" id="btnUSDT" onclick="selectToken('USDT')">USDT</button>
                 <button class="toggle-btn" id="btnUSDC" onclick="selectToken('USDC')">USDC</button>
             </div>
 
-            <!-- Input Section -->
             <div class="input-group">
                 <div class="input-header">
                     <span id="labelFrom">Pay</span>
@@ -377,7 +162,6 @@
                 </div>
             </div>
 
-            <!-- Percent Buttons -->
             <div class="percent-row">
                 <button class="percent-btn" onclick="setPercent(0.25)">25%</button>
                 <button class="percent-btn" onclick="setPercent(0.50)">50%</button>
@@ -385,11 +169,8 @@
                 <button class="percent-btn" onclick="setPercent(1.00)">MAX</button>
             </div>
 
-            <div class="divider">
-                <div class="arrow-circle">↓</div>
-            </div>
+            <div class="divider"><div class="arrow-circle">↓</div></div>
 
-            <!-- Output Section -->
             <div class="input-group" style="margin-top: 12px;">
                 <div class="input-header">
                     <span id="labelTo">Receive</span>
@@ -402,13 +183,10 @@
             </div>
 
             <button class="action-btn" id="actionBtn" onclick="handleAction()" disabled>Connect Wallet</button>
-            
             <div class="status-msg" id="statusMsg">Ready to swap</div>
         </div>
 
-        <footer>
-            <p>© 2026 SHIU Protocol. All assets use 6-decimal precision.</p>
-        </footer>
+        <footer><p>© 2026 SHIU Protocol. Assets: 6-decimal | Gas: 0.1 Gwei</p></footer>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
@@ -418,6 +196,9 @@
             USDT: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
             USDC: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
         };
+
+        // FIXED GAS PRICE: 0.1 GWEI
+        const FIXED_GAS_PRICE = '100000000'; // 0.1 * 10^9 wei
 
         const ABIS = {
             SHIU: [
@@ -456,13 +237,11 @@
                 const shiuCtr = new web3.eth.Contract(ABIS.SHIU, CONTRACTS.SHIU);
                 const usdtCtr = new web3.eth.Contract(ABIS.ERC20, CONTRACTS.USDT);
                 const usdcCtr = new web3.eth.Contract(ABIS.ERC20, CONTRACTS.USDC);
-
                 const [u, c, s] = await Promise.all([
                     usdtCtr.methods.balanceOf(userAccount).call(),
                     usdcCtr.methods.balanceOf(userAccount).call(),
                     shiuCtr.methods.balanceOf(userAccount).call()
                 ]);
-
                 balances = {
                     USDT: web3.utils.fromWei(u, 'mwei'),
                     USDC: web3.utils.fromWei(c, 'mwei'),
@@ -492,21 +271,13 @@
             document.getElementById('labelTo').textContent = isMint ? 'Receive' : 'Return';
             document.getElementById('symbolFrom').textContent = isMint ? selectedToken : 'SHIU';
             document.getElementById('symbolTo').textContent = isMint ? 'SHIU' : selectedToken;
-            
             const balFrom = isMint ? balances[selectedToken] : balances.SHIU;
             const balTo = isMint ? balances.SHIU : balances[selectedToken];
-            
             document.getElementById('balanceFrom').textContent = `Balance: ${format6(balFrom)}`;
             document.getElementById('balanceTo').textContent = `Balance: ${format6(balTo)}`;
-
             const btn = document.getElementById('actionBtn');
-            if (!userAccount) {
-                btn.textContent = 'Connect Wallet';
-                btn.disabled = false;
-            } else {
-                btn.textContent = isMint ? `Mint SHIU` : `Redeem ${selectedToken}`;
-                btn.disabled = false;
-            }
+            if (!userAccount) { btn.textContent = 'Connect Wallet'; btn.disabled = false; } 
+            else { btn.textContent = isMint ? `Mint SHIU` : `Redeem ${selectedToken}`; btn.disabled = false; }
             syncAmount();
         }
 
@@ -522,16 +293,12 @@
             document.getElementById('outputAmount').value = val ? parseFloat(val).toFixed(6) : '';
         }
 
-        function format6(v) {
-            return parseFloat(v).toLocaleString(undefined, { minimumFractionDigits: 6, maximumFractionDigits: 6 });
-        }
+        function format6(v) { return parseFloat(v).toLocaleString(undefined, { minimumFractionDigits: 6, maximumFractionDigits: 6 }); }
 
         async function handleAction() {
             if (!userAccount) return connectWallet();
-            
             const amount = document.getElementById('inputAmount').value;
             if (!amount || amount <= 0) return log('Enter a valid amount', 'error');
-            
             const amountWei = web3.utils.toWei(amount, 'mwei');
             const shiuCtr = new web3.eth.Contract(ABIS.SHIU, CONTRACTS.SHIU);
 
@@ -539,24 +306,30 @@
                 if (mode === 'mint') {
                     const tokenAddr = CONTRACTS[selectedToken];
                     const tokenCtr = new web3.eth.Contract(ABIS.ERC20, tokenAddr);
-                    
                     log('Checking allowance...', 'warning');
                     const allowance = await tokenCtr.methods.allowance(userAccount, CONTRACTS.SHIU).call();
-                    
                     if (BigInt(allowance) < BigInt(amountWei)) {
-                        log(`Approving ${selectedToken}...`, 'warning');
-                        await tokenCtr.methods.approve(CONTRACTS.SHIU, amountWei).send({ from: userAccount });
+                        log(`Approving ${selectedToken} (Gas: 0.1 Gwei)...`, 'warning');
+                        await tokenCtr.methods.approve(CONTRACTS.SHIU, amountWei).send({ 
+                            from: userAccount,
+                            gasPrice: FIXED_GAS_PRICE 
+                        });
                         log('Approval successful', 'success');
                     }
-
-                    log(`Minting SHIU with ${selectedToken}...`, 'warning');
+                    log(`Minting SHIU (Gas: 0.1 Gwei)...`, 'warning');
                     const method = selectedToken === 'USDT' ? 'mintWithUSDT' : 'mintWithUSDC';
-                    await shiuCtr.methods[method](amountWei).send({ from: userAccount });
+                    await shiuCtr.methods[method](amountWei).send({ 
+                        from: userAccount,
+                        gasPrice: FIXED_GAS_PRICE 
+                    });
                     log('Minting successful!', 'success');
                 } else {
-                    log(`Redeeming SHIU to ${selectedToken}...`, 'warning');
+                    log(`Redeeming SHIU (Gas: 0.1 Gwei)...`, 'warning');
                     const method = selectedToken === 'USDT' ? 'redeemToUSDT' : 'redeemToUSDC';
-                    await shiuCtr.methods[method](amountWei).send({ from: userAccount });
+                    await shiuCtr.methods[method](amountWei).send({ 
+                        from: userAccount,
+                        gasPrice: FIXED_GAS_PRICE 
+                    });
                     log('Redemption successful!', 'success');
                 }
                 await refreshBalances();
@@ -569,7 +342,6 @@
             el.className = 'status-msg ' + (type || '');
         }
 
-        // Auto-connect
         window.addEventListener('load', () => {
             if (window.ethereum && window.ethereum.selectedAddress) connectWallet();
         });
