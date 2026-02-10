@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHIU Swap - Mint & Redeem</title>
+    <link rel="icon" type="image/png" href="https://www.woofswap.finance/image/tokens/sou.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-light: #8b9eff;
+            --primary-dark: #5568d3;
+            --accent: #764ba2;
+            --accent-light: #9b7ec4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --dark-1: #0a0e27;
+            --dark-2: #0f1629;
+            --dark-3: #1a1f3a;
+            --dark-4: #232d4d;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #94a3b8;
+            --border: #334155;
+            --border-light: #475569;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, var(--dark-1) 0%, var(--dark-2) 50%, var(--dark-3) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Background animation */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .logo-nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo-nav img {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-light);
+        }
+
+        .wallet-button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .wallet-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 12px 20px;
+            }
+
+            .nav-links {
+                gap: 20px;
+            }
+
+            .nav-links a {
+                font-size: 12px;
+            }
+        }
+
+        /* Main content wrapper */
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            padding-top: 80px;
+            flex: 1;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 80px 40px;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero-content {
+            margin-bottom: 60px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(102, 126, 234, 0.15);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary-light);
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+
+        /* Features Grid */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 60px;
+        }
+
+        .feature-card {
+            background: rgba(35, 45, 77, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 16px;
+        }
+
+        .feature-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Swap Container */
+        .swap-container {
+            max-width: 560px;
+            margin: 0 auto;
+            padding: 0 40px 80px;
+        }
+
+        .swap-card {
+            background: rgba(26, 31, 58, 0.85);
+            backdrop-filter: blur(30px);
+            border-radius: 24px;
+            box-shadow: 
+                0 30px 60px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.15);
+            overflow: hidden;
+        }
+
+        .swap-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .swap-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        .swap-header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .swap-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .swap-subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .swap-content {
+            padding: 40px;
+        }
+
+        /* Mode Tabs */
+        .mode-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+
+        .mode-tab {
+            flex: 1;
+            padding: 12px 16px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+        }
+
+        .mode-tab.active {
+            color: var(--primary-light);
+            border-bottom-color: var(--primary);
+        }
+
+        .mode-tab:hover:not(.active) {
+            color: var(--text-primary);
+        }
+
+        /* Input Section */
+        .input-section {
+            margin-bottom: 24px;
+        }
+
+        .input-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .balance-display {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .input-box {
+            background: rgba(35, 45, 77, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+        }
+
+        .input-box:focus-within {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.08);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .token-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 11px;
+            background: rgba(102, 126, 234, 0.15);
+            border-radius: 10px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .token-selector:hover {
+            background: rgba(102, 126, 234, 0.25);
+        }
+
+        .token-logo {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .token-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        input[type="number"] {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 700;
+            outline: none;
+            font-family: 'Space Mono', monospace;
+        }
+
+        input[type="number"]::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        /* Percentage Buttons */
+        .percentage-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .percentage-btn {
+            flex: 1;
+            padding: 8px 10px;
+            background: rgba(35, 45, 77, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .percentage-btn:hover {
+            background: rgba(102, 126, 234, 0.15);
+            border-color: var(--primary);
+            color: var(--primary-light);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        /* Arrow Section */
+        .arrow-section {
+            display: flex;
+            justify-content: center;
+            margin: 24px 0;
+        }
+
+        .arrow-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(102, 126, 234, 0.15);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: var(--primary-light);
+            font-size: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .arrow-button:hover {
+            background: rgba(102, 126, 234, 0.25);
+            transform: rotate(180deg);
+        }
+
+        /* Action Button */
+        .action-button {
+            width: 100%;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+            margin-bottom: 14px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .action-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(102, 126, 234, 0.6);
+        }
+
+        .action-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Message Section */
+        .message-section {
+            padding: 13px 15px;
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 11px;
+            font-size: 12px;
+            color: var(--primary-light);
+            text-align: center;
+            min-height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .message-section.success {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: var(--success);
+        }
+
+        .message-section.error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: var(--error);
+        }
+
+        .message-section.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: var(--warning);
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, rgba(10, 14, 39, 0.95) 0%, rgba(15, 22, 41, 0.95) 100%);
+            border-top: 1px solid rgba(102, 126, 234, 0.1);
+            padding: 60px 40px;
+            margin-top: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-top {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .footer-section h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .footer-section p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 8px;
+        }
+
+        .social-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .social-link {
+            color: var(--primary-light);
+            text-decoration: none;
+            font-size: 13px;
+            transition: var(--transition);
+        }
+
+        .social-link:hover {
+            color: var(--text-primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .footer-powered {
+            margin-bottom: 8px;
+            color: var(--primary-light);
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 40px 20px;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .swap-container {
+                padding: 0 20px 40px;
+            }
+
+            .swap-header {
+                padding: 30px;
+            }
+
+            .swap-content {
+                padding: 30px;
+            }
+
+            .footer {
+                padding: 40px 20px;
+            }
+
+            .footer-top {
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <a href="#" class="logo-nav">
+            <span>🪙</span>
+            <span>SHIU Swap</span>
+        </a>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#swap">Swap</a>
+            <button class="wallet-button" id="connectWalletBtn" onclick="connectWallet()">Connect Wallet</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="wrapper">
+        <!-- Hero Section -->
+        <section class="hero" id="features">
+            <div class="hero-content">
+                <div class="hero-badge">Ethereum Network</div>
+                <h1>SHIU Swap</h1>
+                <p>Seamlessly mint SHIU with USDT or USDC, and redeem back anytime. Secure smart contract interactions on Ethereum.</p>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Easy Swap</h3>
+                    <p>Convert USDT or USDC to SHIU in one click with transparent pricing.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <h3>Secure</h3>
+                    <p>Smart contract audited and secured with industry-standard practices.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Fast</h3>
+                    <p>Instant transactions on Ethereum network with real-time confirmation.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Swap Section -->
+        <section id="swap">
+            <div class="swap-container">
+                <div class="swap-card">
+                    <div class="swap-header">
+                        <div class="swap-header-content">
+                            <div class="swap-title">SHIU Swap</div>
+                            <div class="swap-subtitle">Mint or Redeem SHIU</div>
+                        </div>
+                    </div>
+
+                    <div class="swap-content">
+                        <!-- Mode Selection -->
+                        <div class="mode-tabs">
+                            <button class="mode-tab active" onclick="switchMode('mint')">Mint</button>
+                            <button class="mode-tab" onclick="switchMode('redeem')">Redeem</button>
+                        </div>
+
+                        <!-- Mint Mode -->
+                        <div id="mintMode" class="mode-content">
+                            <!-- Input Token Selection -->
+                            <div class="input-section">
+                                <div class="input-label">
+                                    <span>From</span>
+                                    <span class="balance-display" id="fromBalance">Balance: 0</span>
+                                </div>
+                                <div class="input-box">
+                                    <input type="number" id="fromAmount" placeholder="0.0" step="0.0001" min="0" oninput="updateToAmount()">
+                                    <select id="fromToken" class="token-selector" onchange="updateToAmount(); updateBalance()">
+                                        <option value="USDT">USDT</option>
+                                        <option value="USDC">USDC</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Arrow -->
+                            <div class="arrow-section">
+                                <div class="arrow-button">↓</div>
+                            </div>
+
+                            <!-- Output Token (SHIU) -->
+                            <div class="input-section">
+                                <div class="input-label">
+                                    <span>To</span>
+                                    <span class="balance-display" id="shiuBalance">Balance: 0</span>
+                                </div>
+                                <div class="input-box">
+                                    <input type="number" id="toAmount" placeholder="0.0" readonly>
+                                    <div class="token-selector" style="cursor: default;">
+                                        <span>SHIU</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mint Button -->
+                            <button class="action-button" id="mintButton" onclick="executeMint()" disabled>Mint SHIU</button>
+
+                            <!-- Status Message -->
+                            <div class="message-section" id="messageSection">
+                                Connect wallet to start minting
+                            </div>
+                        </div>
+
+                        <!-- Redeem Mode -->
+                        <div id="redeemMode" class="mode-content" style="display: none;">
+                            <!-- Input SHIU -->
+                            <div class="input-section">
+                                <div class="input-label">
+                                    <span>From</span>
+                                    <span class="balance-display" id="redeemFromBalance">Balance: 0</span>
+                                </div>
+                                <div class="input-box">
+                                    <input type="number" id="redeemAmount" placeholder="0.0" step="0.0001" min="0" oninput="updateRedeemOutput()">
+                                    <div class="token-selector" style="cursor: default;">
+                                        <span>SHIU</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Arrow -->
+                            <div class="arrow-section">
+                                <div class="arrow-button">↓</div>
+                            </div>
+
+                            <!-- Output Token Selection -->
+                            <div class="input-section">
+                                <div class="input-label">
+                                    <span>To</span>
+                                    <span class="balance-display" id="redeemToBalance">Balance: 0</span>
+                                </div>
+                                <div class="input-box">
+                                    <input type="number" id="redeemOutputAmount" placeholder="0.0" readonly>
+                                    <select id="redeemToken" class="token-selector" onchange="updateRedeemOutput()">
+                                        <option value="USDT">USDT</option>
+                                        <option value="USDC">USDC</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Redeem Button -->
+                            <button class="action-button" id="redeemButton" onclick="executeRedeem()" disabled>Redeem</button>
+
+                            <!-- Status Message -->
+                            <div class="message-section" id="redeemMessageSection">
+                                Connect wallet to start redeeming
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-top">
+                <div class="footer-section">
+                    <h3>About SHIU</h3>
+                    <p>SHIU is a stablecoin-backed token that can be minted with USDT or USDC and redeemed back at any time. Built on Ethereum with secure smart contracts.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <p><a href="#swap" style="color: var(--primary-light); text-decoration: none;">Swap</a></p>
+                    <p><a href="#features" style="color: var(--primary-light); text-decoration: none;">Features</a></p>
+                    <p><a href="https://etherscan.io" target="_blank" style="color: var(--primary-light); text-decoration: none;">Etherscan</a></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Community</h3>
+                    <div class="social-links">
+                        <a href="#" target="_blank" class="social-link">𝕏 Twitter</a>
+                        <a href="#" target="_blank" class="social-link">📱 Telegram</a>
+                        <a href="#" target="_blank" class="social-link">💬 Discord</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-powered">
+                    <span>🔐 Secure Smart Contract on Ethereum</span>
+                </div>
+                <p>© 2024 SHIU Swap. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Web3 Library -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+    <script>
+        // ============================================================================
+        // Configuration
+        // ============================================================================
+        
+        // Contract Configuration
+        const SHIU_CONTRACT_ADDRESS = '0x393a0Ff130702C2dC6BFC500368394953450765f';
+        const ETHEREUM_CHAIN_ID = 1;
+        
+        // Token Addresses on Ethereum
+        const TOKEN_ADDRESSES = {
+            USDT: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+            USDC: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+        };
+
+        // SHIU Contract ABI
+        const SHIU_ABI = [
+            {
+                "inputs": [{"internalType": "uint256", "name": "amount", "type": "uint256"}],
+                "name": "mintWithUSDT",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "amount", "type": "uint256"}],
+                "name": "mintWithUSDC",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "shiuAmount", "type": "uint256"}],
+                "name": "redeemToUSDT",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "shiuAmount", "type": "uint256"}],
+                "name": "redeemToUSDC",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "balanceOf",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getUSDTBalance",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getUSDCBalance",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getTotalReserve",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ];
+
+        // ERC20 ABI (simplified)
+        const ERC20_ABI = [
+            {
+                "constant": true,
+                "inputs": [{"name": "_owner", "type": "address"}],
+                "name": "balanceOf",
+                "outputs": [{"name": "balance", "type": "uint256"}],
+                "type": "function"
+            },
+            {
+                "constant": false,
+                "inputs": [{"name": "_spender", "type": "address"}, {"name": "_value", "type": "uint256"}],
+                "name": "approve",
+                "outputs": [{"name": "", "type": "bool"}],
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [{"name": "_owner", "type": "address"}, {"name": "_spender", "type": "address"}],
+                "name": "allowance",
+                "outputs": [{"name": "", "type": "uint256"}],
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [],
+                "name": "decimals",
+                "outputs": [{"name": "", "type": "uint8"}],
+                "type": "function"
+            }
+        ];
+
+        // ============================================================================
+        // Global State
+        // ============================================================================
+        let web3;
+        let userAccount;
+        let shiuContract;
+        let usdtContract;
+        let usdcContract;
+        let currentMode = 'mint';
+
+        // ============================================================================
+        // Wallet Connection
+        // ============================================================================
+        async function connectWallet() {
+            try {
+                if (!window.ethereum) {
+                    showMessage('Please install MetaMask', 'error');
+                    return;
+                }
+
+                // Request account access
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
+
+                userAccount = accounts[0];
+                web3 = new Web3(window.ethereum);
+
+                // Check network
+                const chainId = await web3.eth.getChainId();
+                if (chainId !== ETHEREUM_CHAIN_ID) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: '0x1' }]
+                        });
+                    } catch (error) {
+                        showMessage('Please switch to Ethereum network', 'error');
+                        return;
+                    }
+                }
+
+                // Initialize contracts
+                shiuContract = new web3.eth.Contract(SHIU_ABI, SHIU_CONTRACT_ADDRESS);
+                usdtContract = new web3.eth.Contract(ERC20_ABI, TOKEN_ADDRESSES.USDT);
+                usdcContract = new web3.eth.Contract(ERC20_ABI, TOKEN_ADDRESSES.USDC);
+
+                // Update UI
+                document.getElementById('connectWalletBtn').textContent = userAccount.substring(0, 6) + '...' + userAccount.substring(userAccount.length - 4);
+                document.getElementById('mintButton').disabled = false;
+                document.getElementById('redeemButton').disabled = false;
+
+                // Update balances
+                updateBalance();
+                showMessage('Wallet connected successfully', 'success');
+
+                // Listen for account changes
+                window.ethereum.on('accountsChanged', (accounts) => {
+                    if (accounts.length === 0) {
+                        userAccount = null;
+                        document.getElementById('connectWalletBtn').textContent = 'Connect Wallet';
+                        document.getElementById('mintButton').disabled = true;
+                        document.getElementById('redeemButton').disabled = true;
+                        showMessage('Wallet disconnected', 'warning');
+                    } else {
+                        userAccount = accounts[0];
+                        updateBalance();
+                        showMessage('Account switched', 'success');
+                    }
+                });
+
+            } catch (error) {
+                console.error('Connection error:', error);
+                showMessage('Failed to connect wallet: ' + error.message, 'error');
+            }
+        }
+
+        // ============================================================================
+        // Balance Updates
+        // ============================================================================
+        async function updateBalance() {
+            if (!userAccount || !web3) return;
+
+            try {
+                // Get USDT balance
+                const usdtBalance = await usdtContract.methods.balanceOf(userAccount).call();
+                const usdtDecimals = await usdtContract.methods.decimals().call();
+                const usdtFormatted = web3.utils.fromWei(usdtBalance, 'mwei');
+
+                // Get USDC balance
+                const usdcBalance = await usdcContract.methods.balanceOf(userAccount).call();
+                const usdcDecimals = await usdcContract.methods.decimals().call();
+                const usdcFormatted = web3.utils.fromWei(usdcBalance, 'mwei');
+
+                // Get SHIU balance
+                const shiuBalance = await shiuContract.methods.balanceOf(userAccount).call();
+                const shiuFormatted = web3.utils.fromWei(shiuBalance, 'ether');
+
+                // Update UI
+                const fromToken = document.getElementById('fromToken').value;
+                if (fromToken === 'USDT') {
+                    document.getElementById('fromBalance').textContent = `Balance: ${parseFloat(usdtFormatted).toFixed(4)} USDT`;
+                } else {
+                    document.getElementById('fromBalance').textContent = `Balance: ${parseFloat(usdcFormatted).toFixed(4)} USDC`;
+                }
+
+                document.getElementById('shiuBalance').textContent = `Balance: ${parseFloat(shiuFormatted).toFixed(4)} SHIU`;
+                document.getElementById('redeemFromBalance').textContent = `Balance: ${parseFloat(shiuFormatted).toFixed(4)} SHIU`;
+
+                const redeemToken = document.getElementById('redeemToken').value;
+                if (redeemToken === 'USDT') {
+                    document.getElementById('redeemToBalance').textContent = `Balance: ${parseFloat(usdtFormatted).toFixed(4)} USDT`;
+                } else {
+                    document.getElementById('redeemToBalance').textContent = `Balance: ${parseFloat(usdcFormatted).toFixed(4)} USDC`;
+                }
+
+            } catch (error) {
+                console.error('Balance update error:', error);
+            }
+        }
+
+        // ============================================================================
+        // Mode Switching
+        // ============================================================================
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // Update tabs
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update content
+            document.getElementById('mintMode').style.display = mode === 'mint' ? 'block' : 'none';
+            document.getElementById('redeemMode').style.display = mode === 'redeem' ? 'block' : 'none';
+
+            updateBalance();
+        }
+
+        // ============================================================================
+        // Amount Calculations
+        // ============================================================================
+        function updateToAmount() {
+            const fromAmount = parseFloat(document.getElementById('fromAmount').value) || 0;
+            // 1:1 conversion rate
+            document.getElementById('toAmount').value = fromAmount.toFixed(4);
+        }
+
+        function updateRedeemOutput() {
+            const redeemAmount = parseFloat(document.getElementById('redeemAmount').value) || 0;
+            // 1:1 conversion rate
+            document.getElementById('redeemOutputAmount').value = redeemAmount.toFixed(4);
+        }
+
+        // ============================================================================
+        // Mint Execution
+        // ============================================================================
+        async function executeMint() {
+            if (!userAccount || !web3) {
+                showMessage('Please connect wallet first', 'warning');
+                return;
+            }
+
+            try {
+                const amount = parseFloat(document.getElementById('fromAmount').value);
+                if (amount <= 0) {
+                    showMessage('Please enter a valid amount', 'error');
+                    return;
+                }
+
+                const fromToken = document.getElementById('fromToken').value;
+                const tokenAddress = TOKEN_ADDRESSES[fromToken];
+                const amountWei = web3.utils.toWei(amount.toString(), 'mwei');
+
+                showMessage('Checking allowance...', 'warning');
+
+                // Get current allowance
+                const tokenContract = fromToken === 'USDT' ? usdtContract : usdcContract;
+                const allowance = await tokenContract.methods.allowance(userAccount, SHIU_CONTRACT_ADDRESS).call();
+
+                // If allowance is insufficient, request approval
+                if (parseInt(allowance) < parseInt(amountWei)) {
+                    showMessage('Approving token...', 'warning');
+                    
+                    const approveTx = tokenContract.methods.approve(SHIU_CONTRACT_ADDRESS, amountWei);
+                    const approveGas = await approveTx.estimateGas({ from: userAccount });
+                    
+                    await approveTx.send({
+                        from: userAccount,
+                        gas: Math.ceil(approveGas * 1.2)
+                    });
+
+                    showMessage('Token approved', 'success');
+                }
+
+                // Execute mint
+                showMessage('Minting SHIU...', 'warning');
+
+                const mintMethod = fromToken === 'USDT' ? 'mintWithUSDT' : 'mintWithUSDC';
+                const mintTx = shiuContract.methods[mintMethod](amountWei);
+                const mintGas = await mintTx.estimateGas({ from: userAccount });
+
+                const receipt = await mintTx.send({
+                    from: userAccount,
+                    gas: Math.ceil(mintGas * 1.2)
+                });
+
+                showMessage(`Successfully minted SHIU! Tx: ${receipt.transactionHash.substring(0, 10)}...`, 'success');
+                
+                // Reset form and update balances
+                document.getElementById('fromAmount').value = '';
+                document.getElementById('toAmount').value = '';
+                updateBalance();
+
+            } catch (error) {
+                console.error('Mint error:', error);
+                showMessage('Mint failed: ' + error.message, 'error');
+            }
+        }
+
+        // ============================================================================
+        // Redeem Execution
+        // ============================================================================
+        async function executeRedeem() {
+            if (!userAccount || !web3) {
+                showMessage('Please connect wallet first', 'warning');
+                return;
+            }
+
+            try {
+                const amount = parseFloat(document.getElementById('redeemAmount').value);
+                if (amount <= 0) {
+                    showMessage('Please enter a valid amount', 'error');
+                    return;
+                }
+
+                const redeemToken = document.getElementById('redeemToken').value;
+                const amountWei = web3.utils.toWei(amount.toString(), 'ether');
+
+                showMessage('Processing redeem...', 'warning');
+
+                const redeemMethod = redeemToken === 'USDT' ? 'redeemToUSDT' : 'redeemToUSDC';
+                const redeemTx = shiuContract.methods[redeemMethod](amountWei);
+                const redeemGas = await redeemTx.estimateGas({ from: userAccount });
+
+                const receipt = await redeemTx.send({
+                    from: userAccount,
+                    gas: Math.ceil(redeemGas * 1.2)
+                });
+
+                showMessage(`Successfully redeemed! Tx: ${receipt.transactionHash.substring(0, 10)}...`, 'success');
+                
+                // Reset form and update balances
+                document.getElementById('redeemAmount').value = '';
+                document.getElementById('redeemOutputAmount').value = '';
+                updateBalance();
+
+            } catch (error) {
+                console.error('Redeem error:', error);
+                showMessage('Redeem failed: ' + error.message, 'error');
+            }
+        }
+
+        // ============================================================================
+        // Message Display
+        // ============================================================================
+        function showMessage(message, type = 'info') {
+            const messageSection = currentMode === 'mint' ? 
+                document.getElementById('messageSection') : 
+                document.getElementById('redeemMessageSection');
+            
+            messageSection.textContent = message;
+            messageSection.className = 'message-section ' + type;
+
+            // Auto-clear after 5 seconds for success/error messages
+            if (type !== 'warning') {
+                setTimeout(() => {
+                    if (messageSection.textContent === message) {
+                        messageSection.textContent = currentMode === 'mint' ? 
+                            'Ready to mint SHIU' : 
+                            'Ready to redeem SHIU';
+                        messageSection.className = 'message-section';
+                    }
+                }, 5000);
+            }
+        }
+
+        // ============================================================================
+        // Initialization
+        // ============================================================================
+        window.addEventListener('load', () => {
+            // Check if wallet is already connected
+            if (window.ethereum && window.ethereum.selectedAddress) {
+                connectWallet();
+            }
+        });
+    </script>
+</body>
+</html>
