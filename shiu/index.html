@@ -199,46 +199,6 @@
             line-height: 1.6;
         }
 
-        /* Features Grid */
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-            margin-top: 60px;
-        }
-
-        .feature-card {
-            background: rgba(35, 45, 77, 0.5);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 32px;
-            text-align: center;
-            transition: var(--transition);
-        }
-
-        .feature-card:hover {
-            border-color: var(--primary);
-            background: rgba(102, 126, 234, 0.1);
-            transform: translateY(-4px);
-        }
-
-        .feature-icon {
-            font-size: 40px;
-            margin-bottom: 16px;
-        }
-
-        .feature-card h3 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        .feature-card p {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
         /* Swap Container */
         .swap-container {
             max-width: 560px;
@@ -387,21 +347,6 @@
             background: rgba(102, 126, 234, 0.25);
         }
 
-        .token-logo {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .token-logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
         input[type="number"] {
             flex: 1;
             background: transparent;
@@ -415,34 +360,6 @@
 
         input[type="number"]::placeholder {
             color: var(--text-tertiary);
-        }
-
-        /* Percentage Buttons */
-        .percentage-buttons {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        .percentage-btn {
-            flex: 1;
-            padding: 8px 10px;
-            background: rgba(35, 45, 77, 0.6);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-secondary);
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .percentage-btn:hover {
-            background: rgba(102, 126, 234, 0.15);
-            border-color: var(--primary);
-            color: var(--primary-light);
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
         }
 
         /* Arrow Section */
@@ -466,11 +383,6 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-        }
-
-        .arrow-button:hover {
-            background: rgba(102, 126, 234, 0.25);
-            transform: rotate(180deg);
         }
 
         /* Action Button */
@@ -514,6 +426,7 @@
             align-items: center;
             justify-content: center;
             font-weight: 600;
+            word-break: break-all;
         }
 
         .message-section.success {
@@ -547,91 +460,12 @@
         .footer-content {
             max-width: 1200px;
             margin: 0 auto;
-        }
-
-        .footer-top {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-            padding-bottom: 40px;
-            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
-        }
-
-        .footer-section h3 {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            color: var(--text-primary);
-        }
-
-        .footer-section p {
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.8;
-            margin-bottom: 8px;
-        }
-
-        .social-links {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .social-link {
-            color: var(--primary-light);
-            text-decoration: none;
-            font-size: 13px;
-            transition: var(--transition);
-        }
-
-        .social-link:hover {
-            color: var(--text-primary);
+            text-align: center;
         }
 
         .footer-bottom {
-            text-align: center;
             font-size: 12px;
             color: var(--text-tertiary);
-        }
-
-        .footer-powered {
-            margin-bottom: 8px;
-            color: var(--primary-light);
-        }
-
-        @media (max-width: 768px) {
-            .hero {
-                padding: 40px 20px;
-            }
-
-            .hero h1 {
-                font-size: 36px;
-            }
-
-            .hero p {
-                font-size: 16px;
-            }
-
-            .swap-container {
-                padding: 0 20px 40px;
-            }
-
-            .swap-header {
-                padding: 30px;
-            }
-
-            .swap-content {
-                padding: 30px;
-            }
-
-            .footer {
-                padding: 40px 20px;
-            }
-
-            .footer-top {
-                gap: 20px;
-            }
         }
     </style>
 </head>
@@ -643,39 +477,17 @@
             <span>SHIU Swap</span>
         </a>
         <div class="nav-links">
-            <a href="#features">Features</a>
-            <a href="#swap">Swap</a>
             <button class="wallet-button" id="connectWalletBtn" onclick="connectWallet()">Connect Wallet</button>
         </div>
     </nav>
 
     <!-- Main Content -->
     <div class="wrapper">
-        <!-- Hero Section -->
-        <section class="hero" id="features">
+        <section class="hero">
             <div class="hero-content">
                 <div class="hero-badge">Ethereum Network</div>
                 <h1>SHIU Swap</h1>
-                <p>Seamlessly mint SHIU with USDT or USDC, and redeem back anytime. Secure smart contract interactions on Ethereum.</p>
-            </div>
-
-            <!-- Features Grid -->
-            <div class="features">
-                <div class="feature-card">
-                    <div class="feature-icon">🔄</div>
-                    <h3>Easy Swap</h3>
-                    <p>Convert USDT or USDC to SHIU in one click with transparent pricing.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔐</div>
-                    <h3>Secure</h3>
-                    <p>Smart contract audited and secured with industry-standard practices.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <h3>Fast</h3>
-                    <p>Instant transactions on Ethereum network with real-time confirmation.</p>
-                </div>
+                <p>Seamlessly mint SHIU with USDT or USDC, and redeem back anytime. All tokens use 6-decimal precision.</p>
             </div>
         </section>
 
@@ -686,105 +498,75 @@
                     <div class="swap-header">
                         <div class="swap-header-content">
                             <div class="swap-title">SHIU Swap</div>
-                            <div class="swap-subtitle">Mint or Redeem SHIU</div>
+                            <div class="swap-subtitle">Mint or Redeem SHIU (6 Decimals)</div>
                         </div>
                     </div>
 
                     <div class="swap-content">
                         <!-- Mode Selection -->
                         <div class="mode-tabs">
-                            <button class="mode-tab active" onclick="switchMode('mint')">Mint</button>
-                            <button class="mode-tab" onclick="switchMode('redeem')">Redeem</button>
+                            <button class="mode-tab active" id="mintTab" onclick="switchMode('mint')">Mint</button>
+                            <button class="mode-tab" id="redeemTab" onclick="switchMode('redeem')">Redeem</button>
                         </div>
 
                         <!-- Mint Mode -->
                         <div id="mintMode" class="mode-content">
-                            <!-- Input Token Selection -->
                             <div class="input-section">
                                 <div class="input-label">
                                     <span>From</span>
-                                    <span class="balance-display" id="fromBalance">Balance: 0</span>
+                                    <span class="balance-display" id="fromBalance">Balance: 0.0000</span>
                                 </div>
                                 <div class="input-box">
                                     <input type="number" id="fromAmount" placeholder="0.0" step="0.0001" min="0" oninput="updateToAmount()">
-                                    <select id="fromToken" class="token-selector" onchange="updateToAmount(); updateBalance()">
+                                    <select id="fromToken" class="token-selector" onchange="updateBalance(); updateToAmount()">
                                         <option value="USDT">USDT</option>
                                         <option value="USDC">USDC</option>
                                     </select>
                                 </div>
                             </div>
-
-                            <!-- Arrow -->
-                            <div class="arrow-section">
-                                <div class="arrow-button">↓</div>
-                            </div>
-
-                            <!-- Output Token (SHIU) -->
+                            <div class="arrow-section"><div class="arrow-button">↓</div></div>
                             <div class="input-section">
                                 <div class="input-label">
                                     <span>To</span>
-                                    <span class="balance-display" id="shiuBalance">Balance: 0</span>
+                                    <span class="balance-display" id="shiuBalance">Balance: 0.0000</span>
                                 </div>
                                 <div class="input-box">
                                     <input type="number" id="toAmount" placeholder="0.0" readonly>
-                                    <div class="token-selector" style="cursor: default;">
-                                        <span>SHIU</span>
-                                    </div>
+                                    <div class="token-selector"><span>SHIU</span></div>
                                 </div>
                             </div>
-
-                            <!-- Mint Button -->
                             <button class="action-button" id="mintButton" onclick="executeMint()" disabled>Mint SHIU</button>
-
-                            <!-- Status Message -->
-                            <div class="message-section" id="messageSection">
-                                Connect wallet to start minting
-                            </div>
+                            <div class="message-section" id="messageSection">Connect wallet to start</div>
                         </div>
 
                         <!-- Redeem Mode -->
                         <div id="redeemMode" class="mode-content" style="display: none;">
-                            <!-- Input SHIU -->
                             <div class="input-section">
                                 <div class="input-label">
                                     <span>From</span>
-                                    <span class="balance-display" id="redeemFromBalance">Balance: 0</span>
+                                    <span class="balance-display" id="redeemFromBalance">Balance: 0.0000</span>
                                 </div>
                                 <div class="input-box">
                                     <input type="number" id="redeemAmount" placeholder="0.0" step="0.0001" min="0" oninput="updateRedeemOutput()">
-                                    <div class="token-selector" style="cursor: default;">
-                                        <span>SHIU</span>
-                                    </div>
+                                    <div class="token-selector"><span>SHIU</span></div>
                                 </div>
                             </div>
-
-                            <!-- Arrow -->
-                            <div class="arrow-section">
-                                <div class="arrow-button">↓</div>
-                            </div>
-
-                            <!-- Output Token Selection -->
+                            <div class="arrow-section"><div class="arrow-button">↓</div></div>
                             <div class="input-section">
                                 <div class="input-label">
                                     <span>To</span>
-                                    <span class="balance-display" id="redeemToBalance">Balance: 0</span>
+                                    <span class="balance-display" id="redeemToBalance">Balance: 0.0000</span>
                                 </div>
                                 <div class="input-box">
                                     <input type="number" id="redeemOutputAmount" placeholder="0.0" readonly>
-                                    <select id="redeemToken" class="token-selector" onchange="updateRedeemOutput()">
+                                    <select id="redeemToken" class="token-selector" onchange="updateBalance(); updateRedeemOutput()">
                                         <option value="USDT">USDT</option>
                                         <option value="USDC">USDC</option>
                                     </select>
                                 </div>
                             </div>
-
-                            <!-- Redeem Button -->
                             <button class="action-button" id="redeemButton" onclick="executeRedeem()" disabled>Redeem</button>
-
-                            <!-- Status Message -->
-                            <div class="message-section" id="redeemMessageSection">
-                                Connect wallet to start redeeming
-                            </div>
+                            <div class="message-section" id="redeemMessageSection">Connect wallet to start</div>
                         </div>
                     </div>
                 </div>
@@ -792,445 +574,128 @@
         </section>
     </div>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
-            <div class="footer-top">
-                <div class="footer-section">
-                    <h3>About SHIU</h3>
-                    <p>SHIU is a stablecoin-backed token that can be minted with USDT or USDC and redeemed back at any time. Built on Ethereum with secure smart contracts.</p>
-                </div>
-                <div class="footer-section">
-                    <h3>Quick Links</h3>
-                    <p><a href="#swap" style="color: var(--primary-light); text-decoration: none;">Swap</a></p>
-                    <p><a href="#features" style="color: var(--primary-light); text-decoration: none;">Features</a></p>
-                    <p><a href="https://etherscan.io" target="_blank" style="color: var(--primary-light); text-decoration: none;">Etherscan</a></p>
-                </div>
-                <div class="footer-section">
-                    <h3>Community</h3>
-                    <div class="social-links">
-                        <a href="#" target="_blank" class="social-link">𝕏 Twitter</a>
-                        <a href="#" target="_blank" class="social-link">📱 Telegram</a>
-                        <a href="#" target="_blank" class="social-link">💬 Discord</a>
-                    </div>
-                </div>
-            </div>
             <div class="footer-bottom">
-                <div class="footer-powered">
-                    <span>🔐 Secure Smart Contract on Ethereum</span>
-                </div>
-                <p>© 2024 SHIU Swap. All rights reserved.</p>
+                <p>© 2024 SHIU Swap. Secure 6-Decimal Stablecoin Bridge.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Web3 Library -->
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-
     <script>
-        // ============================================================================
-        // Configuration
-        // ============================================================================
-        
-        // Contract Configuration
         const SHIU_CONTRACT_ADDRESS = '0x393a0Ff130702C2dC6BFC500368394953450765f';
-        const ETHEREUM_CHAIN_ID = 1;
-        
-        // Token Addresses on Ethereum
         const TOKEN_ADDRESSES = {
             USDT: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
             USDC: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
         };
 
-        // SHIU Contract ABI
         const SHIU_ABI = [
-            {
-                "inputs": [{"internalType": "uint256", "name": "amount", "type": "uint256"}],
-                "name": "mintWithUSDT",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [{"internalType": "uint256", "name": "amount", "type": "uint256"}],
-                "name": "mintWithUSDC",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [{"internalType": "uint256", "name": "shiuAmount", "type": "uint256"}],
-                "name": "redeemToUSDT",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [{"internalType": "uint256", "name": "shiuAmount", "type": "uint256"}],
-                "name": "redeemToUSDC",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "balanceOf",
-                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "getUSDTBalance",
-                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "getUSDCBalance",
-                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "getTotalReserve",
-                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-                "stateMutability": "view",
-                "type": "function"
-            }
+            {"inputs":[{"name":"amount","type":"uint256"}],"name":"mintWithUSDT","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"name":"amount","type":"uint256"}],"name":"mintWithUSDC","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"name":"shiuAmount","type":"uint256"}],"name":"redeemToUSDT","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"name":"shiuAmount","type":"uint256"}],"name":"redeemToUSDC","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
         ];
 
-        // ERC20 ABI (simplified)
         const ERC20_ABI = [
-            {
-                "constant": true,
-                "inputs": [{"name": "_owner", "type": "address"}],
-                "name": "balanceOf",
-                "outputs": [{"name": "balance", "type": "uint256"}],
-                "type": "function"
-            },
-            {
-                "constant": false,
-                "inputs": [{"name": "_spender", "type": "address"}, {"name": "_value", "type": "uint256"}],
-                "name": "approve",
-                "outputs": [{"name": "", "type": "bool"}],
-                "type": "function"
-            },
-            {
-                "constant": true,
-                "inputs": [{"name": "_owner", "type": "address"}, {"name": "_spender", "type": "address"}],
-                "name": "allowance",
-                "outputs": [{"name": "", "type": "uint256"}],
-                "type": "function"
-            },
-            {
-                "constant": true,
-                "inputs": [],
-                "name": "decimals",
-                "outputs": [{"name": "", "type": "uint8"}],
-                "type": "function"
-            }
+            {"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"},
+            {"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"type":"function"},
+            {"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"","type":"uint256"}],"type":"function"}
         ];
 
-        // ============================================================================
-        // Global State
-        // ============================================================================
-        let web3;
-        let userAccount;
-        let shiuContract;
-        let usdtContract;
-        let usdcContract;
-        let currentMode = 'mint';
+        let web3, userAccount, shiuContract, usdtContract, usdcContract, currentMode = 'mint';
 
-        // ============================================================================
-        // Wallet Connection
-        // ============================================================================
         async function connectWallet() {
+            if (!window.ethereum) return showMessage('Please install MetaMask', 'error');
             try {
-                if (!window.ethereum) {
-                    showMessage('Please install MetaMask', 'error');
-                    return;
-                }
-
-                // Request account access
-                const accounts = await window.ethereum.request({
-                    method: 'eth_requestAccounts'
-                });
-
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 userAccount = accounts[0];
                 web3 = new Web3(window.ethereum);
-
-                // Check network
-                const chainId = await web3.eth.getChainId();
-                if (chainId !== ETHEREUM_CHAIN_ID) {
-                    try {
-                        await window.ethereum.request({
-                            method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: '0x1' }]
-                        });
-                    } catch (error) {
-                        showMessage('Please switch to Ethereum network', 'error');
-                        return;
-                    }
-                }
-
-                // Initialize contracts
                 shiuContract = new web3.eth.Contract(SHIU_ABI, SHIU_CONTRACT_ADDRESS);
                 usdtContract = new web3.eth.Contract(ERC20_ABI, TOKEN_ADDRESSES.USDT);
                 usdcContract = new web3.eth.Contract(ERC20_ABI, TOKEN_ADDRESSES.USDC);
-
-                // Update UI
-                document.getElementById('connectWalletBtn').textContent = userAccount.substring(0, 6) + '...' + userAccount.substring(userAccount.length - 4);
+                document.getElementById('connectWalletBtn').textContent = userAccount.substring(0, 6) + '...' + userAccount.substring(38);
                 document.getElementById('mintButton').disabled = false;
                 document.getElementById('redeemButton').disabled = false;
-
-                // Update balances
-                updateBalance();
-                showMessage('Wallet connected successfully', 'success');
-
-                // Listen for account changes
-                window.ethereum.on('accountsChanged', (accounts) => {
-                    if (accounts.length === 0) {
-                        userAccount = null;
-                        document.getElementById('connectWalletBtn').textContent = 'Connect Wallet';
-                        document.getElementById('mintButton').disabled = true;
-                        document.getElementById('redeemButton').disabled = true;
-                        showMessage('Wallet disconnected', 'warning');
-                    } else {
-                        userAccount = accounts[0];
-                        updateBalance();
-                        showMessage('Account switched', 'success');
-                    }
-                });
-
-            } catch (error) {
-                console.error('Connection error:', error);
-                showMessage('Failed to connect wallet: ' + error.message, 'error');
-            }
+                await updateBalance();
+                showMessage('Wallet connected', 'success');
+            } catch (e) { showMessage(e.message, 'error'); }
         }
 
-        // ============================================================================
-        // Balance Updates
-        // ============================================================================
         async function updateBalance() {
-            if (!userAccount || !web3) return;
-
+            if (!userAccount) return;
             try {
-                // Get USDT balance
-                const usdtBalance = await usdtContract.methods.balanceOf(userAccount).call();
-                const usdtDecimals = await usdtContract.methods.decimals().call();
-                const usdtFormatted = web3.utils.fromWei(usdtBalance, 'mwei');
+                // All tokens use 6 decimals (mwei)
+                const usdtRaw = await usdtContract.methods.balanceOf(userAccount).call();
+                const usdcRaw = await usdcContract.methods.balanceOf(userAccount).call();
+                const shiuRaw = await shiuContract.methods.balanceOf(userAccount).call();
+                
+                const usdt = web3.utils.fromWei(usdtRaw, 'mwei');
+                const usdc = web3.utils.fromWei(usdcRaw, 'mwei');
+                const shiu = web3.utils.fromWei(shiuRaw, 'mwei');
 
-                // Get USDC balance
-                const usdcBalance = await usdcContract.methods.balanceOf(userAccount).call();
-                const usdcDecimals = await usdcContract.methods.decimals().call();
-                const usdcFormatted = web3.utils.fromWei(usdcBalance, 'mwei');
-
-                // Get SHIU balance
-                const shiuBalance = await shiuContract.methods.balanceOf(userAccount).call();
-                const shiuFormatted = web3.utils.fromWei(shiuBalance, 'ether');
-
-                // Update UI
                 const fromToken = document.getElementById('fromToken').value;
-                if (fromToken === 'USDT') {
-                    document.getElementById('fromBalance').textContent = `Balance: ${parseFloat(usdtFormatted).toFixed(4)} USDT`;
-                } else {
-                    document.getElementById('fromBalance').textContent = `Balance: ${parseFloat(usdcFormatted).toFixed(4)} USDC`;
-                }
-
-                document.getElementById('shiuBalance').textContent = `Balance: ${parseFloat(shiuFormatted).toFixed(4)} SHIU`;
-                document.getElementById('redeemFromBalance').textContent = `Balance: ${parseFloat(shiuFormatted).toFixed(4)} SHIU`;
-
+                document.getElementById('fromBalance').textContent = `Balance: ${parseFloat(fromToken === 'USDT' ? usdt : usdc).toFixed(4)}`;
+                document.getElementById('shiuBalance').textContent = `Balance: ${parseFloat(shiu).toFixed(4)}`;
+                document.getElementById('redeemFromBalance').textContent = `Balance: ${parseFloat(shiu).toFixed(4)}`;
+                
                 const redeemToken = document.getElementById('redeemToken').value;
-                if (redeemToken === 'USDT') {
-                    document.getElementById('redeemToBalance').textContent = `Balance: ${parseFloat(usdtFormatted).toFixed(4)} USDT`;
-                } else {
-                    document.getElementById('redeemToBalance').textContent = `Balance: ${parseFloat(usdcFormatted).toFixed(4)} USDC`;
-                }
-
-            } catch (error) {
-                console.error('Balance update error:', error);
-            }
+                document.getElementById('redeemToBalance').textContent = `Balance: ${parseFloat(redeemToken === 'USDT' ? usdt : usdc).toFixed(4)}`;
+            } catch (e) { console.error(e); }
         }
 
-        // ============================================================================
-        // Mode Switching
-        // ============================================================================
         function switchMode(mode) {
             currentMode = mode;
-            
-            // Update tabs
-            document.querySelectorAll('.mode-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            event.target.classList.add('active');
-
-            // Update content
+            document.getElementById('mintTab').classList.toggle('active', mode === 'mint');
+            document.getElementById('redeemTab').classList.toggle('active', mode === 'redeem');
             document.getElementById('mintMode').style.display = mode === 'mint' ? 'block' : 'none';
             document.getElementById('redeemMode').style.display = mode === 'redeem' ? 'block' : 'none';
-
             updateBalance();
         }
 
-        // ============================================================================
-        // Amount Calculations
-        // ============================================================================
-        function updateToAmount() {
-            const fromAmount = parseFloat(document.getElementById('fromAmount').value) || 0;
-            // 1:1 conversion rate
-            document.getElementById('toAmount').value = fromAmount.toFixed(4);
-        }
+        function updateToAmount() { document.getElementById('toAmount').value = document.getElementById('fromAmount').value; }
+        function updateRedeemOutput() { document.getElementById('redeemOutputAmount').value = document.getElementById('redeemAmount').value; }
 
-        function updateRedeemOutput() {
-            const redeemAmount = parseFloat(document.getElementById('redeemAmount').value) || 0;
-            // 1:1 conversion rate
-            document.getElementById('redeemOutputAmount').value = redeemAmount.toFixed(4);
-        }
-
-        // ============================================================================
-        // Mint Execution
-        // ============================================================================
         async function executeMint() {
-            if (!userAccount || !web3) {
-                showMessage('Please connect wallet first', 'warning');
-                return;
-            }
-
+            const amount = document.getElementById('fromAmount').value;
+            if (!amount || amount <= 0) return showMessage('Enter valid amount', 'error');
+            const fromToken = document.getElementById('fromToken').value;
+            const amountWei = web3.utils.toWei(amount, 'mwei');
             try {
-                const amount = parseFloat(document.getElementById('fromAmount').value);
-                if (amount <= 0) {
-                    showMessage('Please enter a valid amount', 'error');
-                    return;
-                }
-
-                const fromToken = document.getElementById('fromToken').value;
-                const tokenAddress = TOKEN_ADDRESSES[fromToken];
-                const amountWei = web3.utils.toWei(amount.toString(), 'mwei');
-
                 showMessage('Checking allowance...', 'warning');
-
-                // Get current allowance
                 const tokenContract = fromToken === 'USDT' ? usdtContract : usdcContract;
                 const allowance = await tokenContract.methods.allowance(userAccount, SHIU_CONTRACT_ADDRESS).call();
-
-                // If allowance is insufficient, request approval
-                if (parseInt(allowance) < parseInt(amountWei)) {
-                    showMessage('Approving token...', 'warning');
-                    
-                    const approveTx = tokenContract.methods.approve(SHIU_CONTRACT_ADDRESS, amountWei);
-                    const approveGas = await approveTx.estimateGas({ from: userAccount });
-                    
-                    await approveTx.send({
-                        from: userAccount,
-                        gas: Math.ceil(approveGas * 1.2)
-                    });
-
-                    showMessage('Token approved', 'success');
+                if (BigInt(allowance) < BigInt(amountWei)) {
+                    showMessage('Approving...', 'warning');
+                    await tokenContract.methods.approve(SHIU_CONTRACT_ADDRESS, amountWei).send({ from: userAccount });
                 }
-
-                // Execute mint
-                showMessage('Minting SHIU...', 'warning');
-
-                const mintMethod = fromToken === 'USDT' ? 'mintWithUSDT' : 'mintWithUSDC';
-                const mintTx = shiuContract.methods[mintMethod](amountWei);
-                const mintGas = await mintTx.estimateGas({ from: userAccount });
-
-                const receipt = await mintTx.send({
-                    from: userAccount,
-                    gas: Math.ceil(mintGas * 1.2)
-                });
-
-                showMessage(`Successfully minted SHIU! Tx: ${receipt.transactionHash.substring(0, 10)}...`, 'success');
-                
-                // Reset form and update balances
-                document.getElementById('fromAmount').value = '';
-                document.getElementById('toAmount').value = '';
+                showMessage('Minting...', 'warning');
+                const method = fromToken === 'USDT' ? 'mintWithUSDT' : 'mintWithUSDC';
+                await shiuContract.methods[method](amountWei).send({ from: userAccount });
+                showMessage('Mint success!', 'success');
                 updateBalance();
-
-            } catch (error) {
-                console.error('Mint error:', error);
-                showMessage('Mint failed: ' + error.message, 'error');
-            }
+            } catch (e) { showMessage(e.message, 'error'); }
         }
 
-        // ============================================================================
-        // Redeem Execution
-        // ============================================================================
         async function executeRedeem() {
-            if (!userAccount || !web3) {
-                showMessage('Please connect wallet first', 'warning');
-                return;
-            }
-
+            const amount = document.getElementById('redeemAmount').value;
+            if (!amount || amount <= 0) return showMessage('Enter valid amount', 'error');
+            const redeemToken = document.getElementById('redeemToken').value;
+            const amountWei = web3.utils.toWei(amount, 'mwei');
             try {
-                const amount = parseFloat(document.getElementById('redeemAmount').value);
-                if (amount <= 0) {
-                    showMessage('Please enter a valid amount', 'error');
-                    return;
-                }
-
-                const redeemToken = document.getElementById('redeemToken').value;
-                const amountWei = web3.utils.toWei(amount.toString(), 'ether');
-
-                showMessage('Processing redeem...', 'warning');
-
-                const redeemMethod = redeemToken === 'USDT' ? 'redeemToUSDT' : 'redeemToUSDC';
-                const redeemTx = shiuContract.methods[redeemMethod](amountWei);
-                const redeemGas = await redeemTx.estimateGas({ from: userAccount });
-
-                const receipt = await redeemTx.send({
-                    from: userAccount,
-                    gas: Math.ceil(redeemGas * 1.2)
-                });
-
-                showMessage(`Successfully redeemed! Tx: ${receipt.transactionHash.substring(0, 10)}...`, 'success');
-                
-                // Reset form and update balances
-                document.getElementById('redeemAmount').value = '';
-                document.getElementById('redeemOutputAmount').value = '';
+                showMessage('Redeeming...', 'warning');
+                const method = redeemToken === 'USDT' ? 'redeemToUSDT' : 'redeemToUSDC';
+                await shiuContract.methods[method](amountWei).send({ from: userAccount });
+                showMessage('Redeem success!', 'success');
                 updateBalance();
-
-            } catch (error) {
-                console.error('Redeem error:', error);
-                showMessage('Redeem failed: ' + error.message, 'error');
-            }
+            } catch (e) { showMessage(e.message, 'error'); }
         }
 
-        // ============================================================================
-        // Message Display
-        // ============================================================================
-        function showMessage(message, type = 'info') {
-            const messageSection = currentMode === 'mint' ? 
-                document.getElementById('messageSection') : 
-                document.getElementById('redeemMessageSection');
-            
-            messageSection.textContent = message;
-            messageSection.className = 'message-section ' + type;
-
-            // Auto-clear after 5 seconds for success/error messages
-            if (type !== 'warning') {
-                setTimeout(() => {
-                    if (messageSection.textContent === message) {
-                        messageSection.textContent = currentMode === 'mint' ? 
-                            'Ready to mint SHIU' : 
-                            'Ready to redeem SHIU';
-                        messageSection.className = 'message-section';
-                    }
-                }, 5000);
-            }
+        function showMessage(msg, type) {
+            const el = currentMode === 'mint' ? document.getElementById('messageSection') : document.getElementById('redeemMessageSection');
+            el.textContent = msg; el.className = 'message-section ' + type;
         }
-
-        // ============================================================================
-        // Initialization
-        // ============================================================================
-        window.addEventListener('load', () => {
-            // Check if wallet is already connected
-            if (window.ethereum && window.ethereum.selectedAddress) {
-                connectWallet();
-            }
-        });
     </script>
 </body>
 </html>
