@@ -434,6 +434,24 @@
             font-size: 12px;
         }
 
+        .primary-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .empty-state {
             text-align: center;
             padding: 40px 20px;
@@ -638,6 +656,7 @@
                 mint: '🎯 铸造新域名',
                 query: '🔍 查询与解析',
                 domains: '📋 我的域名',
+                currentPrimary: '当前主域名',
                 fee: '铸造费用：',
                 feeVal: '1000 SOU 代币',
                 len: '域名长度：',
@@ -699,6 +718,7 @@
                 mint: '🎯 Mint Domain',
                 query: '🔍 Query & Resolve',
                 domains: '📋 My Domains',
+                currentPrimary: 'Current Primary',
                 fee: 'Mint Fee: ',
                 feeVal: '1000 SOU tokens',
                 len: 'Domain Length: ',
@@ -1092,20 +1112,27 @@
                     return;
                 }
 
+                const primaryDomain = await contract.methods.reverse(account).call();
+                const primaryName = primaryDomain ? primaryDomain.replace('.sou', '') : null;
+
                 let domainsHTML = '';
                 for (let i = 0; i < domainCount; i++) {
                     try {
                         const tokenId = await contract.methods.tokenOfOwnerByIndex(account, i).call();
                         const domainName = await contract.methods.getNameByTokenId(tokenId).call();
+                        const isPrimary = primaryName && domainName.toLowerCase() === primaryName.toLowerCase();
                         
                         domainsHTML += `
                             <div class="domain-item">
                                 <div>
-                                    <div class="domain-name">${domainName}.sou</div>
+                                    <div class="domain-name">
+                                        ${domainName}.sou
+                                        ${isPrimary ? '<span class="primary-badge">' + t('currentPrimary') + '</span>' : ''}
+                                    </div>
                                     <div class="domain-id">Token ID: ${tokenId}</div>
                                 </div>
                                 <div class="domain-actions">
-                                    <button class="btn btn-secondary" onclick="setPrimaryName('${domainName}')">${t('setAsMain')}</button>
+                                    <button class="btn btn-secondary" onclick="setPrimaryName('${domainName}')" ${isPrimary ? 'disabled' : ''}>${t('setAsMain')}</button>
                                 </div>
                             </div>
                         `;
