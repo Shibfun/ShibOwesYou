@@ -842,7 +842,7 @@
         const CONTRACT_ABI = [
             {"inputs": [{"internalType": "string", "name": "_id", "type": "string"}], "name": "mint", "outputs": [], "stateMutability": "nonpayable", "type": "function"},
             {"inputs": [{"internalType": "string", "name": "inputName", "type": "string"}], "name": "resolve", "outputs": [{"internalType": "string", "name": "", "type": "string"}], "stateMutability": "view", "type": "function"},
-            {"inputs": [{"internalType": "address", "name": "owner", "type": "address"}], "name": "reverse", "outputs": [{"internalType": "string", "name": "", "type": "string"}], "stateMutability": "view", "type": "function"},
+            {"inputs": [{"internalType": "address", "name": "owner", "type": "address"}], "name": "primaryName", "outputs": [{"internalType": "string", "name": "", "type": "string"}], "stateMutability": "view", "type": "function"},
             {"inputs": [{"internalType": "address", "name": "owner", "type": "address"}], "name": "balanceOf", "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}], "stateMutability": "view", "type": "function"},
             {"inputs": [{"internalType": "address", "name": "owner", "type": "address"}, {"internalType": "uint256", "name": "index", "type": "uint256"}], "name": "tokenOfOwnerByIndex", "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}], "stateMutability": "view", "type": "function"},
             {"inputs": [{"internalType": "uint256", "name": "tokenId", "type": "uint256"}], "name": "getNameByTokenId", "outputs": [{"internalType": "string", "name": "", "type": "string"}], "stateMutability": "view", "type": "function"},
@@ -1078,7 +1078,7 @@
 
             try {
                 showMessage('reverseMessage', t('loading'), 'info');
-                const result = await contract.methods.reverse(address).call();
+                const result = await contract.methods.primaryName(address).call();
                 
                 if (result && result !== '') {
                     document.getElementById('reverseResultValue').textContent = result;
@@ -1112,7 +1112,7 @@
                     return;
                 }
 
-                const primaryDomain = await contract.methods.reverse(account).call();
+                const primaryDomain = await contract.methods.primaryName(account).call();
                 const primaryName = primaryDomain ? primaryDomain.replace('.sou', '') : null;
 
                 let domainsHTML = '';
