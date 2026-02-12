@@ -3,360 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShibOwesYouID - Domain Management</title>
-    <link rel="icon" type="image/png" href="https://www.woofswap.finance/image/tokens/sou.png">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>ShibOwesYouID</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Space+Mono&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <style>
         :root {
-            --primary: #667eea;
-            --primary-light: #8b9eff;
-            --primary-dark: #5568d3;
-            --accent: #764ba2;
-            --accent-light: #9b7ec4;
+            --primary: #F1A849;
+            --primary-hover: #d9933a;
+            --dark-1: #0a0a0a;
+            --dark-2: #141414;
+            --dark-3: #1f1f1f;
+            --dark-4: #2a2a2a;
+            --text-main: #ffffff;
+            --text-dim: #a0a0a0;
             --success: #10b981;
-            --warning: #f59e0b;
             --error: #ef4444;
-            --dark-1: #0a0e27;
-            --dark-2: #0f1629;
-            --dark-3: #1a1f3a;
-            --dark-4: #232d4d;
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --text-tertiary: #94a3b8;
-            --border: #334155;
-            --border-light: #475569;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --border: rgba(255, 255, 255, 0.1);
         }
 
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
-            background: linear-gradient(135deg, var(--dark-1) 0%, var(--dark-2) 50%, var(--dark-3) 100%);
-            color: var(--text-primary);
-            min-height: 100vh;
-            position: relative;
+            background-color: var(--dark-1);
+            color: var(--text-main);
+            line-height: 1.6;
             overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
+            background-image: radial-gradient(circle at 50% 0%, #2a1f10 0%, #0a0a0a 100%);
+            min-height: 100vh;
         }
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.08) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
 
         nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(10, 14, 39, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
-            padding: 16px 40px;
+            height: 80px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 1000;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .logo-nav {
+        .logo {
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--text-primary);
-            text-decoration: none;
+            font-weight: 700;
+            font-size: 22px;
+            letter-spacing: -0.5px;
         }
 
-        .logo-nav img {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-        }
-
-        .nav-right {
-            display: flex;
-            gap: 20px;
-            align-items: center;
+        .logo img {
+            width: 40px;
+            height: 40px;
         }
 
         .nav-links {
             display: flex;
-            gap: 40px;
+            gap: 30px;
             align-items: center;
         }
 
         .nav-links a {
-            color: var(--text-secondary);
+            color: var(--text-dim);
             text-decoration: none;
             font-weight: 500;
-            font-size: 14px;
-            transition: var(--transition);
-            cursor: pointer;
+            transition: 0.3s;
+            font-size: 15px;
         }
 
         .nav-links a:hover {
-            color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .wallet-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .lang-toggle {
-            display: flex;
-            gap: 8px;
-            background: rgba(35, 45, 77, 0.5);
-            padding: 6px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-
-        .lang-btn {
-            padding: 6px 12px;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 700;
-            border-radius: 6px;
-            transition: var(--transition);
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .lang-btn.active {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            color: white;
-        }
-
-        .header-right {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .network-status {
+            background: var(--dark-3);
+            border: 2px solid var(--primary);
+            color: var(--primary);
             padding: 8px 16px;
-            background: rgba(35, 45, 77, 0.5);
-            border: 1px solid var(--border);
             border-radius: 8px;
+            cursor: pointer;
             font-size: 13px;
-            color: var(--text-secondary);
-            font-weight: 600;
+            font-weight: 700;
+            transition: 0.3s;
         }
 
-        .network-status.connected {
-            background: rgba(16, 185, 129, 0.1);
-            border-color: rgba(16, 185, 129, 0.3);
-            color: var(--success);
-        }
-
-        .wrapper {
-            position: relative;
-            z-index: 1;
-            padding-top: 80px;
-            flex: 1;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 40px;
-        }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            padding: 60px 0;
-        }
-
-        .card {
-            background: rgba(35, 45, 77, 0.5);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 32px;
-            transition: var(--transition);
-        }
-
-        .card:hover {
-            border-color: var(--primary);
-            background: rgba(102, 126, 234, 0.1);
-        }
-
-        .card h2 {
-            color: var(--primary-light);
-            margin-bottom: 20px;
-            font-size: 22px;
-            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
-            padding-bottom: 15px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            font-size: 14px;
-            background: rgba(35, 45, 77, 0.5);
-            color: var(--text-primary);
-            transition: var(--transition);
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .form-actions .btn {
-            flex: 1;
+        .lang-toggle:hover {
+            background: var(--primary);
+            color: #000;
         }
 
         .btn {
-            padding: 14px 24px;
-            border: none;
+            padding: 12px 24px;
             border-radius: 12px;
+            font-weight: 600;
             cursor: pointer;
+            transition: 0.3s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             font-size: 14px;
-            font-weight: 700;
-            transition: var(--transition);
-            font-family: 'Outfit', sans-serif;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            color: white;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            background: var(--primary);
+            color: #000;
         }
 
-        .btn-primary:hover:not(:disabled) {
+        .btn-primary:hover {
+            background: var(--primary-hover);
             transform: translateY(-2px);
-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
         }
 
         .btn-secondary {
-            background: transparent;
-            border: 2px solid var(--border-light);
-            color: var(--text-primary);
+            background: var(--dark-3);
+            color: var(--text-main);
+            border: 1px solid var(--border);
         }
 
         .btn-secondary:hover {
+            background: var(--dark-4);
             border-color: var(--primary);
-            color: var(--primary-light);
         }
 
-        .message {
-            padding: 15px;
-            border-radius: 12px;
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .hero {
+            padding: 80px 0 40px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 48px;
             margin-bottom: 20px;
-            font-size: 14px;
-            display: none;
-            border-left: 4px solid transparent;
+            background: linear-gradient(135deg, #fff 0%, #F1A849 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .message.show {
+        .card {
+            background: var(--dark-2);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
             display: block;
+            margin-bottom: 10px;
+            color: var(--text-dim);
+            font-size: 14px;
+            font-weight: 500;
         }
 
-        .message.success {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-            border-left-color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.3);
+        .input-wrapper {
+            position: relative;
         }
 
-        .message.error {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--error);
-            border-left-color: var(--error);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .message.info {
-            background: rgba(102, 126, 234, 0.1);
-            color: var(--primary-light);
-            border-left-color: var(--primary);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-        }
-
-        .info-box {
-            background: rgba(102, 126, 234, 0.1);
-            padding: 15px;
+        input {
+            width: 100%;
+            background: var(--dark-3);
+            border: 1px solid var(--border);
+            padding: 15px 20px;
             border-radius: 12px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            color: var(--text-secondary);
-            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: var(--text-main);
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            background: var(--dark-4);
+        }
+
+        input::placeholder {
+            color: var(--text-dim);
+        }
+
+        .suffix-hint {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dim);
+            font-weight: 600;
         }
 
         .tabs {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border);
+            margin-bottom: 25px;
+            background: var(--dark-3);
+            padding: 5px;
+            border-radius: 14px;
         }
 
-        .tab-btn {
-            padding: 12px 20px;
-            background: none;
-            border: none;
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
             cursor: pointer;
+            border-radius: 10px;
+            font-weight: 600;
             font-size: 14px;
-            font-weight: 700;
-            color: var(--text-tertiary);
-            border-bottom: 3px solid transparent;
-            transition: var(--transition);
-            font-family: 'Outfit', sans-serif;
+            transition: 0.3s;
+            color: var(--text-dim);
         }
 
-        .tab-btn.active {
-            color: var(--primary-light);
-            border-bottom-color: var(--primary);
+        .tab.active {
+            background: var(--dark-4);
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
         .tab-content {
@@ -367,852 +253,551 @@
             display: block;
         }
 
-        .result-box {
-            background: rgba(35, 45, 77, 0.5);
-            padding: 20px;
+        .message {
+            padding: 15px;
             border-radius: 12px;
-            margin-top: 20px;
-            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
         }
 
-        .result-label {
-            font-size: 12px;
-            color: var(--text-tertiary);
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
-        }
-
-        .result-value {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--primary-light);
-            word-break: break-all;
-            font-family: 'Space Mono', monospace;
-        }
-
-        .domain-list {
-            margin-top: 20px;
-        }
+        .message.info { background: rgba(241, 168, 73, 0.1); color: var(--primary); border: 1px solid rgba(241, 168, 73, 0.2); display: block; }
+        .message.success { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); display: block; }
+        .message.error { background: rgba(239, 68, 68, 0.1); color: var(--error); border: 1px solid rgba(239, 68, 68, 0.2); display: block; }
 
         .domain-item {
-            background: rgba(35, 45, 77, 0.5);
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 12px;
+            background: var(--dark-3);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 1px solid var(--border);
-            transition: var(--transition);
+            transition: 0.3s;
         }
 
         .domain-item:hover {
             border-color: var(--primary);
-            background: rgba(102, 126, 234, 0.1);
+            transform: scale(1.01);
         }
 
         .domain-name {
             font-weight: 700;
-            color: var(--text-primary);
-            font-size: 16px;
+            font-size: 18px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
         }
 
         .domain-id {
+            font-family: 'Space Mono', monospace;
             font-size: 12px;
-            color: var(--text-tertiary);
-            margin-top: 5px;
-        }
-
-        .domain-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .domain-actions .btn {
-            padding: 8px 14px;
-            font-size: 12px;
+            color: var(--text-dim);
+            margin-top: 4px;
         }
 
         .primary-badge {
-            display: inline-block;
             background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
             color: white;
-            padding: 4px 12px;
+            padding: 3px 10px;
             border-radius: 6px;
-            font-size: 11px;
-            font-weight: 700;
+            font-size: 10px;
+            font-weight: 800;
             margin-left: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .result-box {
+            background: var(--dark-4);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px dashed var(--border);
+            word-break: break-all;
+        }
+
+        .result-label {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .result-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 15px;
+            color: var(--primary);
+            font-weight: 600;
         }
 
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: var(--text-tertiary);
+            color: var(--text-dim);
         }
 
-        .empty-state-icon {
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
-
-        .full-width {
-            grid-column: 1 / -1;
+        .info-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 0 20px;
-            }
-
-            .main-content {
-                grid-template-columns: 1fr;
-                padding: 40px 0;
-            }
-
-            .card {
-                padding: 24px;
-            }
-
-            .card h2 {
-                font-size: 18px;
-            }
-
-            nav {
-                flex-direction: column;
-                gap: 15px;
-                padding: 12px 20px;
-            }
-
-            .nav-right {
-                width: 100%;
-                justify-content: space-between;
-            }
-
-            .nav-links {
-                gap: 20px;
-            }
-
-            .nav-links a {
-                font-size: 12px;
-            }
-
-            .header-right .btn {
-                width: auto;
-            }
-
-            .domain-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .domain-actions {
-                width: 100%;
-                margin-top: 12px;
-            }
-
-            .domain-actions .btn {
-                flex: 1;
-            }
+            .nav-links { display: none; }
+            .hero h1 { font-size: 32px; }
+            .domain-item { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .info-box { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <nav>
-        <a href="#" class="logo-nav">
-            <img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU">
-            <span class="nav-title">ShibOwesYouID</span>
-        </a>
-        <div class="nav-right">
+    <div class="container">
+        <nav>
+            <div class="logo">
+                <img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU">
+                <span>ShibOwesYouID</span>
+            </div>
             <div class="nav-links">
-                <a href="#mint" class="nav-mint">Mint</a>
-                <a href="#query" class="nav-query">Query</a>
-                <a href="#domains" class="nav-domains">My Domains</a>
+                <a href="#mint-section" class="nav-mint">铸造</a>
+                <a href="#query-section" class="nav-query">查询</a>
+                <a href="#my-domains" class="nav-domains">我的域名</a>
             </div>
-            <div class="lang-toggle">
-                <button class="lang-btn active" onclick="switchLanguage('zh')">中文</button>
-                <button class="lang-btn" onclick="switchLanguage('en')">English</button>
+            <div class="wallet-section">
+                <button class="lang-toggle" onclick="toggleLanguage()">中文 / EN</button>
+                <button id="connectBtn" class="btn btn-primary" onclick="connectWallet()">连接钱包</button>
+                <button id="disconnectBtn" class="btn btn-secondary" style="display: none;" onclick="disconnectWallet()">断开</button>
             </div>
-        </div>
-        <div class="header-right">
-            <div class="network-status" id="networkStatus">Not Connected</div>
-            <button class="btn btn-primary" id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
-            <button class="btn btn-secondary" id="disconnectBtn" onclick="disconnectWallet()" style="display: none;">Disconnect</button>
-        </div>
-    </nav>
+        </nav>
 
-    <div class="wrapper">
-        <div class="container">
-            <div class="main-content">
-                <div class="card" id="mint">
-                    <h2 class="card-title-mint">🎯 Mint Domain</h2>
-                    <div id="mintMessage" class="message"></div>
-                    
-                    <div class="info-box">
-                        <strong class="info-fee">Mint Fee:</strong> <span class="info-fee-val">1000 SOU</span><br>
-                        <strong class="info-len">Domain Length:</strong> <span class="info-len-val">1-15 characters</span><br>
-                        <strong class="info-suffix">Suffix:</strong> <span class="info-suffix-val">.sou</span>
-                    </div>
+        <section class="hero">
+            <h1 id="heroTitle">您的链上身份由 .sou 开启</h1>
+            <p id="heroSub" style="color: var(--text-dim);">简单、独特、属于您的 Web3 域名服务</p>
+        </section>
 
-                    <div class="form-group">
-                        <label for="domainName" class="label-domain">Domain (without .sou)</label>
-                        <input type="text" id="domainName" placeholder="e.g. myname" maxlength="15">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="souBalance" class="label-balance">SOU Balance</label>
-                        <input type="text" id="souBalance" readonly placeholder="Loading...">
-                    </div>
-
-                    <div class="form-actions">
-                        <button class="btn btn-primary" onclick="mintDomainWithApprove()" style="flex: 1;">
-                            <span class="btn-mint-text">Mint Now</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="card" id="query">
-                    <h2 class="card-title-query">🔍 Query & Resolve</h2>
-                    
-                    <div class="tabs">
-                        <button class="tab-btn active" onclick="switchTab('resolve')" class="tab-resolve">Resolve</button>
-                        <button class="tab-btn" onclick="switchTab('reverse')" class="tab-reverse">Reverse</button>
-                        <button class="tab-btn" onclick="switchTab('setPrimary')" class="tab-set-primary">Set Primary</button>
-                    </div>
-
-                    <div id="resolve" class="tab-content active">
-                        <div id="resolveMessage" class="message"></div>
-                        <div class="form-group">
-                            <label for="resolveName" class="label-resolve-name">Enter Domain</label>
-                            <input type="text" id="resolveName" placeholder="e.g. myname">
-                        </div>
-                        <button class="btn btn-primary" style="width: 100%;" onclick="resolveDomain()">
-                            <span class="btn-resolve">Query</span>
-                        </button>
-                        <div id="resolveResult" class="result-box" style="display: none; margin-top: 20px;">
-                            <div class="result-label">Token ID</div>
-                            <div class="result-value" id="resolveResultValue"></div>
-                        </div>
-                    </div>
-
-                    <div id="reverse" class="tab-content">
-                        <div id="reverseMessage" class="message"></div>
-                        <div class="form-group">
-                            <label for="reverseAddress" class="label-reverse-addr">Enter Address</label>
-                            <input type="text" id="reverseAddress" placeholder="0x...">
-                        </div>
-                        <button class="btn btn-primary" style="width: 100%;" onclick="reverseDomain()">
-                            <span class="btn-reverse">Query</span>
-                        </button>
-                        <div id="reverseResult" class="result-box" style="display: none; margin-top: 20px;">
-                            <div class="result-label">Primary Domain</div>
-                            <div class="result-value" id="reverseResultValue"></div>
-                        </div>
-                    </div>
-
-                    <div id="setPrimary" class="tab-content">
-                        <div id="setPrimaryMessage" class="message"></div>
-                        <div class="form-group">
-                            <label for="setPrimaryDomainName" class="label-set-domain">Select Domain</label>
-                            <input type="text" id="setPrimaryDomainName" placeholder="e.g. myname">
-                        </div>
-                        <button class="btn btn-primary" style="width: 100%;" onclick="setPrimaryNameManual()">
-                            <span class="btn-set-primary">Set as Primary</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="card full-width" id="domains">
-                    <h2 class="card-title-domains">📋 My Domains</h2>
-                    <div id="myDomainsMessage" class="message"></div>
-                    
-                    <div class="form-actions" style="margin-bottom: 20px;">
-                        <button class="btn btn-primary" onclick="loadMyDomains()" style="flex: 1;">
-                            <span class="btn-refresh">Refresh</span>
-                        </button>
-                    </div>
-
-                    <div id="domainsList" class="domain-list">
-                        <div class="empty-state">
-                            <div class="empty-state-icon">📭</div>
-                            <p class="empty-msg">Please connect wallet first</p>
-                        </div>
-                    </div>
+        <section id="mint-section" class="card">
+            <h2 id="mintTitle" style="margin-bottom: 25px;">🎯 铸造新域名</h2>
+            <div id="mintMessage" class="message"></div>
+            
+            <div class="input-group">
+                <label id="labelDomain">输入您想要的域名</label>
+                <div class="input-wrapper">
+                    <input type="text" id="domainName" placeholder="例如: manus" maxlength="15">
+                    <span class="suffix-hint">.sou</span>
                 </div>
             </div>
-        </div>
+
+            <div class="info-box">
+                <div class="result-box">
+                    <div class="result-label" id="labelFee">铸造费用</div>
+                    <div class="result-value">1000 SOU</div>
+                </div>
+                <div class="result-box">
+                    <div class="result-label" id="labelBalance">您的 SOU 余额</div>
+                    <div class="result-value" id="souBalance">0.00</div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%; height: 56px; font-size: 16px;" onclick="handleMint()">
+                <span id="btnMint">立即铸造</span>
+            </button>
+        </section>
+
+        <section id="query-section" class="card">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('resolve')" id="tabResolve">域名解析</div>
+                <div class="tab" onclick="switchTab('reverse')" id="tabReverse">反向查询</div>
+                <div class="tab" onclick="switchTab('set-primary')" id="tabSetPrimary">设置主域名</div>
+            </div>
+
+            <div id="resolve" class="tab-content active">
+                <div id="resolveMessage" class="message"></div>
+                <div class="input-group">
+                    <label id="labelResolveName">输入域名查询钱包地址</label>
+                    <input type="text" id="resolveName" placeholder="例如: manus.sou">
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="resolveDomain()">
+                    <span id="btnResolve">开始查询</span>
+                </button>
+                <div id="resolveResult" class="result-box" style="display: none; margin-top: 20px;">
+                    <div class="result-label" id="resLabelAddr">持有者地址</div>
+                    <div class="result-value" id="resolveResultValue"></div>
+                </div>
+            </div>
+
+            <div id="reverse" class="tab-content">
+                <div id="reverseMessage" class="message"></div>
+                <div class="input-group">
+                    <label id="labelReverseAddr">输入钱包地址查询主域名</label>
+                    <input type="text" id="reverseAddress" placeholder="0x...">
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="reverseDomain()">
+                    <span id="btnReverse">开始查询</span>
+                </button>
+                <div id="reverseResult" class="result-box" style="display: none; margin-top: 20px;">
+                    <div class="result-label" id="resLabelDomain">主域名</div>
+                    <div class="result-value" id="reverseResultValue"></div>
+                </div>
+            </div>
+
+            <div id="set-primary" class="tab-content">
+                <div id="setPrimaryMessage" class="message"></div>
+                <div class="input-group">
+                    <label id="labelSetPrimary">输入您拥有的域名设为主域名</label>
+                    <input type="text" id="setPrimaryNameInput" placeholder="例如: manus">
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="setPrimaryNameManual()">
+                    <span id="btnSetPrimary">确认设置</span>
+                </button>
+            </div>
+        </section>
+
+        <section id="my-domains" class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h2 id="myDomainsTitle">📋 我的域名</h2>
+                <button class="btn btn-secondary" onclick="loadMyDomains()" style="padding: 8px 16px; font-size: 12px;" id="btnRefresh">刷新列表</button>
+            </div>
+            <div id="myDomainsMessage" class="message"></div>
+            <div id="domainsList">
+                <div class="empty-state">
+                    <p id="emptyMsg">请先连接钱包查看您的域名</p>
+                </div>
+            </div>
+        </section>
     </div>
 
     <script>
+        const CONFIG = {
+            CONTRACT: '0x57FD3175Fb85156Ec8E0DD63cCB2136f88B48183',
+            SOU_TOKEN: '0xb65bD36fef84ebc5114Cfd803A4F25B2b57F7777',
+            CHAIN_ID: '0x38',
+            RPC: 'https://bsc-dataseed.binance.org/'
+        };
+
+        const ABI = [
+            {"inputs":[{"internalType":"string","name":"_id","type":"string"}],"name":"mint","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"string","name":"inputName","type":"string"}],"name":"resolve","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"primaryName","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"index","type":"uint256"}],"name":"tokenOfOwnerByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getNameByTokenId","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"string","name":"inputName","type":"string"}],"name":"setPrimaryName","outputs":[],"stateMutability":"nonpayable","type":"function"}
+        ];
+
+        const ERC20_ABI = [
+            {"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
+        ];
+
         const LANG = {
             zh: {
-                mint: '🎯 铸造新域名',
-                query: '🔍 查询与解析',
-                domains: '📋 我的域名',
-                currentPrimary: '当前主域名',
-                fee: '铸造费用：',
-                feeVal: '1000 SOU 代币',
-                len: '域名长度：',
-                lenVal: '1-15 个字符',
-                suffix: '后缀：',
-                suffixVal: '.sou',
-                domainLabel: '域名（不含.sou）',
-                domainPlaceholder: '例如：myname',
-                balanceLabel: 'SOU 余额',
-                balancePlaceholder: '加载中...',
-                mintBtn: '立即铸造',
-                resolve: '域名解析',
-                reverse: '反向解析',
-                setPrimary: '设置主域名',
-                resolveLabel: '输入域名',
-                resolvePlaceholder: '例如：myname',
-                resolveBtn: '查询',
-                reverseLabel: '输入地址',
-                reversePlaceholder: '0x...',
-                reverseBtn: '查询',
-                setPrimaryLabel: '选择要设置的域名',
-                setPrimaryPlaceholder: '例如：myname',
-                setPrimaryBtn: '设置为主域名',
-                refreshBtn: '刷新列表',
-                emptyMsg: '请先连接钱包',
-                notConnected: '未连接',
-                connectWallet: '连接钱包',
-                disconnect: '断开连接',
-                tokenId: 'Token ID',
-                primaryDomain: '主域名',
-                approving: '正在授权 SOU...',
-                approveFail: '授权失败：',
-                approveSuccess: '授权成功！',
-                minting: '正在铸造域名...',
-                mintSuccess: '域名铸造成功！交易哈希：',
-                mintFail: '铸造失败：',
-                inputDomain: '请输入域名',
-                invalidLen: '域名长度必须在 1-15 个字符之间',
-                noWallet: '请先连接钱包',
-                querySuccess: '查询成功',
-                domainNotFound: '域名不存在',
-                queryFail: '查询失败：',
-                invalidAddr: '地址格式不正确',
-                noPrimaryDomain: '该地址未设置主域名',
-                loading: '正在加载...',
-                loadSuccess: '已加载',
-                domainCount: '个域名',
-                loadFail: '加载失败：',
-                setPrimarySuccess: '主域名设置成功！交易哈希：',
-                setPrimaryFail: '设置失败：',
-                setAsMain: '设置为主域名',
-                noDomains: '您还没有任何域名',
-                txHash: '交易哈希：',
-                installMetamask: '请安装 MetaMask 钱包',
-                connectFail: '连接钱包失败：',
-                switchNetworkFail: '添加 BSC 网络失败'
+                navMint: '铸造', navQuery: '查询', navDomains: '我的域名',
+                heroTitle: '您的链上身份由 .sou 开启', heroSub: '简单、独特、属于您的 Web3 域名服务',
+                mintTitle: '🎯 铸造新域名', labelDomain: '输入您想要的域名', labelFee: '铸造费用', labelBalance: '您的 SOU 余额', btnMint: '立即铸造',
+                tabResolve: '域名解析', tabReverse: '反向查询', tabSetPrimary: '设置主域名',
+                labelResolveName: '输入域名查询钱包地址', btnResolve: '开始查询', resLabelAddr: '持有者地址',
+                labelReverseAddr: '输入钱包地址查询主域名', btnReverse: '开始查询', resLabelDomain: '主域名',
+                labelSetPrimary: '输入您拥有的域名设为主域名', btnSetPrimary: '确认设置',
+                myDomainsTitle: '📋 我的域名', btnRefresh: '刷新列表', emptyMsg: '请先连接钱包查看您的域名',
+                noDomains: '您还没有拥有任何 .sou 域名', currentPrimary: '当前主域名', setAsMain: '设为主域名',
+                connect: '连接钱包', disconnect: '断开连接', loading: '处理中...', success: '操作成功', fail: '操作失败：',
+                switchNet: '请切换到 BSC 网络', installMetamask: '请安装 MetaMask',
+                approving: '正在授权 SOU...', minting: '正在铸造...', querySuccess: '查询成功', queryFail: '查询失败',
+                notFound: '未找到相关信息', invalidAddr: '无效的地址', inputName: '请输入域名',
+                domainPlaceholder: '例如: manus', addressPlaceholder: '0x...'
             },
             en: {
-                mint: '🎯 Mint Domain',
-                query: '🔍 Query & Resolve',
-                domains: '📋 My Domains',
-                currentPrimary: 'Current Primary',
-                fee: 'Mint Fee: ',
-                feeVal: '1000 SOU tokens',
-                len: 'Domain Length: ',
-                lenVal: '1-15 characters',
-                suffix: 'Suffix: ',
-                suffixVal: '.sou',
-                domainLabel: 'Domain (without .sou)',
-                domainPlaceholder: 'e.g. myname',
-                balanceLabel: 'SOU Balance',
-                balancePlaceholder: 'Loading...',
-                mintBtn: 'Mint Now',
-                resolve: 'Resolve',
-                reverse: 'Reverse',
-                setPrimary: 'Set Primary',
-                resolveLabel: 'Enter Domain',
-                resolvePlaceholder: 'e.g. myname',
-                resolveBtn: 'Query',
-                reverseLabel: 'Enter Address',
-                reversePlaceholder: '0x...',
-                reverseBtn: 'Query',
-                setPrimaryLabel: 'Select Domain',
-                setPrimaryPlaceholder: 'e.g. myname',
-                setPrimaryBtn: 'Set as Primary',
-                refreshBtn: 'Refresh',
-                emptyMsg: 'Please connect wallet first',
-                notConnected: 'Not Connected',
-                connectWallet: 'Connect Wallet',
-                disconnect: 'Disconnect',
-                tokenId: 'Token ID',
-                primaryDomain: 'Primary Domain',
-                approving: 'Approving SOU...',
-                approveFail: 'Approve failed: ',
-                approveSuccess: 'Approve successful!',
-                minting: 'Minting domain...',
-                mintSuccess: 'Domain minted successfully! Tx: ',
-                mintFail: 'Mint failed: ',
-                inputDomain: 'Please enter domain name',
-                invalidLen: 'Domain length must be 1-15 characters',
-                noWallet: 'Please connect wallet first',
-                querySuccess: 'Query successful',
-                domainNotFound: 'Domain not found',
-                queryFail: 'Query failed: ',
-                invalidAddr: 'Invalid address format',
-                noPrimaryDomain: 'No primary domain set for this address',
-                loading: 'Loading...',
-                loadSuccess: 'Loaded',
-                domainCount: 'domains',
-                loadFail: 'Load failed: ',
-                setPrimarySuccess: 'Primary domain set successfully! Tx: ',
-                setPrimaryFail: 'Set failed: ',
-                setAsMain: 'Set as Primary',
-                noDomains: 'You have no domains yet',
-                txHash: 'Tx Hash: ',
-                installMetamask: 'Please install MetaMask wallet',
-                connectFail: 'Connect wallet failed: ',
-                switchNetworkFail: 'Add BSC network failed'
+                navMint: 'Mint', navQuery: 'Query', navDomains: 'Domains',
+                heroTitle: 'Your On-chain Identity Starts with .sou', heroSub: 'Simple, Unique, Your Own Web3 Domain Service',
+                mintTitle: '🎯 Mint New Domain', labelDomain: 'Enter desired domain name', labelFee: 'Mint Fee', labelBalance: 'Your SOU Balance', btnMint: 'Mint Now',
+                tabResolve: 'Resolve', tabReverse: 'Reverse Lookup', tabSetPrimary: 'Set Primary',
+                labelResolveName: 'Enter domain to find address', btnResolve: 'Resolve Now', resLabelAddr: 'Owner Address',
+                labelReverseAddr: 'Enter address to find primary domain', btnReverse: 'Lookup Now', resLabelDomain: 'Primary Domain',
+                labelSetPrimary: 'Enter your domain to set as primary', btnSetPrimary: 'Set Primary',
+                myDomainsTitle: '📋 My Domains', btnRefresh: 'Refresh', emptyMsg: 'Connect wallet to see your domains',
+                noDomains: 'You don\'t own any .sou domains yet', currentPrimary: 'Current Primary', setAsMain: 'Set Primary',
+                connect: 'Connect Wallet', disconnect: 'Disconnect', loading: 'Processing...', success: 'Success', fail: 'Failed: ',
+                switchNet: 'Please switch to BSC Network', installMetamask: 'Please install MetaMask',
+                approving: 'Approving SOU...', minting: 'Minting...', querySuccess: 'Query successful', queryFail: 'Query failed',
+                notFound: 'Not found', invalidAddr: 'Invalid address', inputName: 'Please enter a name',
+                domainPlaceholder: 'e.g: manus', addressPlaceholder: '0x...'
             }
         };
 
         let currentLang = 'zh';
+        let web3, account, contract, tokenContract;
 
-        function t(key) {
-            return LANG[currentLang][key] || key;
+        function t(key) { return LANG[currentLang][key]; }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            updateAllUI();
         }
 
-        function switchLanguage(lang) {
-            currentLang = lang;
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            updateAllText();
+        function updateAllUI() {
+            document.querySelector('.lang-toggle').textContent = currentLang === 'zh' ? '中文 / EN' : 'EN / 中文';
+            
+            document.querySelector('.nav-mint').textContent = t('navMint');
+            document.querySelector('.nav-query').textContent = t('navQuery');
+            document.querySelector('.nav-domains').textContent = t('navDomains');
+            
+            document.getElementById('heroTitle').textContent = t('heroTitle');
+            document.getElementById('heroSub').textContent = t('heroSub');
+            
+            document.getElementById('mintTitle').textContent = t('mintTitle');
+            document.getElementById('labelDomain').textContent = t('labelDomain');
+            document.getElementById('labelFee').textContent = t('labelFee');
+            document.getElementById('labelBalance').textContent = t('labelBalance');
+            document.getElementById('btnMint').textContent = t('btnMint');
+            document.getElementById('domainName').placeholder = t('domainPlaceholder');
+            
+            document.getElementById('tabResolve').textContent = t('tabResolve');
+            document.getElementById('tabReverse').textContent = t('tabReverse');
+            document.getElementById('tabSetPrimary').textContent = t('tabSetPrimary');
+            
+            document.getElementById('labelResolveName').textContent = t('labelResolveName');
+            document.getElementById('btnResolve').textContent = t('btnResolve');
+            document.getElementById('resLabelAddr').textContent = t('resLabelAddr');
+            document.getElementById('resolveName').placeholder = currentLang === 'zh' ? '例如: manus.sou' : 'e.g: manus.sou';
+            
+            document.getElementById('labelReverseAddr').textContent = t('labelReverseAddr');
+            document.getElementById('btnReverse').textContent = t('btnReverse');
+            document.getElementById('resLabelDomain').textContent = t('resLabelDomain');
+            document.getElementById('reverseAddress').placeholder = t('addressPlaceholder');
+            
+            document.getElementById('labelSetPrimary').textContent = t('labelSetPrimary');
+            document.getElementById('btnSetPrimary').textContent = t('btnSetPrimary');
+            document.getElementById('setPrimaryNameInput').placeholder = currentLang === 'zh' ? '例如: manus' : 'e.g: manus';
+            
+            document.getElementById('myDomainsTitle').textContent = t('myDomainsTitle');
+            document.getElementById('btnRefresh').textContent = t('btnRefresh');
+            document.getElementById('emptyMsg').textContent = t('emptyMsg');
+            
+            document.getElementById('connectBtn').textContent = account ? account.substring(0,6)+'...'+account.substring(38) : t('connect');
         }
-
-        function updateAllText() {
-            document.querySelector('.card-title-mint').textContent = t('mint');
-            document.querySelector('.card-title-query').textContent = t('query');
-            document.querySelector('.card-title-domains').textContent = t('domains');
-            document.querySelector('.info-fee').textContent = t('fee');
-            document.querySelector('.info-fee-val').textContent = t('feeVal');
-            document.querySelector('.info-len').textContent = t('len');
-            document.querySelector('.info-len-val').textContent = t('lenVal');
-            document.querySelector('.info-suffix').textContent = t('suffix');
-            document.querySelector('.info-suffix-val').textContent = t('suffixVal');
-            document.querySelector('.label-domain').textContent = t('domainLabel');
-            document.querySelector('#domainName').placeholder = t('domainPlaceholder');
-            document.querySelector('.label-balance').textContent = t('balanceLabel');
-            document.querySelector('#souBalance').placeholder = t('balancePlaceholder');
-            document.querySelector('.btn-mint-text').textContent = t('mintBtn');
-            document.querySelector('.tab-resolve').textContent = t('resolve');
-            document.querySelector('.tab-reverse').textContent = t('reverse');
-            document.querySelector('.tab-set-primary').textContent = t('setPrimary');
-            document.querySelector('.label-resolve-name').textContent = t('resolveLabel');
-            document.querySelector('#resolveName').placeholder = t('resolvePlaceholder');
-            document.querySelector('.btn-resolve').textContent = t('resolveBtn');
-            document.querySelector('.label-reverse-addr').textContent = t('reverseLabel');
-            document.querySelector('#reverseAddress').placeholder = t('reversePlaceholder');
-            document.querySelector('.btn-reverse').textContent = t('reverseBtn');
-            document.querySelector('.label-set-domain').textContent = t('setPrimaryLabel');
-            document.querySelector('#setPrimaryDomainName').placeholder = t('setPrimaryPlaceholder');
-            document.querySelector('.btn-set-primary').textContent = t('setPrimaryBtn');
-            document.querySelector('.btn-refresh').textContent = t('refreshBtn');
-            document.querySelector('.empty-msg').textContent = t('emptyMsg');
-            document.querySelector('#connectBtn').textContent = t('connectWallet');
-            document.querySelector('#disconnectBtn').textContent = t('disconnect');
-            document.querySelector('.nav-mint').textContent = t('mint').split(' ')[1];
-            document.querySelector('.nav-query').textContent = t('query').split(' ')[1];
-            document.querySelector('.nav-domains').textContent = t('domains').split(' ')[1];
-        }
-
-        const CONFIG = {
-            BSC: {
-                chainId: 56,
-                chainName: 'BSC Mainnet',
-                rpcUrl: 'https://bsc-dataseed1.binance.org:443',
-                explorerUrl: 'https://bscscan.com'
-            },
-            CONTRACT_ADDRESS: '0x17C09cD004cB6dad2989da05bcD93B78D2bDb9D0',
-            SOU_TOKEN_ADDRESS: '0xb65bD36fef84ebc5114Cfd803A4F25B2b57F7777',
-            MINT_FEE: '1000000000000000000'
-        };
-
-        const CONTRACT_ABI = [
-            {"inputs": [{"internalType": "string", "name": "_id", "type": "string"}], "name": "mint", "outputs": [], "stateMutability": "nonpayable", "type": "function"},
-            {"inputs": [{"internalType": "string", "name": "inputName", "type": "string"}], "name": "resolve", "outputs": [{"internalType": "string", "name": "", "type": "string"}], "stateMutability": "view", "type": "function"},
-            {"inputs": [{"internalType": "address", "name": "owner", "type": "address"}], "name": "primaryName", "outputs": [{"internalType": "string", "name": "", "type": "string"}], "stateMutability": "view", "type": "function"},
-            {"inputs": [{"internalType": "address", "name": "owner", "type": "address"}], "name": "balanceOf", "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}], "stateMutability": "view", "type": "function"},
-            {"inputs": [{"internalType": "address", "name": "owner", "type": "address"}, {"internalType": "uint256", "name": "index", "type": "uint256"}], "name": "tokenOfOwnerByIndex", "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}], "stateMutability": "view", "type": "function"},
-            {"inputs": [{"internalType": "uint256", "name": "tokenId", "type": "uint256"}], "name": "getNameByTokenId", "outputs": [{"internalType": "string", "name": "", "type": "string"}], "stateMutability": "view", "type": "function"},
-            {"inputs": [{"internalType": "string", "name": "inputName", "type": "string"}], "name": "setPrimaryName", "outputs": [], "stateMutability": "nonpayable", "type": "function"}
-        ];
-
-        const ERC20_ABI = [
-            {"constant": true, "inputs": [{"name": "_owner", "type": "address"}], "name": "balanceOf", "outputs": [{"name": "balance", "type": "uint256"}], "type": "function"},
-            {"constant": false, "inputs": [{"name": "_spender", "type": "address"}, {"name": "_value", "type": "uint256"}], "name": "approve", "outputs": [{"name": "success", "type": "bool"}], "type": "function"},
-            {"constant": true, "inputs": [{"name": "_owner", "type": "address"}, {"name": "_spender", "type": "address"}], "name": "allowance", "outputs": [{"name": "remaining", "type": "uint256"}], "type": "function"}
-        ];
-
-        let web3 = null;
-        let account = null;
-        let contract = null;
-        let souToken = null;
 
         async function connectWallet() {
-            try {
-                if (!window.ethereum) {
-                    showMessage('mintMessage', t('installMetamask'), 'error');
-                    return;
-                }
-
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                account = accounts[0];
-                web3 = new Web3(window.ethereum);
-
-                const chainId = await web3.eth.getChainId();
-                if (chainId !== CONFIG.BSC.chainId) {
-                    await switchToBSC();
-                } else {
-                    initializeContracts();
-                    updateUI();
-                }
-
-                window.ethereum.on('accountsChanged', (accounts) => {
-                    if (accounts.length === 0) {
-                        disconnectWallet();
-                    } else {
-                        account = accounts[0];
-                        updateUI();
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    web3 = new Web3(window.ethereum);
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    account = accounts[0];
+                    
+                    const chainId = await web3.eth.getChainId();
+                    if (chainId !== 56) {
+                        try {
+                            await window.ethereum.request({
+                                method: 'wallet_switchEthereumChain',
+                                params: [{ chainId: CONFIG.CHAIN_ID }],
+                            });
+                        } catch (e) {
+                            alert(t('switchNet'));
+                            return;
+                        }
                     }
-                });
 
-                window.ethereum.on('chainChanged', () => {
-                    window.location.reload();
-                });
-
-            } catch (error) {
-                console.error('Connect error:', error);
-                showMessage('mintMessage', t('connectFail') + error.message, 'error');
-            }
-        }
-
-        async function switchToBSC() {
-            try {
-                await window.ethereum.request({
-                    method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: '0x' + CONFIG.BSC.chainId.toString(16) }]
-                });
-                initializeContracts();
-                updateUI();
-            } catch (switchError) {
-                if (switchError.code === 4902) {
-                    try {
-                        await window.ethereum.request({
-                            method: 'wallet_addEthereumChain',
-                            params: [{
-                                chainId: '0x' + CONFIG.BSC.chainId.toString(16),
-                                chainName: CONFIG.BSC.chainName,
-                                rpcUrls: [CONFIG.BSC.rpcUrl],
-                                nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
-                                blockExplorerUrls: [CONFIG.BSC.explorerUrl]
-                            }]
-                        });
-                        initializeContracts();
-                        updateUI();
-                    } catch (addError) {
-                        showMessage('mintMessage', t('switchNetworkFail'), 'error');
-                    }
+                    contract = new web3.eth.Contract(ABI, CONFIG.CONTRACT);
+                    tokenContract = new web3.eth.Contract(ERC20_ABI, CONFIG.SOU_TOKEN);
+                    
+                    document.getElementById('connectBtn').textContent = account.substring(0,6)+'...'+account.substring(38);
+                    document.getElementById('disconnectBtn').style.display = 'inline-flex';
+                    
+                    updateSOUBalance();
+                    loadMyDomains();
+                    updateAllUI();
+                } catch (error) {
+                    console.error(error);
                 }
+            } else {
+                alert(t('installMetamask'));
             }
         }
 
         function disconnectWallet() {
             account = null;
-            web3 = null;
-            contract = null;
-            souToken = null;
-            updateUI();
-        }
-
-        function initializeContracts() {
-            if (!web3 || !account) return;
-            contract = new web3.eth.Contract(CONTRACT_ABI, CONFIG.CONTRACT_ADDRESS);
-            souToken = new web3.eth.Contract(ERC20_ABI, CONFIG.SOU_TOKEN_ADDRESS);
-        }
-
-        function updateUI() {
-            const connectBtn = document.getElementById('connectBtn');
-            const disconnectBtn = document.getElementById('disconnectBtn');
-            const networkStatus = document.getElementById('networkStatus');
-
-            if (account) {
-                connectBtn.style.display = 'none';
-                disconnectBtn.style.display = 'inline-block';
-                networkStatus.textContent = '✓ ' + account.substring(0, 6) + '...' + account.substring(38);
-                networkStatus.classList.add('connected');
-                updateSOUBalance();
-                loadMyDomains();
-            } else {
-                connectBtn.style.display = 'inline-block';
-                disconnectBtn.style.display = 'none';
-                networkStatus.textContent = t('notConnected');
-                networkStatus.classList.remove('connected');
-                document.getElementById('souBalance').value = '';
-                document.getElementById('domainsList').innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>' + t('emptyMsg') + '</p></div>';
-            }
+            document.getElementById('connectBtn').textContent = t('connect');
+            document.getElementById('disconnectBtn').style.display = 'none';
+            document.getElementById('domainsList').innerHTML = `<div class="empty-state"><p id="emptyMsg">${t('emptyMsg')}</p></div>`;
+            document.getElementById('souBalance').textContent = '0.00';
+            updateAllUI();
         }
 
         async function updateSOUBalance() {
-            if (!souToken || !account) return;
-            try {
-                const balance = await souToken.methods.balanceOf(account).call();
-                const balanceInEther = web3.utils.fromWei(balance, 'ether');
-                document.getElementById('souBalance').value = parseFloat(balanceInEther).toFixed(2) + ' SOU';
-            } catch (error) {
-                console.error('Balance error:', error);
-                document.getElementById('souBalance').value = 'Error';
-            }
+            if (!account || !tokenContract) return;
+            const bal = await tokenContract.methods.balanceOf(account).call();
+            document.getElementById('souBalance').textContent = parseFloat(web3.utils.fromWei(bal, 'ether')).toFixed(2);
         }
 
-        async function checkAndApprove() {
-            if (!account || !souToken) return false;
+        function showMsg(id, text, type) {
+            const el = document.getElementById(id);
+            if (!text) {
+                el.style.display = 'none';
+                return;
+            }
+            el.textContent = text;
+            el.className = 'message ' + type;
+            el.style.display = 'block';
+        }
+
+        async function handleMint() {
+            if (!account) return connectWallet();
+            const name = document.getElementById('domainName').value.trim();
+            if (!name) return showMsg('mintMessage', t('inputName'), 'error');
 
             try {
-                const allowance = await souToken.methods.allowance(account, CONFIG.CONTRACT_ADDRESS).call();
-                if (parseInt(allowance) < parseInt(CONFIG.MINT_FEE)) {
-                    showMessage('mintMessage', t('approving'), 'info');
-                    const tx = await souToken.methods.approve(CONFIG.CONTRACT_ADDRESS, CONFIG.MINT_FEE).send({ from: account });
-                    showMessage('mintMessage', t('approveSuccess'), 'success');
-                    return true;
+                showMsg('mintMessage', t('approving'), 'info');
+                const fee = web3.utils.toWei('1000', 'ether');
+                const allowance = await tokenContract.methods.allowance(account, CONFIG.CONTRACT).call();
+                
+                if (BigInt(allowance) < BigInt(fee)) {
+                    await tokenContract.methods.approve(CONFIG.CONTRACT, fee).send({ from: account });
                 }
-                return true;
-            } catch (error) {
-                console.error('Approve error:', error);
-                showMessage('mintMessage', t('approveFail') + error.message, 'error');
-                return false;
-            }
-        }
 
-        async function mintDomainWithApprove() {
-            if (!account || !contract) {
-                showMessage('mintMessage', t('noWallet'), 'error');
-                return;
-            }
-
-            const domainName = document.getElementById('domainName').value.trim();
-            if (!domainName) {
-                showMessage('mintMessage', t('inputDomain'), 'error');
-                return;
-            }
-
-            if (domainName.length < 1 || domainName.length > 15) {
-                showMessage('mintMessage', t('invalidLen'), 'error');
-                return;
-            }
-
-            try {
-                const approved = await checkAndApprove();
-                if (!approved) return;
-
-                showMessage('mintMessage', t('minting'), 'info');
-                const tx = await contract.methods.mint(domainName).send({ from: account });
-                showMessage('mintMessage', t('mintSuccess') + tx.transactionHash, 'success');
+                showMsg('mintMessage', t('minting'), 'info');
+                await contract.methods.mint(name).send({ from: account });
+                showMsg('mintMessage', t('success'), 'success');
                 document.getElementById('domainName').value = '';
                 updateSOUBalance();
-                setTimeout(() => loadMyDomains(), 2000);
-            } catch (error) {
-                console.error('Mint error:', error);
-                showMessage('mintMessage', t('mintFail') + error.message, 'error');
+                loadMyDomains();
+            } catch (e) {
+                showMsg('mintMessage', t('fail') + e.message, 'error');
             }
         }
 
         async function resolveDomain() {
-            if (!contract) {
-                showMessage('resolveMessage', t('noWallet'), 'error');
-                return;
-            }
-
-            const domainName = document.getElementById('resolveName').value.trim();
-            if (!domainName) {
-                showMessage('resolveMessage', t('inputDomain'), 'error');
-                return;
-            }
-
+            if (!contract) return connectWallet();
+            let name = document.getElementById('resolveName').value.trim();
+            if (name.toLowerCase().endsWith('.sou')) name = name.slice(0, -4);
+            if (!name) return showMsg('resolveMessage', t('inputName'), 'error');
+            
             try {
-                showMessage('resolveMessage', t('loading'), 'info');
-                const result = await contract.methods.resolve(domainName).call();
-                
-                if (result && result !== '') {
-                    document.getElementById('resolveResultValue').textContent = result;
+                showMsg('resolveMessage', t('loading'), 'info');
+                const addr = await contract.methods.resolve(name).call();
+                if (addr && addr !== '0x0000000000000000000000000000000000000000') {
+                    document.getElementById('resolveResultValue').textContent = addr;
                     document.getElementById('resolveResult').style.display = 'block';
-                    showMessage('resolveMessage', t('querySuccess'), 'success');
+                    showMsg('resolveMessage', t('querySuccess'), 'success');
                 } else {
-                    showMessage('resolveMessage', t('domainNotFound'), 'error');
+                    showMsg('resolveMessage', t('notFound'), 'error');
                     document.getElementById('resolveResult').style.display = 'none';
                 }
-            } catch (error) {
-                console.error('Resolve error:', error);
-                showMessage('resolveMessage', t('queryFail') + error.message, 'error');
-                document.getElementById('resolveResult').style.display = 'none';
+            } catch (e) {
+                showMsg('resolveMessage', t('queryFail'), 'error');
             }
         }
 
         async function reverseDomain() {
-            if (!contract) {
-                showMessage('reverseMessage', t('noWallet'), 'error');
-                return;
-            }
-
-            let address = document.getElementById('reverseAddress').value.trim();
-            if (!address) {
-                showMessage('reverseMessage', t('inputDomain'), 'error');
-                return;
-            }
-
-            if (!web3.utils.isAddress(address)) {
-                showMessage('reverseMessage', t('invalidAddr'), 'error');
-                return;
-            }
+            if (!contract) return connectWallet();
+            const addr = document.getElementById('reverseAddress').value.trim();
+            if (!addr) return showMsg('reverseMessage', t('inputName'), 'error');
+            if (!web3.utils.isAddress(addr)) return showMsg('reverseMessage', t('invalidAddr'), 'error');
 
             try {
-                showMessage('reverseMessage', t('loading'), 'info');
-                const result = await contract.methods.primaryName(address).call();
-                
-                if (result && result !== '') {
-                    document.getElementById('reverseResultValue').textContent = result;
+                showMsg('reverseMessage', t('loading'), 'info');
+                const name = await contract.methods.primaryName(addr).call();
+                if (name) {
+                    document.getElementById('reverseResultValue').textContent = name + '.sou';
                     document.getElementById('reverseResult').style.display = 'block';
-                    showMessage('reverseMessage', t('querySuccess'), 'success');
+                    showMsg('reverseMessage', t('querySuccess'), 'success');
                 } else {
-                    showMessage('reverseMessage', t('noPrimaryDomain'), 'error');
+                    showMsg('reverseMessage', t('notFound'), 'error');
                     document.getElementById('reverseResult').style.display = 'none';
                 }
-            } catch (error) {
-                console.error('Reverse error:', error);
-                showMessage('reverseMessage', t('queryFail') + error.message, 'error');
-                document.getElementById('reverseResult').style.display = 'none';
-            }
-        }
-
-        async function loadMyDomains() {
-            if (!account || !contract) {
-                document.getElementById('domainsList').innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>' + t('emptyMsg') + '</p></div>';
-                return;
-            }
-
-            try {
-                showMessage('myDomainsMessage', t('loading'), 'info');
-                const balance = await contract.methods.balanceOf(account).call();
-                const domainCount = parseInt(balance);
-
-                if (domainCount === 0) {
-                    document.getElementById('domainsList').innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>' + t('noDomains') + '</p></div>';
-                    showMessage('myDomainsMessage', '', '');
-                    return;
-                }
-
-                const primaryDomain = await contract.methods.primaryName(account).call();
-                const primaryName = primaryDomain ? primaryDomain.replace('.sou', '') : null;
-
-                let domainsHTML = '';
-                for (let i = 0; i < domainCount; i++) {
-                    try {
-                        const tokenId = await contract.methods.tokenOfOwnerByIndex(account, i).call();
-                        const domainName = await contract.methods.getNameByTokenId(tokenId).call();
-                        const isPrimary = primaryName && domainName.toLowerCase() === primaryName.toLowerCase();
-                        
-                        domainsHTML += `
-                            <div class="domain-item">
-                                <div>
-                                    <div class="domain-name">
-                                        ${domainName}.sou
-                                        ${isPrimary ? '<span class="primary-badge">' + t('currentPrimary') + '</span>' : ''}
-                                    </div>
-                                    <div class="domain-id">Token ID: ${tokenId}</div>
-                                </div>
-                                <div class="domain-actions">
-                                    <button class="btn btn-secondary" onclick="setPrimaryName('${domainName}')" ${isPrimary ? 'disabled' : ''}>${t('setAsMain')}</button>
-                                </div>
-                            </div>
-                        `;
-                    } catch (error) {
-                        console.error('Load domain error:', error);
-                    }
-                }
-
-                document.getElementById('domainsList').innerHTML = domainsHTML;
-                showMessage('myDomainsMessage', t('loadSuccess') + ' ' + domainCount + ' ' + t('domainCount'), 'success');
-            } catch (error) {
-                console.error('Load error:', error);
-                showMessage('myDomainsMessage', t('loadFail') + error.message, 'error');
-                document.getElementById('domainsList').innerHTML = '<div class="empty-state"><div class="empty-state-icon">❌</div><p>' + t('loadFail') + '</p></div>';
-            }
-        }
-
-        async function setPrimaryName(domainName) {
-            if (!account || !contract) {
-                showMessage('myDomainsMessage', t('noWallet'), 'error');
-                return;
-            }
-
-            try {
-                showMessage('myDomainsMessage', t('loading'), 'info');
-                const tx = await contract.methods.setPrimaryName(domainName).send({ from: account });
-                showMessage('myDomainsMessage', t('setPrimarySuccess') + tx.transactionHash, 'success');
-                setTimeout(() => loadMyDomains(), 2000);
-            } catch (error) {
-                console.error('Set primary error:', error);
-                showMessage('myDomainsMessage', t('setPrimaryFail') + error.message, 'error');
+            } catch (e) {
+                showMsg('reverseMessage', t('queryFail'), 'error');
             }
         }
 
         async function setPrimaryNameManual() {
-            if (!account || !contract) {
-                showMessage('setPrimaryMessage', t('noWallet'), 'error');
-                return;
-            }
-
-            const domainName = document.getElementById('setPrimaryDomainName').value.trim();
-            if (!domainName) {
-                showMessage('setPrimaryMessage', t('inputDomain'), 'error');
-                return;
-            }
-
+            if (!account) return connectWallet();
+            let name = document.getElementById('setPrimaryNameInput').value.trim();
+            if (name.toLowerCase().endsWith('.sou')) name = name.slice(0, -4);
+            if (!name) return showMsg('setPrimaryMessage', t('inputName'), 'error');
             try {
-                showMessage('setPrimaryMessage', t('loading'), 'info');
-                const tx = await contract.methods.setPrimaryName(domainName).send({ from: account });
-                showMessage('setPrimaryMessage', t('setPrimarySuccess') + tx.transactionHash, 'success');
-                document.getElementById('setPrimaryDomainName').value = '';
-                setTimeout(() => loadMyDomains(), 2000);
-            } catch (error) {
-                console.error('Set primary error:', error);
-                showMessage('setPrimaryMessage', t('setPrimaryFail') + error.message, 'error');
+                showMsg('setPrimaryMessage', t('loading'), 'info');
+                await contract.methods.setPrimaryName(name).send({ from: account });
+                showMsg('setPrimaryMessage', t('success'), 'success');
+                document.getElementById('setPrimaryNameInput').value = '';
+                loadMyDomains();
+            } catch (e) {
+                showMsg('setPrimaryMessage', t('fail') + e.message, 'error');
             }
         }
 
-        function showMessage(elementId, message, type) {
-            const element = document.getElementById(elementId);
-            element.textContent = message;
-            element.className = 'message';
-            if (message) {
-                element.classList.add('show', type);
+        async function loadMyDomains() {
+            if (!account || !contract) return;
+            try {
+                const bal = await contract.methods.balanceOf(account).call();
+                const count = parseInt(bal);
+                const primary = await contract.methods.primaryName(account).call();
+                
+                if (count === 0) {
+                    document.getElementById('domainsList').innerHTML = `<div class="empty-state"><p>${t('noDomains')}</p></div>`;
+                    return;
+                }
+
+                let html = '';
+                for (let i = 0; i < count; i++) {
+                    const tid = await contract.methods.tokenOfOwnerByIndex(account, i).call();
+                    const name = await contract.methods.getNameByTokenId(tid).call();
+                    const isPrimary = primary && name.toLowerCase() === primary.toLowerCase();
+                    
+                    html += `
+                        <div class="domain-item">
+                            <div>
+                                <div class="domain-name">
+                                    ${name}.sou
+                                    ${isPrimary ? `<span class="primary-badge">${t('currentPrimary')}</span>` : ''}
+                                </div>
+                                <div class="domain-id">Token ID: ${tid}</div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="setPrimary('${name}')" ${isPrimary ? 'disabled' : ''}>
+                                ${t('setAsMain')}
+                            </button>
+                        </div>
+                    `;
+                }
+                document.getElementById('domainsList').innerHTML = html;
+            } catch (e) {
+                console.error(e);
             }
         }
 
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
+        async function setPrimary(name) {
+            try {
+                showMsg('myDomainsMessage', t('loading'), 'info');
+                await contract.methods.setPrimaryName(name).send({ from: account });
+                showMsg('myDomainsMessage', t('success'), 'success');
+                loadMyDomains();
+            } catch (e) {
+                showMsg('myDomainsMessage', t('fail') + e.message, 'error');
+            }
         }
 
-        window.addEventListener('load', () => {
-            updateAllText();
-            if (window.ethereum && window.ethereum.selectedAddress) {
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            const tabMap = { 'resolve': 'Resolve', 'reverse': 'Reverse', 'set-primary': 'SetPrimary' };
+            const tabName = tabMap[tabId];
+            document.getElementById('tab' + tabName).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        window.ethereum?.on('accountsChanged', (accounts) => {
+            if (accounts.length > 0) {
+                account = accounts[0];
                 connectWallet();
+            } else {
+                disconnectWallet();
             }
         });
+
+        window.ethereum?.on('chainChanged', () => window.location.reload());
+
+        updateAllUI();
     </script>
 </body>
 </html>
