@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShibOwesYouID</title>
+    <title>ShibOwesYouID - Domain Service</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Space+Mono&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <style>
@@ -383,7 +383,7 @@
             <div class="input-group">
                 <label id="labelDomain">输入您想要的域名</label>
                 <div class="input-wrapper">
-                    <input type="text" id="domainName" placeholder="例如: shib" maxlength="15">
+                    <input type="text" id="domainName" placeholder="例如: manus" maxlength="15">
                     <span class="suffix-hint">.sou</span>
                 </div>
             </div>
@@ -415,7 +415,7 @@
                 <div id="resolveMessage" class="message"></div>
                 <div class="input-group">
                     <label id="labelResolveName">输入域名查询钱包地址</label>
-                    <input type="text" id="resolveName" placeholder="例如: shib.sou">
+                    <input type="text" id="resolveName" placeholder="例如: manus.sou">
                 </div>
                 <button class="btn btn-primary" style="width: 100%;" onclick="resolveDomain()">
                     <span id="btnResolve">开始查询</span>
@@ -445,7 +445,7 @@
                 <div id="setPrimaryMessage" class="message"></div>
                 <div class="input-group">
                     <label id="labelSetPrimary">输入您拥有的域名设为主域名</label>
-                    <input type="text" id="setPrimaryNameInput" placeholder="例如: shib">
+                    <input type="text" id="setPrimaryNameInput" placeholder="例如: manus">
                 </div>
                 <button class="btn btn-primary" style="width: 100%;" onclick="setPrimaryNameManual()">
                     <span id="btnSetPrimary">确认设置</span>
@@ -469,7 +469,7 @@
 
     <script>
         const CONFIG = {
-            CONTRACT: '0x57FD3175Fb85156Ec8E0DD63cCB2136f88B48183',
+            CONTRACT: '0x31CCB08535398AFEe394E8cd8d34e72973C08cc9',
             SOU_TOKEN: '0xb65bD36fef84ebc5114Cfd803A4F25B2b57F7777',
             CHAIN_ID: '0x38',
             RPC: 'https://bsc-dataseed.binance.org/'
@@ -506,7 +506,7 @@
                 switchNet: '请切换到 BSC 网络', installMetamask: '请安装 MetaMask',
                 approving: '正在授权 SOU...', minting: '正在铸造...', querySuccess: '查询成功', queryFail: '查询失败',
                 notFound: '未找到相关信息', invalidAddr: '无效的地址', inputName: '请输入域名',
-                domainPlaceholder: '例如: shib', addressPlaceholder: '0x...'
+                domainPlaceholder: '例如: manus', addressPlaceholder: '0x...'
             },
             en: {
                 navMint: 'Mint', navQuery: 'Query', navDomains: 'Domains',
@@ -522,7 +522,7 @@
                 switchNet: 'Please switch to BSC Network', installMetamask: 'Please install MetaMask',
                 approving: 'Approving SOU...', minting: 'Minting...', querySuccess: 'Query successful', queryFail: 'Query failed',
                 notFound: 'Not found', invalidAddr: 'Invalid address', inputName: 'Please enter a name',
-                domainPlaceholder: 'e.g: shib', addressPlaceholder: '0x...'
+                domainPlaceholder: 'e.g: manus', addressPlaceholder: '0x...'
             }
         };
 
@@ -560,7 +560,7 @@
             document.getElementById('labelResolveName').textContent = t('labelResolveName');
             document.getElementById('btnResolve').textContent = t('btnResolve');
             document.getElementById('resLabelAddr').textContent = t('resLabelAddr');
-            document.getElementById('resolveName').placeholder = currentLang === 'zh' ? '例如: shib.sou' : 'e.g: shib.sou';
+            document.getElementById('resolveName').placeholder = currentLang === 'zh' ? '例如: manus.sou' : 'e.g: manus.sou';
             
             document.getElementById('labelReverseAddr').textContent = t('labelReverseAddr');
             document.getElementById('btnReverse').textContent = t('btnReverse');
@@ -569,7 +569,7 @@
             
             document.getElementById('labelSetPrimary').textContent = t('labelSetPrimary');
             document.getElementById('btnSetPrimary').textContent = t('btnSetPrimary');
-            document.getElementById('setPrimaryNameInput').placeholder = currentLang === 'zh' ? '例如: shib' : 'e.g: shib';
+            document.getElementById('setPrimaryNameInput').placeholder = currentLang === 'zh' ? '例如: manus' : 'e.g: manus';
             
             document.getElementById('myDomainsTitle').textContent = t('myDomainsTitle');
             document.getElementById('btnRefresh').textContent = t('btnRefresh');
