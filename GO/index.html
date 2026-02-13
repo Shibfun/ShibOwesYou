@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShibOwesYou - Shibarium 代币兑换</title>
+    <link rel="icon" type="image/webp" href="https://raw.githubusercontent.com/ChewySwap/chewy-tokenlist/main/tokens/oscar.webp">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #0f1629 50%, #1a1f3a 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .logo-nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 800;
+            color: #f8fafc;
+            text-decoration: none;
+        }
+
+        .logo-nav img {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .wallet-info {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(35, 45, 77, 0.6);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+
+        .wallet-info.connected {
+            display: flex;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+        }
+
+        .owner-badge {
+            background: rgba(249, 115, 22, 0.2);
+            color: #fb923c;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            padding-top: 80px;
+            flex: 1;
+        }
+
+        .app-container {
+            max-width: 560px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .card {
+            background: rgba(26, 31, 58, 0.85);
+            backdrop-filter: blur(30px);
+            border-radius: 24px;
+            border: 1px solid rgba(102, 126, 234, 0.15);
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .card-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .card-subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .card-content {
+            padding: 30px;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #cbd5e1;
+            font-weight: 600;
+        }
+
+        .balance-display {
+            color: #8b9eff;
+            cursor: pointer;
+        }
+
+        .input-box {
+            background: rgba(35, 45, 77, 0.6);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .token-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: rgba(102, 126, 234, 0.15);
+            border-radius: 10px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .token-logo {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        input[type="number"] {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #f8fafc;
+            font-size: 18px;
+            font-weight: 700;
+            outline: none;
+            font-family: 'Courier New', monospace;
+        }
+
+        input[type="number"]::placeholder {
+            color: #64748b;
+        }
+
+        .percentage-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .percentage-btn {
+            flex: 1;
+            padding: 8px;
+            background: rgba(35, 45, 77, 0.6);
+            border: 1px solid #334155;
+            border-radius: 10px;
+            color: #cbd5e1;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .percentage-btn:hover {
+            border-color: #667eea;
+            color: #8b9eff;
+        }
+
+        .action-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+        }
+
+        .action-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(102, 126, 234, 0.6);
+        }
+
+        .action-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .message-section {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            font-size: 12px;
+            text-align: center;
+            color: #8b9eff;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .chain-selector {
+            display: flex;
+            gap: 8px;
+            background: rgba(35, 45, 77, 0.6);
+            padding: 6px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .chain-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            color: #cbd5e1;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .chain-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .swap-toggle {
+            display: flex;
+            justify-content: center;
+            margin: -10px 0 10px;
+        }
+
+        .toggle-icon {
+            width: 36px;
+            height: 36px;
+            background: #232d4d;
+            border: 2px solid #334155;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2;
+        }
+
+        .toggle-icon:hover {
+            border-color: #667eea;
+            color: #8b9eff;
+        }
+
+        .connect-button {
+            width: 100%;
+            padding: 14px;
+            background: #1a1f3a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .connect-button:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .connect-button.connected {
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 8px;
+            background: rgba(35, 45, 77, 0.6);
+            padding: 6px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            color: #cbd5e1;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 14px;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .admin-section {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .admin-section h3 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #fca5a5;
+        }
+
+        .admin-button {
+            width: 100%;
+            padding: 12px;
+            background: #ef4444;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 14px;
+        }
+
+        .admin-button:hover:not(:disabled) {
+            background: #dc2626;
+        }
+
+        .admin-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 640px) {
+            nav {
+                padding: 12px 16px;
+            }
+
+            .logo-nav {
+                font-size: 16px;
+            }
+
+            .logo-nav img {
+                width: 28px;
+                height: 28px;
+            }
+
+            .wallet-info {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .app-container {
+                padding: 20px 16px 60px;
+                gap: 20px;
+            }
+
+            .card-content {
+                padding: 20px;
+            }
+
+            .card-header {
+                padding: 20px;
+            }
+
+            .card-title {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="#" class="logo-nav">
+            <img src="https://raw.githubusercontent.com/ChewySwap/chewy-tokenlist/main/tokens/oscar.webp" alt="SOU">
+            <span>ShibOwesYou</span>
+        </a>
+        <div class="nav-right">
+            <div class="wallet-info" id="walletInfo">
+                <div class="status-dot"></div>
+                <span id="walletAddress">连接中...</span>
+                <span class="owner-badge" id="ownerBadge" style="display: none;">Owner</span>
+            </div>
+            <button class="connect-button" id="connectBtn">连接钱包</button>
+        </div>
+    </nav>
+
+    <div class="wrapper">
+        <div class="app-container">
+            <!-- 连接钱包卡片 -->
+            <div class="card" id="connectCard">
+                <div class="card-content">
+                    <button class="connect-button" id="connectBtn2" style="width: 100%; padding: 16px;">连接钱包</button>
+                </div>
+            </div>
+
+            <!-- 主要功能卡片 -->
+            <div class="card" id="mainCard" style="display: none;">
+                <div class="card-header">
+                    <h2 class="card-title">代币兑换</h2>
+                    <p class="card-subtitle">在 Shibarium 网络上兑换代币</p>
+                </div>
+                <div class="card-content">
+                    <!-- 选项卡 -->
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" data-tab="swap">兑换</button>
+                        <button class="tab-btn" data-tab="deposit">存入</button>
+                        <button class="tab-btn" id="adminTabBtn" data-tab="admin" style="display: none;">管理员</button>
+                    </div>
+
+                    <!-- 兑换选项卡 -->
+                    <div class="tab-content active" id="swapTab">
+                        <div class="input-section">
+                            <div class="input-label">
+                                <span>从</span>
+                                <span class="balance-display" id="balanceFrom">余额: 0</span>
+                            </div>
+                            <div class="input-box">
+                                <select id="tokenFrom" style="background: transparent; border: none; color: #f8fafc; font-weight: 700; outline: none; flex: 1; cursor: pointer;">
+                                    <option value="oscar">OSCAR</option>
+                                    <option value="ltd">LTD</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="swap-toggle">
+                            <div class="toggle-icon" id="swapToggle">⇅</div>
+                        </div>
+
+                        <div class="input-section">
+                            <div class="input-label">
+                                <span>到</span>
+                                <span class="balance-display" id="balanceTo">余额: 0</span>
+                            </div>
+                            <div class="input-box">
+                                <select id="tokenTo" style="background: transparent; border: none; color: #f8fafc; font-weight: 700; outline: none; flex: 1; cursor: pointer;">
+                                    <option value="ltd">LTD</option>
+                                    <option value="oscar">OSCAR</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="input-section">
+                            <div class="input-label">
+                                <span>数量</span>
+                            </div>
+                            <div class="input-box">
+                                <input type="number" id="swapAmount" placeholder="输入数量" step="any">
+                            </div>
+                            <div class="percentage-buttons">
+                                <button class="percentage-btn" data-percent="25">25%</button>
+                                <button class="percentage-btn" data-percent="50">50%</button>
+                                <button class="percentage-btn" data-percent="75">75%</button>
+                                <button class="percentage-btn" data-percent="100">100%</button>
+                            </div>
+                        </div>
+
+                        <button class="action-button" id="swapBtn">连接钱包</button>
+                        <div class="message-section" id="swapMessage"></div>
+                    </div>
+
+                    <!-- 存入选项卡 -->
+                    <div class="tab-content" id="depositTab">
+                        <div class="input-section">
+                            <div class="input-label">
+                                <span>选择代币</span>
+                                <span class="balance-display" id="balanceDeposit">余额: 0</span>
+                            </div>
+                            <div class="input-box">
+                                <select id="tokenDeposit" style="background: transparent; border: none; color: #f8fafc; font-weight: 700; outline: none; flex: 1; cursor: pointer;">
+                                    <option value="oscar">OSCAR</option>
+                                    <option value="ltd">LTD</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="input-section">
+                            <div class="input-label">
+                                <span>数量</span>
+                            </div>
+                            <div class="input-box">
+                                <input type="number" id="depositAmount" placeholder="输入数量" step="any">
+                            </div>
+                            <div class="percentage-buttons">
+                                <button class="percentage-btn" data-percent="25">25%</button>
+                                <button class="percentage-btn" data-percent="50">50%</button>
+                                <button class="percentage-btn" data-percent="75">75%</button>
+                                <button class="percentage-btn" data-percent="100">100%</button>
+                            </div>
+                        </div>
+
+                        <button class="action-button" id="depositBtn">连接钱包</button>
+                        <div class="message-section" id="depositMessage"></div>
+                    </div>
+
+                    <!-- 管理员选项卡 -->
+                    <div class="tab-content" id="adminTab">
+                        <div class="admin-section">
+                            <h3>⏸️ 合约状态</h3>
+                            <p style="font-size: 12px; margin-bottom: 12px; color: #cbd5e1;" id="pauseStatus">状态: 正常运行</p>
+                            <button class="admin-button" id="pauseBtn">暂停合约</button>
+                        </div>
+
+                        <div class="admin-section">
+                            <h3>➕ 添加代币对</h3>
+                            <div class="input-section">
+                                <div class="input-label">代币 A</div>
+                                <select id="pairTokenA" style="width: 100%; padding: 10px; background: rgba(35, 45, 77, 0.6); border: 1px solid #334155; border-radius: 8px; color: #f8fafc; cursor: pointer;">
+                                    <option value="oscar">OSCAR</option>
+                                    <option value="ltd">LTD</option>
+                                </select>
+                            </div>
+                            <div class="input-section">
+                                <div class="input-label">代币 B</div>
+                                <select id="pairTokenB" style="width: 100%; padding: 10px; background: rgba(35, 45, 77, 0.6); border: 1px solid #334155; border-radius: 8px; color: #f8fafc; cursor: pointer;">
+                                    <option value="ltd">LTD</option>
+                                    <option value="oscar">OSCAR</option>
+                                </select>
+                            </div>
+                            <div class="input-section">
+                                <div class="input-label">显示小数位</div>
+                                <input type="number" id="pairDecimals" value="18" min="0" max="18" style="width: 100%; padding: 10px; background: rgba(35, 45, 77, 0.6); border: 1px solid #334155; border-radius: 8px; color: #f8fafc;">
+                            </div>
+                            <button class="admin-button" id="addPairBtn" style="background: #667eea;">添加代币对</button>
+                        </div>
+
+                        <div class="admin-section">
+                            <h3>🚨 紧急提取</h3>
+                            <div class="input-section">
+                                <div class="input-label">选择代币</div>
+                                <select id="withdrawToken" style="width: 100%; padding: 10px; background: rgba(35, 45, 77, 0.6); border: 1px solid #334155; border-radius: 8px; color: #f8fafc; cursor: pointer;">
+                                    <option value="oscar">OSCAR</option>
+                                    <option value="ltd">LTD</option>
+                                </select>
+                            </div>
+                            <div class="input-section">
+                                <div class="input-label">数量</div>
+                                <input type="number" id="withdrawAmount" placeholder="输入数量" step="any" style="width: 100%; padding: 10px; background: rgba(35, 45, 77, 0.6); border: 1px solid #334155; border-radius: 8px; color: #f8fafc;">
+                            </div>
+                            <button class="admin-button" id="withdrawBtn">紧急提取</button>
+                        </div>
+
+                        <div class="message-section" id="adminMessage"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 配置 ====================
+        const CONTRACT_ADDRESS = '0xF5aA5b002eeC9196b9DBd7f6782f3f7FC4Ec42d5';
+        const SHIBARIUM_CHAIN_ID = 109;
+        const SHIBARIUM_RPC = 'https://www.shibrpc.com';
+
+        const TOKENS = {
+            oscar: {
+                address: '0x0e56b8f632215053c6fb214b14a294372195760f',
+                pairAddress: '0x22f9c69affdc54cb0c32e299e53c9b764218c4e9',
+                symbol: 'OSCAR',
+                decimals: 9,
+                logo: 'https://raw.githubusercontent.com/ChewySwap/chewy-tokenlist/main/tokens/oscar.webp',
+            },
+            ltd: {
+                address: '0x2ace8fab52842beda0713282d96c683fbe00ff89',
+                pairAddress: '0xa34dbfc7710f3a51cf9f8932b74d3b8bdcea95e8',
+                symbol: 'LTD',
+                decimals: 18,
+                logo: 'https://cdn.dexscreener.com/cms/images/d724eb4e72a137c57c94e9eec7e0f3bab1f4e1b8efb2ed2c70c1df9852d5a15f?width=256&height=256&quality=90&format=webp',
+            },
+        };
+
+        // ==================== 状态 ====================
+        let wallet = {
+            connected: false,
+            address: null,
+            isOwner: false,
+        };
+
+        let contractPaused = false;
+
+        // ==================== ERC20 ABI ====================
+        const ERC20_ABI = [
+            {
+                constant: true,
+                inputs: [{ name: '_owner', type: 'address' }],
+                name: 'balanceOf',
+                outputs: [{ name: 'balance', type: 'uint256' }],
+                type: 'function',
+            },
+            {
+                constant: false,
+                inputs: [
+                    { name: '_spender', type: 'address' },
+                    { name: '_value', type: 'uint256' },
+                ],
+                name: 'approve',
+                outputs: [{ name: '', type: 'bool' }],
+                type: 'function',
+            },
+            {
+                constant: true,
+                inputs: [
+                    { name: '_owner', type: 'address' },
+                    { name: '_spender', type: 'address' },
+                ],
+                name: 'allowance',
+                outputs: [{ name: '', type: 'uint256' }],
+                type: 'function',
+            },
+            {
+                constant: false,
+                inputs: [
+                    { name: '_to', type: 'address' },
+                    { name: '_value', type: 'uint256' },
+                ],
+                name: 'transfer',
+                outputs: [{ name: '', type: 'bool' }],
+                type: 'function',
+            },
+            {
+                constant: false,
+                inputs: [
+                    { name: 'from', type: 'address' },
+                    { name: 'to', type: 'address' },
+                    { name: 'amount', type: 'uint256' },
+                ],
+                name: 'transferFrom',
+                outputs: [{ name: '', type: 'bool' }],
+                type: 'function',
+            },
+        ];
+
+        // ==================== 合约 ABI ====================
+        const CONTRACT_ABI = [
+            {
+                inputs: [
+                    { name: 'fromToken', type: 'address' },
+                    { name: 'toToken', type: 'address' },
+                    { name: 'displayAmount', type: 'uint256' },
+                ],
+                name: 'swap',
+                outputs: [],
+                stateMutability: 'nonpayable',
+                type: 'function',
+            },
+            {
+                inputs: [
+                    { name: 'token', type: 'address' },
+                    { name: 'amount', type: 'uint256' },
+                ],
+                name: 'deposit',
+                outputs: [],
+                stateMutability: 'nonpayable',
+                type: 'function',
+            },
+            {
+                inputs: [],
+                name: 'pause',
+                outputs: [],
+                stateMutability: 'nonpayable',
+                type: 'function',
+            },
+            {
+                inputs: [],
+                name: 'unpause',
+                outputs: [],
+                stateMutability: 'nonpayable',
+                type: 'function',
+            },
+            {
+                inputs: [],
+                name: 'paused',
+                outputs: [{ name: '', type: 'bool' }],
+                stateMutability: 'view',
+                type: 'function',
+            },
+            {
+                inputs: [
+                    { name: 'tokenA', type: 'address' },
+                    { name: 'tokenB', type: 'address' },
+                    { name: 'displayDecimals', type: 'uint8' },
+                ],
+                name: 'addBoth',
+                outputs: [],
+                stateMutability: 'nonpayable',
+                type: 'function',
+            },
+            {
+                inputs: [
+                    { name: 'token', type: 'address' },
+                    { name: 'amount', type: 'uint256' },
+                ],
+                name: 'emergencyWithdrawToken',
+                outputs: [],
+                stateMutability: 'nonpayable',
+                type: 'function',
+            },
+        ];
+
+        // ==================== 工具函数 ====================
+        function showMessage(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.color = type === 'error' ? '#ef4444' : '#8b9eff';
+        }
+
+        function parseAmount(amount, decimals) {
+            return BigInt(Math.floor(parseFloat(amount) * Math.pow(10, decimals)));
+        }
+
+        function formatAmount(amount, decimals) {
+            return (parseFloat(amount) / Math.pow(10, decimals)).toFixed(6);
+        }
+
+        // ==================== 钱包连接 ====================
+        async function connectWallet() {
+            if (!window.ethereum) {
+                alert('请安装 MetaMask 或其他 Web3 钱包');
+                return;
+            }
+
+            try {
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts',
+                });
+
+                // 切换到 Shibarium
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x' + SHIBARIUM_CHAIN_ID.toString(16) }],
+                    });
+                } catch (switchError) {
+                    if (switchError.code === 4902) {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [
+                                {
+                                    chainId: '0x' + SHIBARIUM_CHAIN_ID.toString(16),
+                                    chainName: 'Shibarium',
+                                    rpcUrls: [SHIBARIUM_RPC],
+                                    nativeCurrency: {
+                                        name: 'Bone',
+                                        symbol: 'BONE',
+                                        decimals: 18,
+                                    },
+                                    blockExplorerUrls: ['https://www.shibariumscan.io'],
+                                },
+                            ],
+                        });
+                    }
+                }
+
+                wallet.connected = true;
+                wallet.address = accounts[0];
+                wallet.isOwner = accounts[0].toLowerCase() === CONTRACT_ADDRESS.toLowerCase();
+
+                updateUI();
+            } catch (err) {
+                console.error('连接失败:', err);
+            }
+        }
+
+        function updateUI() {
+            const connectCard = document.getElementById('connectCard');
+            const mainCard = document.getElementById('mainCard');
+            const walletInfo = document.getElementById('walletInfo');
+            const walletAddress = document.getElementById('walletAddress');
+            const ownerBadge = document.getElementById('ownerBadge');
+            const adminTabBtn = document.getElementById('adminTabBtn');
+
+            if (wallet.connected) {
+                connectCard.style.display = 'none';
+                mainCard.style.display = 'block';
+                walletInfo.classList.add('connected');
+                walletAddress.textContent = `${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}`;
+
+                if (wallet.isOwner) {
+                    ownerBadge.style.display = 'inline-block';
+                    adminTabBtn.style.display = 'block';
+                } else {
+                    ownerBadge.style.display = 'none';
+                    adminTabBtn.style.display = 'none';
+                }
+
+                document.getElementById('swapBtn').textContent = '兑换';
+                document.getElementById('depositBtn').textContent = '存入';
+            } else {
+                connectCard.style.display = 'block';
+                mainCard.style.display = 'none';
+                walletInfo.classList.remove('connected');
+            }
+        }
+
+        // ==================== 授权和兑换 ====================
+        async function handleSwap() {
+            if (!wallet.connected) {
+                await connectWallet();
+                return;
+            }
+
+            const fromToken = document.getElementById('tokenFrom').value;
+            const toToken = document.getElementById('tokenTo').value;
+            const amount = document.getElementById('swapAmount').value;
+
+            if (!amount || parseFloat(amount) <= 0) {
+                showMessage('swapMessage', '❌ 请输入有效数量', 'error');
+                return;
+            }
+
+            try {
+                const btn = document.getElementById('swapBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span>处理中...';
+
+                const fromTokenConfig = TOKENS[fromToken];
+                const toTokenConfig = TOKENS[toToken];
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+
+                // 检查授权
+                const tokenContract = new ethers.Contract(
+                    fromTokenConfig.address,
+                    ERC20_ABI,
+                    signer
+                );
+
+                const amountToSwap = parseAmount(amount, fromTokenConfig.decimals);
+                const allowance = await tokenContract.allowance(wallet.address, CONTRACT_ADDRESS);
+
+                if (allowance < amountToSwap) {
+                    showMessage('swapMessage', '⏳ 授权中...');
+                    const approveTx = await tokenContract.approve(CONTRACT_ADDRESS, ethers.constants.MaxUint256);
+                    await approveTx.wait();
+                    showMessage('swapMessage', '✅ 授权成功，执行兑换...');
+                }
+
+                // 执行兑换
+                const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                const swapTx = await contractInstance.swap(
+                    fromTokenConfig.address,
+                    toTokenConfig.address,
+                    amountToSwap
+                );
+
+                await swapTx.wait();
+                showMessage('swapMessage', '✅ 兑换成功！');
+                document.getElementById('swapAmount').value = '';
+            } catch (err) {
+                console.error('兑换失败:', err);
+                showMessage('swapMessage', `❌ ${err.message || '兑换失败'}`, 'error');
+            } finally {
+                const btn = document.getElementById('swapBtn');
+                btn.disabled = false;
+                btn.textContent = '兑换';
+            }
+        }
+
+        // ==================== 存入 ====================
+        async function handleDeposit() {
+            if (!wallet.connected) {
+                await connectWallet();
+                return;
+            }
+
+            const token = document.getElementById('tokenDeposit').value;
+            const amount = document.getElementById('depositAmount').value;
+
+            if (!amount || parseFloat(amount) <= 0) {
+                showMessage('depositMessage', '❌ 请输入有效数量', 'error');
+                return;
+            }
+
+            try {
+                const btn = document.getElementById('depositBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span>处理中...';
+
+                const tokenConfig = TOKENS[token];
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+
+                const tokenContract = new ethers.Contract(
+                    tokenConfig.address,
+                    ERC20_ABI,
+                    signer
+                );
+
+                const amountToDeposit = parseAmount(amount, tokenConfig.decimals);
+                const allowance = await tokenContract.allowance(wallet.address, CONTRACT_ADDRESS);
+
+                if (allowance < amountToDeposit) {
+                    showMessage('depositMessage', '⏳ 授权中...');
+                    const approveTx = await tokenContract.approve(CONTRACT_ADDRESS, ethers.constants.MaxUint256);
+                    await approveTx.wait();
+                    showMessage('depositMessage', '✅ 授权成功，执行存入...');
+                }
+
+                const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                const depositTx = await contractInstance.deposit(tokenConfig.address, amountToDeposit);
+                await depositTx.wait();
+
+                showMessage('depositMessage', '✅ 存入成功！');
+                document.getElementById('depositAmount').value = '';
+            } catch (err) {
+                console.error('存入失败:', err);
+                showMessage('depositMessage', `❌ ${err.message || '存入失败'}`, 'error');
+            } finally {
+                const btn = document.getElementById('depositBtn');
+                btn.disabled = false;
+                btn.textContent = '存入';
+            }
+        }
+
+        // ==================== 管理员功能 ====================
+        async function handlePause() {
+            if (!wallet.isOwner) {
+                showMessage('adminMessage', '❌ 仅管理员可操作', 'error');
+                return;
+            }
+
+            try {
+                const btn = document.getElementById('pauseBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span>处理中...';
+
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+                const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+                if (contractPaused) {
+                    const tx = await contractInstance.unpause();
+                    await tx.wait();
+                    contractPaused = false;
+                    document.getElementById('pauseStatus').textContent = '状态: 正常运行';
+                    showMessage('adminMessage', '✅ 合约已恢复');
+                } else {
+                    const tx = await contractInstance.pause();
+                    await tx.wait();
+                    contractPaused = true;
+                    document.getElementById('pauseStatus').textContent = '状态: 已暂停';
+                    showMessage('adminMessage', '✅ 合约已暂停');
+                }
+
+                btn.textContent = contractPaused ? '恢复合约' : '暂停合约';
+                btn.disabled = false;
+            } catch (err) {
+                console.error('操作失败:', err);
+                showMessage('adminMessage', `❌ ${err.message || '操作失败'}`, 'error');
+                document.getElementById('pauseBtn').disabled = false;
+                document.getElementById('pauseBtn').textContent = contractPaused ? '恢复合约' : '暂停合约';
+            }
+        }
+
+        async function handleAddPair() {
+            if (!wallet.isOwner) {
+                showMessage('adminMessage', '❌ 仅管理员可操作', 'error');
+                return;
+            }
+
+            const tokenA = document.getElementById('pairTokenA').value;
+            const tokenB = document.getElementById('pairTokenB').value;
+            const decimals = document.getElementById('pairDecimals').value;
+
+            try {
+                const btn = document.getElementById('addPairBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span>处理中...';
+
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+                const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+                const tx = await contractInstance.addBoth(
+                    TOKENS[tokenA].address,
+                    TOKENS[tokenB].address,
+                    decimals
+                );
+                await tx.wait();
+
+                showMessage('adminMessage', '✅ 代币对已添加');
+                btn.disabled = false;
+                btn.textContent = '添加代币对';
+            } catch (err) {
+                console.error('添加失败:', err);
+                showMessage('adminMessage', `❌ ${err.message || '添加失败'}`, 'error');
+                document.getElementById('addPairBtn').disabled = false;
+                document.getElementById('addPairBtn').textContent = '添加代币对';
+            }
+        }
+
+        async function handleWithdraw() {
+            if (!wallet.isOwner) {
+                showMessage('adminMessage', '❌ 仅管理员可操作', 'error');
+                return;
+            }
+
+            const token = document.getElementById('withdrawToken').value;
+            const amount = document.getElementById('withdrawAmount').value;
+
+            if (!amount || parseFloat(amount) <= 0) {
+                showMessage('adminMessage', '❌ 请输入有效数量', 'error');
+                return;
+            }
+
+            try {
+                const btn = document.getElementById('withdrawBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span>处理中...';
+
+                const tokenConfig = TOKENS[token];
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+                const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+                const amountToWithdraw = parseAmount(amount, tokenConfig.decimals);
+                const tx = await contractInstance.emergencyWithdrawToken(tokenConfig.address, amountToWithdraw);
+                await tx.wait();
+
+                showMessage('adminMessage', '✅ 提取成功');
+                document.getElementById('withdrawAmount').value = '';
+                btn.disabled = false;
+                btn.textContent = '紧急提取';
+            } catch (err) {
+                console.error('提取失败:', err);
+                showMessage('adminMessage', `❌ ${err.message || '提取失败'}`, 'error');
+                document.getElementById('withdrawBtn').disabled = false;
+                document.getElementById('withdrawBtn').textContent = '紧急提取';
+            }
+        }
+
+        // ==================== 事件监听 ====================
+        document.getElementById('connectBtn').addEventListener('click', connectWallet);
+        document.getElementById('connectBtn2').addEventListener('click', connectWallet);
+
+        document.getElementById('swapBtn').addEventListener('click', handleSwap);
+        document.getElementById('depositBtn').addEventListener('click', handleDeposit);
+
+        document.getElementById('pauseBtn').addEventListener('click', handlePause);
+        document.getElementById('addPairBtn').addEventListener('click', handleAddPair);
+        document.getElementById('withdrawBtn').addEventListener('click', handleWithdraw);
+
+        // 选项卡切换
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                e.target.classList.add('active');
+                const tabName = e.target.dataset.tab;
+                document.getElementById(tabName + 'Tab').classList.add('active');
+            });
+        });
+
+        // 兑换切换
+        document.getElementById('swapToggle').addEventListener('click', () => {
+            const from = document.getElementById('tokenFrom').value;
+            const to = document.getElementById('tokenTo').value;
+            document.getElementById('tokenFrom').value = to;
+            document.getElementById('tokenTo').value = from;
+        });
+
+        // 百分比按钮
+        document.querySelectorAll('.percentage-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const percent = parseInt(e.target.dataset.percent);
+                const input = e.target.closest('.input-section').querySelector('input[type="number"]');
+                if (input) {
+                    input.value = (parseFloat(input.placeholder || 0) * percent / 100).toFixed(6);
+                }
+            });
+        });
+
+        // 初始化
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length > 0) {
+                    wallet.address = accounts[0];
+                    wallet.isOwner = accounts[0].toLowerCase() === CONTRACT_ADDRESS.toLowerCase();
+                    updateUI();
+                } else {
+                    wallet.connected = false;
+                    wallet.address = null;
+                    wallet.isOwner = false;
+                    updateUI();
+                }
+            });
+
+            window.ethereum.on('chainChanged', () => {
+                window.location.reload();
+            });
+        }
+    </script>
+
+    <!-- ethers.js 库 -->
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
+</body>
+</html>
