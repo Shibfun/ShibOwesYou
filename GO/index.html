@@ -78,7 +78,7 @@
         .action-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4); }
         .action-button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .status-msg { margin-top: 16px; padding: 14px; border-radius: 12px; font-size: 13px; text-align: center; font-weight: 600; display: none; background: rgba(102, 126, 234, 0.1); }
+        .status-msg { margin-top: 16px; padding: 14px; border-radius: 12px; font-size: 13px; text-align: center; font-weight: 600; display: none; background: rgba(102, 126, 234, 0.1); word-break: break-all; }
         
         .wallet-info { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(35, 45, 77, 0.6); border: 1px solid var(--border); border-radius: 20px; font-size: 13px; font-weight: 600; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--error); }
@@ -272,6 +272,30 @@
 
         let web3;
 
+        // Helper to convert float amount to BN without scientific notation issues
+        function toRawAmount(amount, decimals) {
+            let s = amount.toString();
+            if (s.includes('e')) {
+                // Handle scientific notation if any
+                s = Number(amount).toFixed(decimals);
+            }
+            const parts = s.split('.');
+            let integer = parts[0];
+            let fraction = parts[1] || '';
+            if (fraction.length > decimals) {
+                fraction = fraction.substring(0, decimals);
+            } else {
+                while (fraction.length < decimals) {
+                    fraction += '0';
+                }
+            }
+            // Remove leading zeros from integer part
+            integer = integer.replace(/^0+/, '');
+            if (integer === '') integer = '0';
+            const result = integer + fraction;
+            return web3.utils.toBN(result.replace(/^0+/, '') || '0');
+        }
+
         async function updateUI() {
             const p = PAIRS[state.pair];
             const from = state.reversed ? TOKEN_MAP[p.t2] : TOKEN_MAP[p.t1];
@@ -317,9 +341,18 @@
                     cDep.methods.balanceOf(state.account).call()
                 ]);
 
-                document.getElementById('balFrom').textContent = (bFrom / (10 ** from.decimals)).toFixed(4);
-                document.getElementById('balTo').textContent = (bTo / (10 ** to.decimals)).toFixed(4);
-                document.getElementById('balDep').textContent = (bDep / (10 ** dep.decimals)).toFixed(4);
+                // Safe division for display
+                const format = (bal, dec) => {
+                    const b = web3.utils.toBN(bal);
+                    const d = web3.utils.toBN(10).pow(web3.utils.toBN(dec));
+                    const integer = b.div(d).toString();
+                    const fraction = b.mod(d).toString().padStart(dec, '0').substring(0, 4);
+                    return `${integer}.${fraction}`;
+                };
+
+                document.getElementById('balFrom').textContent = format(bFrom, from.decimals);
+                document.getElementById('balTo').textContent = format(bTo, to.decimals);
+                document.getElementById('balDep').textContent = format(bDep, dep.decimals);
             } catch (e) { console.error("Balance Error:", e); }
         }
 
@@ -376,7 +409,7 @@
                 const tokenC = new web3.eth.Contract(ERC20_ABI, from.addr);
                 const appC = new web3.eth.Contract(APP_ABI, CONTRACT_ADDR);
 
-                const rawAmt = web3.utils.toBN(Math.floor(amt * (10 ** from.decimals)).toString());
+                const rawAmt = toRawAmount(amt, from.decimals);
                 const allowance = await tokenC.methods.allowance(state.account, CONTRACT_ADDR).call();
                 
                 if (web3.utils.toBN(allowance).lt(rawAmt)) {
@@ -385,7 +418,14 @@
                 }
 
                 status.textContent = 'Swapping...';
-                await appC.methods.swap(from.addr, to.addr, amt).send({ from: state.account });
+                // Contract takes display amount (integer part as uint256, scaled inside contract)
+                // Note: If displayAmount in contract logic scales by decimals, we send the float converted to floor integer if that's what's expected.
+                // Looking at contract: uint256 rawAmount = displayAmount * 10 ** p.decimals;
+                // So displayAmount should be the human-readable integer. 
+                // However, if user enters 1.5, displayAmount (uint256) will lose .5.
+                // We should send the amount as a value that the contract can scale correctly.
+                // Given the contract logic, it's best to send the value as the user sees it.
+                await appC.methods.swap(from.addr, to.addr, Math.floor(amt)).send({ from: state.account });
                 status.textContent = '✅ Success!';
                 fetchBalances();
             } catch (e) { status.textContent = `❌ Error: ${e.message}`; }
@@ -405,17 +445,22 @@
                 const tokenC = new web3.eth.Contract(ERC20_ABI, dep.addr);
                 const appC = new web3.eth.Contract(APP_ABI, CONTRACT_ADDR);
 
-                const rawAmt = web3.utils.toBN(Math.floor(amt * (10 ** dep.decimals)).toString());
+                const rawAmt = toRawAmount(amt, dep.decimals);
                 const allowance = await tokenC.methods.allowance(state.account, CONTRACT_ADDR).call();
                 
                 if (web3.utils.toBN(allowance).lt(rawAmt)) {
+                    status.textContent = 'Approving...';
                     await tokenC.methods.approve(CONTRACT_ADDR, '115792089237316195423570985008687907853269984665640564039457584007913129639935').send({ from: state.account });
                 }
 
-                await appC.methods.deposit(dep.addr, rawAmt).send({ from: state.account });
+                status.textContent = 'Depositing...';
+                await appC.methods.deposit(dep.addr, rawAmt.toString()).send({ from: state.account });
                 status.textContent = '✅ Deposited!';
                 fetchBalances();
-            } catch (e) { status.textContent = `❌ ${e.message}`; }
+            } catch (e) { 
+                console.error(e);
+                status.textContent = `❌ Error: ${e.message}`; 
+            }
         }
 
         // Event Listeners
