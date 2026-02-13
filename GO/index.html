@@ -10,334 +10,157 @@
             --primary: #667eea;
             --primary-hover: #764ba2;
             --bg-dark: #0a0e27;
-            --card-bg: rgba(26, 31, 58, 0.9);
+            --card-bg: rgba(26, 31, 58, 0.95);
             --text-main: #f8fafc;
             --text-dim: #94a3b8;
             --accent: #8b9eff;
             --danger: #ef4444;
             --success: #10b981;
+            --border: rgba(255, 255, 255, 0.1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0a0e27 0%, #0f1629 50%, #1a1f3a 100%);
+            background: #050714;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(102, 126, 234, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(118, 75, 162, 0.15) 0%, transparent 40%);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 10% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 40%),
-                        radial-gradient(circle at 90% 80%, rgba(118, 75, 162, 0.1) 0%, transparent 40%);
-            pointer-events: none;
-            z-index: 0;
         }
 
         nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(10, 14, 39, 0.8);
+            position: fixed; top: 0; left: 0; right: 0;
+            background: rgba(5, 7, 20, 0.8);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+            border-bottom: 1px solid var(--border);
             padding: 12px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
             z-index: 1000;
         }
 
         .logo-nav {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--text-main);
-            text-decoration: none;
+            display: flex; align-items: center; gap: 12px;
+            font-size: 20px; font-weight: 800; color: var(--text-main); text-decoration: none;
         }
 
-        .logo-nav img {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-        }
+        .logo-nav img { width: 36px; height: 36px; border-radius: 50%; }
 
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
+        .nav-right { display: flex; align-items: center; gap: 16px; }
 
         .wallet-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 14px;
-            background: rgba(35, 45, 77, 0.6);
-            border: 1px solid rgba(102, 126, 234, 0.2);
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 16px; background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border); border-radius: 20px;
+            font-size: 13px; font-weight: 600;
         }
 
-        .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--danger);
-        }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); }
+        .dot.connected { background: var(--success); box-shadow: 0 0 8px var(--success); }
 
-        .dot.connected { background: var(--success); }
-
-        .wrapper {
-            position: relative;
-            z-index: 1;
-            padding-top: 100px;
-            flex: 1;
-            display: flex;
-            justify-content: center;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 480px;
-            padding: 20px;
-        }
+        .wrapper { padding-top: 100px; flex: 1; display: flex; justify-content: center; padding-bottom: 40px; }
+        .app-container { width: 100%; max-width: 480px; padding: 0 20px; }
 
         .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(40px);
-            border-radius: 28px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background: var(--card-bg); border-radius: 32px;
+            border: 1px solid var(--border);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
             overflow: hidden;
         }
 
-        .card-tabs {
-            display: flex;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 4px;
-            margin: 20px;
-            border-radius: 16px;
-        }
-
+        .card-tabs { display: flex; background: rgba(0, 0, 0, 0.3); padding: 6px; margin: 20px; border-radius: 18px; }
         .tab-btn {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            background: transparent;
-            color: var(--text-dim);
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            border-radius: 12px;
-            transition: all 0.2s;
+            flex: 1; padding: 12px; border: none; background: transparent;
+            color: var(--text-dim); font-weight: 700; font-size: 14px;
+            cursor: pointer; border-radius: 14px; transition: all 0.2s;
         }
+        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3); }
 
-        .tab-btn.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-        }
-
-        .card-content {
-            padding: 0 24px 24px;
-        }
+        .card-content { padding: 0 24px 24px; }
 
         .input-group {
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 16px;
-            margin-bottom: 8px;
+            background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border);
+            border-radius: 24px; padding: 16px; margin-bottom: 12px;
         }
+        .group-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 12px; font-weight: 600; color: var(--text-dim); }
+        .balance-val { color: var(--accent); font-family: 'Courier New', monospace; }
 
-        .group-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-dim);
+        .input-row { display: flex; align-items: center; gap: 12px; }
+        .token-badge {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(255, 255, 255, 0.08); padding: 8px 12px;
+            border-radius: 14px; min-width: 120px;
         }
-
-        .balance-val {
-            color: var(--accent);
-            cursor: pointer;
-        }
-
-        .input-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .token-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 6px 12px;
-            border-radius: 12px;
-            min-width: 130px;
-        }
-
-        .token-info img {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-        }
-
-        .token-symbol {
-            font-weight: 700;
-            font-size: 14px;
-        }
+        .token-badge img { width: 24px; height: 24px; border-radius: 50%; }
+        .token-symbol { font-weight: 800; font-size: 14px; }
 
         input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 20px;
-            font-weight: 700;
-            outline: none;
-            width: 100%;
+            flex: 1; background: transparent; border: none;
+            color: white; font-size: 24px; font-weight: 700; outline: none; width: 100%;
         }
 
-        .address-display {
-            font-family: 'Courier New', monospace;
-            font-size: 10px;
-            color: var(--text-dim);
-            margin-top: 8px;
-            word-break: break-all;
-            opacity: 0.7;
-            background: rgba(0,0,0,0.1);
-            padding: 4px 8px;
-            border-radius: 6px;
+        .addr-tag {
+            font-family: 'Courier New', monospace; font-size: 10px; color: var(--text-dim);
+            margin-top: 10px; padding: 6px 10px; background: rgba(0,0,0,0.2);
+            border-radius: 8px; word-break: break-all; opacity: 0.8;
         }
 
-        .swap-divider {
-            display: flex;
-            justify-content: center;
-            margin: -20px 0 -20px;
-            position: relative;
-            z-index: 10;
+        .swap-divider { display: flex; justify-content: center; margin: -22px 0; position: relative; z-index: 10; }
+        .swap-btn-circle {
+            width: 44px; height: 44px; background: #1a1f3a; border: 4px solid #050714;
+            border-radius: 14px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.3s;
         }
-
-        .swap-circle {
-            width: 40px;
-            height: 40px;
-            background: #1e2342;
-            border: 4px solid var(--bg-dark);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-
-        .swap-circle:hover {
-            transform: rotate(180deg);
-            background: var(--primary);
-        }
+        .swap-btn-circle:hover { transform: rotate(180deg); background: var(--primary); }
 
         .action-btn {
-            width: 100%;
-            padding: 18px;
+            width: 100%; padding: 18px;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
-            border: none;
-            border-radius: 20px;
-            color: white;
-            font-size: 16px;
-            font-weight: 800;
-            cursor: pointer;
-            margin-top: 16px;
-            transition: all 0.3s;
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+            border: none; border-radius: 20px; color: white;
+            font-size: 16px; font-weight: 800; cursor: pointer;
+            margin-top: 16px; transition: 0.3s;
         }
+        .action-btn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.1); }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .action-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        .token-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .token-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            padding: 16px; border-radius: 18px; color: white; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            transition: 0.2s;
         }
+        .token-btn:hover { background: rgba(102, 126, 234, 0.1); border-color: var(--primary); }
+        .token-btn.active { background: rgba(102, 126, 234, 0.2); border-color: var(--primary); box-shadow: 0 0 15px rgba(102, 126, 234, 0.2); }
+        .token-btn img { width: 32px; height: 32px; border-radius: 50%; }
+        .token-btn span { font-weight: 700; font-size: 13px; }
 
-        .action-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .status-box {
+            margin-top: 16px; padding: 14px; border-radius: 14px;
+            font-size: 13px; text-align: center; font-weight: 600; display: none;
+            animation: fadeIn 0.3s ease;
         }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .pair-selector {
-            width: 100%;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            color: white;
-            font-weight: 700;
-            margin-bottom: 20px;
-            cursor: pointer;
-            outline: none;
+        .pair-select-custom {
+            width: 100%; padding: 14px; background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border); border-radius: 18px;
+            color: white; font-weight: 700; margin-bottom: 20px; cursor: pointer; outline: none;
         }
-
-        .status-msg {
-            margin-top: 16px;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 13px;
-            text-align: center;
-            font-weight: 600;
-            display: none;
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 8px;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
 
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .admin-box {
-            background: rgba(255,255,255,0.03);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-        .admin-box h4 { font-size: 14px; margin-bottom: 12px; color: var(--accent); }
+        .admin-item { background: rgba(255,255,255,0.03); border-radius: 18px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--border); }
+        .admin-item h4 { font-size: 14px; margin-bottom: 12px; color: var(--accent); }
         .admin-input {
-            width: 100%;
-            padding: 10px;
-            background: rgba(0,0,0,0.2);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            color: white;
-            font-size: 12px;
-            margin-bottom: 8px;
+            width: 100%; padding: 12px; background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border); border-radius: 10px; color: white;
+            font-size: 13px; margin-bottom: 10px; outline: none;
         }
     </style>
 </head>
@@ -350,9 +173,8 @@
         <div class="nav-right">
             <div class="wallet-status">
                 <div class="dot" id="walletDot"></div>
-                <span id="walletAddr">未连接</span>
+                <span id="walletAddr">未连接钱包</span>
             </div>
-            <button class="tab-btn active" id="connectBtn" style="padding: 6px 16px; display: none;">连接</button>
         </div>
     </nav>
 
@@ -366,93 +188,108 @@
                 </div>
 
                 <div class="card-content">
-                    <!-- 兑换面板 -->
+                    <!-- 兑换 -->
                     <div class="tab-content active" id="swapTab">
-                        <div style="margin-bottom: 8px; font-size: 12px; color: var(--text-dim); font-weight: 600;">选择兑换资产</div>
-                        <select id="pairSelect" class="pair-selector">
-                            <option value="oscar">OSCAR (9位精度)</option>
-                            <option value="ltd">LTD (18位精度)</option>
+                        <div style="margin-bottom: 10px; font-size: 12px; color: var(--text-dim); font-weight: 700; margin-left: 4px;">选择代币对</div>
+                        <select id="pairSelect" class="pair-select-custom">
+                            <option value="oscar">OSCAR 对 (1:1 兑换)</option>
+                            <option value="ltd">LTD 对 (1:1 兑换)</option>
                         </select>
 
                         <div class="input-group">
                             <div class="group-header">
-                                <span>支付</span>
+                                <span>从</span>
                                 <span>余额: <span class="balance-val" id="balFrom">0.00</span></span>
                             </div>
                             <div class="input-row">
-                                <div class="token-info">
+                                <div class="token-badge">
                                     <img src="" id="iconFrom">
                                     <span class="token-symbol" id="symFrom">---</span>
                                 </div>
                                 <input type="number" id="amtIn" placeholder="0.0">
                             </div>
-                            <div class="address-display" id="addrFrom">0x...</div>
+                            <div class="addr-tag" id="addrFrom">0x...</div>
                         </div>
 
                         <div class="swap-divider">
-                            <div class="swap-circle" id="reverseBtn">
+                            <div class="swap-btn-circle" id="reverseBtn">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4L3 8M7 4L11 8M17 8v12M17 20l4-4M17 20l-4-4"/></svg>
                             </div>
                         </div>
 
-                        <div class="input-group" style="margin-top: 8px;">
+                        <div class="input-group" style="margin-top: 12px;">
                             <div class="group-header">
-                                <span>接收 (1:1)</span>
+                                <span>到 (1:1)</span>
                                 <span>余额: <span class="balance-val" id="balTo">0.00</span></span>
                             </div>
                             <div class="input-row">
-                                <div class="token-info">
+                                <div class="token-badge">
                                     <img src="" id="iconTo">
                                     <span class="token-symbol" id="symTo">---</span>
                                 </div>
                                 <input type="number" id="amtOut" placeholder="0.0" readonly>
                             </div>
-                            <div class="address-display" id="addrTo">0x...</div>
+                            <div class="addr-tag" id="addrTo">0x...</div>
                         </div>
 
                         <button class="action-btn" id="mainAction">连接钱包</button>
-                        <div class="status-msg" id="swapStatus"></div>
+                        <div class="status-box" id="swapStatus"></div>
                     </div>
 
-                    <!-- 存入面板 -->
+                    <!-- 存入 -->
                     <div class="tab-content" id="depositTab">
+                        <div style="margin-bottom: 12px; font-size: 12px; color: var(--text-dim); font-weight: 700; margin-left: 4px;">选择存入代币</div>
+                        <div class="token-grid">
+                            <div class="token-btn active" data-token="oscar1">
+                                <img src="https://raw.githubusercontent.com/ChewySwap/chewy-tokenlist/main/tokens/oscar.webp">
+                                <span>OSCAR (1)</span>
+                            </div>
+                            <div class="token-btn" data-token="oscar2">
+                                <img src="https://raw.githubusercontent.com/ChewySwap/chewy-tokenlist/main/tokens/oscar.webp">
+                                <span>OSCAR (2)</span>
+                            </div>
+                            <div class="token-btn" data-token="ltd1">
+                                <img src="https://cdn.dexscreener.com/cms/images/d724eb4e72a137c57c94e9eec7e0f3bab1f4e1b8efb2ed2c70c1df9852d5a15f?width=256&height=256&quality=90&format=webp">
+                                <span>LTD (1)</span>
+                            </div>
+                            <div class="token-btn" data-token="ltd2">
+                                <img src="https://cdn.dexscreener.com/cms/images/d724eb4e72a137c57c94e9eec7e0f3bab1f4e1b8efb2ed2c70c1df9852d5a15f?width=256&height=256&quality=90&format=webp">
+                                <span>LTD (2)</span>
+                            </div>
+                        </div>
+
                         <div class="input-group">
                             <div class="group-header">
-                                <span>选择代币</span>
+                                <span>存入数量</span>
                                 <span>余额: <span class="balance-val" id="balDep">0.00</span></span>
                             </div>
-                            <select id="depTokenSelect" class="pair-selector" style="margin-bottom: 0; border: none; background: transparent; padding-left: 0;">
-                                <!-- Options by JS -->
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <div class="group-header"><span>存入数量</span></div>
                             <input type="number" id="amtDep" placeholder="0.0">
+                            <div class="addr-tag" id="addrDep">0x...</div>
                         </div>
-                        <button class="action-btn" id="depAction">存入代币</button>
-                        <div class="status-msg" id="depStatus"></div>
+                        <button class="action-btn" id="depAction">确认存入</button>
+                        <div class="status-box" id="depStatus"></div>
                     </div>
 
-                    <!-- 管理面板 -->
+                    <!-- 管理 -->
                     <div class="tab-content" id="adminTab">
-                        <div class="admin-box">
-                            <h4>合约控制</h4>
-                            <p id="pStatus" style="font-size: 12px; margin-bottom: 8px;">状态: 正常</p>
-                            <button class="admin-input" id="pBtn" style="cursor: pointer;">暂停/恢复</button>
+                        <div class="admin-item">
+                            <h4>合约状态</h4>
+                            <p id="pStatus" style="font-size: 13px; margin-bottom: 12px;">当前状态: <span style="color:var(--success)">正常</span></p>
+                            <button class="admin-input" id="pBtn" style="cursor: pointer; background: var(--primary);">切换 暂停/恢复</button>
                         </div>
-                        <div class="admin-box">
-                            <h4>紧急提现</h4>
-                            <input type="text" id="wAddr" class="admin-input" placeholder="代币地址">
-                            <input type="text" id="wAmt" class="admin-input" placeholder="数量 (原始单位)">
-                            <button class="admin-input" id="wBtn" style="cursor: pointer; background: var(--danger);">提取</button>
+                        <div class="admin-item">
+                            <h4>紧急提取</h4>
+                            <input type="text" id="wAddr" class="admin-input" placeholder="代币合约地址 (0x...)">
+                            <input type="text" id="wAmt" class="admin-input" placeholder="原始数量 (包含精度)">
+                            <button class="admin-input" id="wBtn" style="cursor: pointer; background: var(--danger); border: none; font-weight: 700;">执行提取</button>
                         </div>
-                        <div class="status-msg" id="adminStatus"></div>
+                        <div class="status-box" id="adminStatus"></div>
                     </div>
                 </div>
             </div>
             
-            <div style="text-align: center; margin-top: 24px; font-size: 12px; color: var(--text-dim);">
-                合约地址: <a href="https://www.shibariumscan.io/address/0xF5aA5b002eeC9196b9DBd7f6782f3f7FC4Ec42d5" target="_blank" style="color: var(--accent); text-decoration: none;">0xF5aA5...42d5</a>
+            <div style="text-align: center; margin-top: 24px; font-size: 11px; color: var(--text-dim); letter-spacing: 0.5px;">
+                兑换合约: <a href="https://www.shibariumscan.io/address/0xF5aA5b002eeC9196b9DBd7f6782f3f7FC4Ec42d5" target="_blank" style="color: var(--accent); text-decoration: none; font-weight: 700;">0xF5aA5b002eeC9196b9DBd7f6782f3f7FC4Ec42d5</a>
             </div>
         </div>
     </div>
@@ -463,21 +300,16 @@
         const CHAIN_ID = 109;
         const RPC = 'https://www.shibrpc.com';
 
-        const TOKENS = {
-            oscar: {
-                name: 'OSCAR',
-                decimals: 9,
-                logo: 'https://raw.githubusercontent.com/ChewySwap/chewy-tokenlist/main/tokens/oscar.webp',
-                t1: '0x0e56b8f632215053c6fb214b14a294372195760f',
-                t2: '0x22f9c69affdc54cb0c32e299e53c9b764218c4e9'
-            },
-            ltd: {
-                name: 'LTD',
-                decimals: 18,
-                logo: 'https://cdn.dexscreener.com/cms/images/d724eb4e72a137c57c94e9eec7e0f3bab1f4e1b8efb2ed2c70c1df9852d5a15f?width=256&height=256&quality=90&format=webp',
-                t1: '0x2ace8fab52842beda0713282d96c683fbe00ff89',
-                t2: '0xa34dbfc7710f3a51cf9f8932b74d3b8bdcea95e8'
-            }
+        const TOKEN_MAP = {
+            oscar1: { name: 'OSCAR (1)', decimals: 9, addr: '0x0e56b8f632215053c6fb214b14a294372195760f', logo: 'https://raw.githubusercontent.com/ChewySwap/chewy-tokenlist/main/tokens/oscar.webp' },
+            oscar2: { name: 'OSCAR (2)', decimals: 9, addr: '0x22f9c69affdc54cb0c32e299e53c9b764218c4e9', logo: 'https://raw.githubusercontent.com/ChewySwap/chewy-tokenlist/main/tokens/oscar.webp' },
+            ltd1: { name: 'LTD (1)', decimals: 18, addr: '0x2ace8fab52842beda0713282d96c683fbe00ff89', logo: 'https://cdn.dexscreener.com/cms/images/d724eb4e72a137c57c94e9eec7e0f3bab1f4e1b8efb2ed2c70c1df9852d5a15f?width=256&height=256&quality=90&format=webp' },
+            ltd2: { name: 'LTD (2)', decimals: 18, addr: '0xa34dbfc7710f3a51cf9f8932b74d3b8bdcea95e8', logo: 'https://cdn.dexscreener.com/cms/images/d724eb4e72a137c57c94e9eec7e0f3bab1f4e1b8efb2ed2c70c1df9852d5a15f?width=256&height=256&quality=90&format=webp' }
+        };
+
+        const PAIRS = {
+            oscar: { t1: 'oscar1', t2: 'oscar2' },
+            ltd: { t1: 'ltd1', t2: 'ltd2' }
         };
 
         let state = {
@@ -486,7 +318,7 @@
             isOwner: false,
             pair: 'oscar',
             reversed: false,
-            paused: false
+            selectedDep: 'oscar1'
         };
 
         const ERC20_ABI = ["function balanceOf(address) view returns (uint256)", "function approve(address,uint256) returns (bool)", "function allowance(address,address) view returns (uint256)"];
@@ -499,88 +331,91 @@
             "function emergencyWithdrawToken(address,uint256) external"
         ];
 
-        function updateUI() {
-            const p = TOKENS[state.pair];
-            const fromToken = state.reversed ? p.t2 : p.t1;
-            const toToken = state.reversed ? p.t1 : p.t2;
-            const suffixFrom = state.reversed ? "(2)" : "(1)";
-            const suffixTo = state.reversed ? "(1)" : "(2)";
+        async function updateUI() {
+            const p = PAIRS[state.pair];
+            const from = state.reversed ? TOKEN_MAP[p.t2] : TOKEN_MAP[p.t1];
+            const to = state.reversed ? TOKEN_MAP[p.t1] : TOKEN_MAP[p.t2];
 
-            document.getElementById('iconFrom').src = p.logo;
-            document.getElementById('iconTo').src = p.logo;
-            document.getElementById('symFrom').textContent = `${p.name} ${suffixFrom}`;
-            document.getElementById('symTo').textContent = `${p.name} ${suffixTo}`;
-            document.getElementById('addrFrom').textContent = fromToken;
-            document.getElementById('addrTo').textContent = toToken;
+            document.getElementById('iconFrom').src = from.logo;
+            document.getElementById('iconTo').src = to.logo;
+            document.getElementById('symFrom').textContent = from.name;
+            document.getElementById('symTo').textContent = to.name;
+            document.getElementById('addrFrom').textContent = from.addr;
+            document.getElementById('addrTo').textContent = to.addr;
 
-            const depSelect = document.getElementById('depTokenSelect');
-            const oldVal = depSelect.value;
-            depSelect.innerHTML = `<option value="${p.t1}">${p.name} (1)</option><option value="${p.t2}">${p.name} (2)</option>`;
-            if (oldVal === p.t1 || oldVal === p.t2) depSelect.value = oldVal;
+            const dep = TOKEN_MAP[state.selectedDep];
+            document.getElementById('addrDep').textContent = dep.addr;
 
             if (state.connected) {
                 document.getElementById('walletDot').classList.add('connected');
                 document.getElementById('walletAddr').textContent = `${state.account.slice(0,6)}...${state.account.slice(-4)}`;
                 document.getElementById('mainAction').textContent = '立即兑换';
                 if (state.isOwner) document.getElementById('adminTabBtn').style.display = 'block';
-                fetchBalances();
+                await fetchAllBalances();
             } else {
                 document.getElementById('mainAction').textContent = '连接钱包';
             }
         }
 
-        async function fetchBalances() {
-            if (!state.connected) return;
+        async function fetchAllBalances() {
+            if (!state.connected || !window.ethereum) return;
             try {
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
-                const p = TOKENS[state.pair];
-                const c1 = new ethers.Contract(p.t1, ERC20_ABI, provider);
-                const c2 = new ethers.Contract(p.t2, ERC20_ABI, provider);
-                const b1 = await c1.balanceOf(state.account);
-                const b2 = await c2.balanceOf(state.account);
-                
-                const f1 = ethers.utils.formatUnits(b1, p.decimals);
-                const f2 = ethers.utils.formatUnits(b2, p.decimals);
+                const p = PAIRS[state.pair];
+                const from = state.reversed ? TOKEN_MAP[p.t2] : TOKEN_MAP[p.t1];
+                const to = state.reversed ? TOKEN_MAP[p.t1] : TOKEN_MAP[p.t2];
+                const dep = TOKEN_MAP[state.selectedDep];
 
-                if (!state.reversed) {
-                    document.getElementById('balFrom').textContent = parseFloat(f1).toFixed(4);
-                    document.getElementById('balTo').textContent = parseFloat(f2).toFixed(4);
-                } else {
-                    document.getElementById('balFrom').textContent = parseFloat(f2).toFixed(4);
-                    document.getElementById('balTo').textContent = parseFloat(f1).toFixed(4);
-                }
+                const cFrom = new ethers.Contract(from.addr, ERC20_ABI, provider);
+                const cTo = new ethers.Contract(to.addr, ERC20_ABI, provider);
+                const cDep = new ethers.Contract(dep.addr, ERC20_ABI, provider);
 
-                const depToken = document.getElementById('depTokenSelect').value;
-                document.getElementById('balDep').textContent = depToken === p.t1 ? parseFloat(f1).toFixed(4) : parseFloat(f2).toFixed(4);
-            } catch(e) { console.error(e); }
+                const [bFrom, bTo, bDep] = await Promise.all([
+                    cFrom.balanceOf(state.account),
+                    cTo.balanceOf(state.account),
+                    cDep.balanceOf(state.account)
+                ]);
+
+                document.getElementById('balFrom').textContent = ethers.utils.formatUnits(bFrom, from.decimals);
+                document.getElementById('balTo').textContent = ethers.utils.formatUnits(bTo, to.decimals);
+                document.getElementById('balDep').textContent = ethers.utils.formatUnits(bDep, dep.decimals);
+            } catch (e) { console.error("Balance Error:", e); }
         }
 
         async function connect() {
-            if (!window.ethereum) return alert("请安装MetaMask");
+            if (!window.ethereum) return alert("请安装 MetaMask");
             try {
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 state.account = accounts[0];
                 state.connected = true;
-                state.isOwner = state.account.toLowerCase() === '0x35667e69680327e023730e0600021644795760f'.toLowerCase() || state.account.toLowerCase() === CONTRACT_ADDR.toLowerCase(); 
                 
-                try {
-                    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x' + CHAIN_ID.toString(16) }] });
-                } catch (e) {
-                    if (e.code === 4902) {
-                        await window.ethereum.request({
-                            method: 'wallet_addEthereumChain',
-                            params: [{
-                                chainId: '0x' + CHAIN_ID.toString(16),
-                                chainName: 'Shibarium',
-                                rpcUrls: [RPC],
-                                nativeCurrency: { name: 'Bone', symbol: 'BONE', decimals: 18 },
-                                blockExplorerUrls: ['https://www.shibariumscan.io']
-                            }]
-                        });
+                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                if (parseInt(chainId, 16) !== CHAIN_ID) {
+                    try {
+                        await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x' + CHAIN_ID.toString(16) }] });
+                    } catch (e) {
+                        if (e.code === 4902) {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: '0x' + CHAIN_ID.toString(16),
+                                    chainName: 'Shibarium',
+                                    rpcUrls: [RPC],
+                                    nativeCurrency: { name: 'Bone', symbol: 'BONE', decimals: 18 },
+                                    blockExplorerUrls: ['https://www.shibariumscan.io']
+                                }]
+                            });
+                        }
                     }
                 }
+
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const appC = new ethers.Contract(CONTRACT_ADDR, ["function owner() view returns (address)"], provider);
+                const owner = await appC.owner();
+                state.isOwner = state.account.toLowerCase() === owner.toLowerCase();
+
                 updateUI();
-            } catch(e) { console.error(e); }
+            } catch (e) { console.error(e); }
         }
 
         async function handleSwap() {
@@ -588,43 +423,68 @@
             const amt = document.getElementById('amtIn').value;
             if (!amt || amt <= 0) return;
 
-            const msg = document.getElementById('swapStatus');
-            msg.style.display = 'block';
-            msg.style.background = 'rgba(102, 126, 234, 0.1)';
-            msg.textContent = '准备交易...';
+            const status = document.getElementById('swapStatus');
+            status.style.display = 'block'; status.style.background = 'rgba(102, 126, 234, 0.1)';
+            status.textContent = '准备交易...';
 
             try {
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
                 const signer = provider.getSigner();
-                const p = TOKENS[state.pair];
-                const fromToken = state.reversed ? p.t2 : p.t1;
-                const toToken = state.reversed ? p.t1 : p.t2;
+                const p = PAIRS[state.pair];
+                const from = state.reversed ? TOKEN_MAP[p.t2] : TOKEN_MAP[p.t1];
+                const to = state.reversed ? TOKEN_MAP[p.t1] : TOKEN_MAP[p.t2];
                 
-                const tokenC = new ethers.Contract(fromToken, ERC20_ABI, signer);
+                const tokenC = new ethers.Contract(from.addr, ERC20_ABI, signer);
                 const appC = new ethers.Contract(CONTRACT_ADDR, APP_ABI, signer);
-                const amtWei = ethers.utils.parseUnits(amt, 0); // Contract expects displayAmount (unscaled)
 
-                msg.textContent = '正在检查授权...';
+                status.textContent = '正在授权...';
+                const rawAmount = ethers.utils.parseUnits(amt, from.decimals);
                 const allowance = await tokenC.allowance(state.account, CONTRACT_ADDR);
-                // Contract uses rawAmount = displayAmount * 10**decimals
-                const rawAmount = ethers.utils.parseUnits(amt, p.decimals);
                 
                 if (allowance.lt(rawAmount)) {
-                    msg.textContent = '请在钱包中确认授权...';
                     const tx = await tokenC.approve(CONTRACT_ADDR, ethers.constants.MaxUint256);
                     await tx.wait();
                 }
 
-                msg.textContent = '请在钱包中确认兑换...';
-                const tx = await appC.swap(fromToken, toToken, amt); // Passing displayAmount
+                status.textContent = '正在兑换...';
+                const tx = await appC.swap(from.addr, to.addr, amt); // Contract takes display amount
                 await tx.wait();
-                msg.textContent = '✅ 兑换成功！';
-                msg.style.color = 'var(--success)';
-                fetchBalances();
-            } catch(e) {
-                msg.textContent = `❌ 错误: ${e.reason || e.message}`;
-                msg.style.color = 'var(--danger)';
+                status.textContent = '✅ 兑换成功！';
+                status.style.color = 'var(--success)';
+                fetchAllBalances();
+            } catch (e) {
+                status.textContent = `❌ 失败: ${e.reason || e.message}`;
+                status.style.color = 'var(--danger)';
             }
+        }
+
+        async function handleDeposit() {
+            if (!state.connected) return connect();
+            const amt = document.getElementById('amtDep').value;
+            if (!amt || amt <= 0) return;
+
+            const status = document.getElementById('depStatus');
+            status.style.display = 'block'; status.textContent = '处理中...';
+
+            try {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+                const dep = TOKEN_MAP[state.selectedDep];
+                const tokenC = new ethers.Contract(dep.addr, ERC20_ABI, signer);
+                const appC = new ethers.Contract(CONTRACT_ADDR, APP_ABI, signer);
+
+                const rawAmount = ethers.utils.parseUnits(amt, dep.decimals);
+                const allowance = await tokenC.allowance(state.account, CONTRACT_ADDR);
+                if (allowance.lt(rawAmount)) {
+                    const tx = await tokenC.approve(CONTRACT_ADDR, ethers.constants.MaxUint256);
+                    await tx.wait();
+                }
+
+                const tx = await appC.deposit(dep.addr, rawAmount);
+                await tx.wait();
+                status.textContent = '✅ 存入成功！';
+                fetchAllBalances();
+            } catch (e) { status.textContent = `❌ ${e.message}`; }
         }
 
         // Listeners
@@ -632,7 +492,17 @@
         document.getElementById('reverseBtn').onclick = () => { state.reversed = !state.reversed; updateUI(); };
         document.getElementById('amtIn').oninput = (e) => { document.getElementById('amtOut').value = e.target.value; };
         document.getElementById('mainAction').onclick = handleSwap;
-        document.getElementById('connectBtn').onclick = connect;
+        document.getElementById('depAction').onclick = handleDeposit;
+
+        document.querySelectorAll('.token-btn').forEach(btn => {
+            btn.onclick = (e) => {
+                document.querySelectorAll('.token-btn').forEach(b => b.classList.remove('active'));
+                const target = e.currentTarget;
+                target.classList.add('active');
+                state.selectedDep = target.dataset.token;
+                updateUI();
+            };
+        });
 
         document.querySelectorAll('.tab-btn').forEach(b => {
             b.onclick = (e) => {
@@ -643,10 +513,39 @@
             };
         });
 
+        // Admin
+        document.getElementById('pBtn').onclick = async () => {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const appC = new ethers.Contract(CONTRACT_ADDR, APP_ABI, signer);
+            try {
+                const isPaused = await appC.paused();
+                const tx = isPaused ? await appC.unpause() : await appC.pause();
+                await tx.wait();
+                document.getElementById('pStatus').innerHTML = `当前状态: <span style="color:${!isPaused ? 'var(--danger)' : 'var(--success)'}">${!isPaused ? '已暂停' : '正常'}</span>`;
+            } catch (e) { alert(e.message); }
+        };
+
+        document.getElementById('wBtn').onclick = async () => {
+            const addr = document.getElementById('wAddr').value;
+            const amt = document.getElementById('wAmt').value;
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const appC = new ethers.Contract(CONTRACT_ADDR, APP_ABI, signer);
+            try {
+                const tx = await appC.emergencyWithdrawToken(addr, amt);
+                await tx.wait();
+                alert("提取成功");
+            } catch (e) { alert(e.message); }
+        };
+
         // Init
         updateUI();
         if (window.ethereum) {
-            window.ethereum.on('accountsChanged', () => window.location.reload());
+            window.ethereum.on('accountsChanged', (accs) => {
+                if (accs.length > 0) { state.account = accs[0]; state.connected = true; updateUI(); }
+                else { window.location.reload(); }
+            });
             window.ethereum.on('chainChanged', () => window.location.reload());
         }
     </script>
