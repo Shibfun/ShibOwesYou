@@ -1,179 +1,104 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShibOwesYou - Shibarium 1:1 代币兑换</title>
+    <title>ShibOwesYou - 1:1 Token Swap</title>
     <link rel="icon" type="image/png" href="https://www.woofswap.finance/image/tokens/sou.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #667eea;
-            --primary-hover: #764ba2;
-            --bg-dark: #0a0e27;
-            --card-bg: rgba(26, 31, 58, 0.95);
-            --text-main: #f8fafc;
-            --text-dim: #94a3b8;
-            --accent: #8b9eff;
-            --danger: #ef4444;
-            --success: #10b981;
-            --border: rgba(255, 255, 255, 0.1);
+            --primary: #667eea; --primary-light: #8b9eff; --primary-dark: #5568d3;
+            --accent: #764ba2; --accent-light: #9b7ec4; --success: #10b981;
+            --warning: #f59e0b; --error: #ef4444; --dark-1: #0a0e27;
+            --dark-2: #0f1629; --dark-3: #1a1f3a; --dark-4: #232d4d;
+            --text-primary: #f8fafc; --text-secondary: #cbd5e1; --text-tertiary: #94a3b8;
+            --border: #334155; --border-light: #475569; --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #050714;
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(102, 126, 234, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 80% 70%, rgba(118, 75, 162, 0.15) 0%, transparent 40%);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, var(--dark-1) 0%, var(--dark-2) 50%, var(--dark-3) 100%);
+            color: var(--text-primary); min-height: 100vh; position: relative;
+            overflow-x: hidden; display: flex; flex-direction: column;
         }
-
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.08) 0%, transparent 50%);
+            pointer-events: none; z-index: 0;
+        }
         nav {
-            position: fixed; top: 0; left: 0; right: 0;
-            background: rgba(5, 7, 20, 0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            padding: 12px 24px;
-            display: flex; justify-content: space-between; align-items: center;
-            z-index: 1000;
+            position: fixed; top: 0; left: 0; right: 0; background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(20px); border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+            padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; z-index: 1000;
         }
+        .logo-nav { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 800; color: var(--text-primary); text-decoration: none; }
+        .logo-nav img { width: 32px; height: 32px; border-radius: 8px; }
+        .wrapper { position: relative; z-index: 1; padding-top: 80px; flex: 1; }
+        .app-container { max-width: 520px; margin: 0 auto; padding: 40px 20px 80px; display: flex; flex-direction: column; gap: 32px; }
+        
+        .card { background: rgba(26, 31, 58, 0.85); backdrop-filter: blur(30px); border-radius: 24px; border: 1px solid rgba(102, 126, 234, 0.15); overflow: hidden; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6); }
+        .card-header { background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); padding: 24px; text-align: center; }
+        .card-title { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+        .card-subtitle { font-size: 11px; opacity: 0.9; }
+        .card-content { padding: 24px; }
 
-        .logo-nav {
-            display: flex; align-items: center; gap: 12px;
-            font-size: 20px; font-weight: 800; color: var(--text-main); text-decoration: none;
-        }
-
-        .logo-nav img { width: 36px; height: 36px; border-radius: 50%; }
-
-        .nav-right { display: flex; align-items: center; gap: 16px; }
-
-        .wallet-status {
-            display: flex; align-items: center; gap: 8px;
-            padding: 8px 16px; background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border); border-radius: 20px;
-            font-size: 13px; font-weight: 600;
-        }
-
-        .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); }
-        .dot.connected { background: var(--success); box-shadow: 0 0 8px var(--success); }
-
-        .wrapper { padding-top: 100px; flex: 1; display: flex; justify-content: center; padding-bottom: 40px; }
-        .app-container { width: 100%; max-width: 480px; padding: 0 20px; }
-
-        .card {
-            background: var(--card-bg); border-radius: 32px;
-            border: 1px solid var(--border);
-            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
-            overflow: hidden;
-        }
-
-        .card-tabs { display: flex; background: rgba(0, 0, 0, 0.3); padding: 6px; margin: 20px; border-radius: 18px; }
-        .tab-btn {
-            flex: 1; padding: 12px; border: none; background: transparent;
-            color: var(--text-dim); font-weight: 700; font-size: 14px;
-            cursor: pointer; border-radius: 14px; transition: all 0.2s;
-        }
+        .tab-nav { display: flex; background: rgba(0, 0, 0, 0.3); padding: 6px; margin-bottom: 24px; border-radius: 14px; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: var(--text-secondary); font-weight: 700; font-size: 14px; cursor: pointer; border-radius: 10px; transition: var(--transition); }
         .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3); }
 
-        .card-content { padding: 0 24px 24px; }
-
-        .input-group {
-            background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border);
-            border-radius: 24px; padding: 16px; margin-bottom: 12px;
-        }
-        .group-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 12px; font-weight: 600; color: var(--text-dim); }
-        .balance-val { color: var(--accent); font-family: 'Courier New', monospace; }
-
-        .input-row { display: flex; align-items: center; gap: 12px; }
-        .token-badge {
-            display: flex; align-items: center; gap: 8px;
-            background: rgba(255, 255, 255, 0.08); padding: 8px 12px;
-            border-radius: 14px; min-width: 120px;
-        }
-        .token-badge img { width: 24px; height: 24px; border-radius: 50%; }
-        .token-symbol { font-weight: 800; font-size: 14px; }
-
-        input {
-            flex: 1; background: transparent; border: none;
-            color: white; font-size: 24px; font-weight: 700; outline: none; width: 100%;
-        }
-
-        .addr-tag {
-            font-family: 'Courier New', monospace; font-size: 10px; color: var(--text-dim);
-            margin-top: 10px; padding: 6px 10px; background: rgba(0,0,0,0.2);
-            border-radius: 8px; word-break: break-all; opacity: 0.8;
-        }
-
-        .swap-divider { display: flex; justify-content: center; margin: -22px 0; position: relative; z-index: 10; }
-        .swap-btn-circle {
-            width: 44px; height: 44px; background: #1a1f3a; border: 4px solid #050714;
-            border-radius: 14px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.3s;
-        }
-        .swap-btn-circle:hover { transform: rotate(180deg); background: var(--primary); }
-
-        .action-btn {
-            width: 100%; padding: 18px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
-            border: none; border-radius: 20px; color: white;
-            font-size: 16px; font-weight: 800; cursor: pointer;
-            margin-top: 16px; transition: 0.3s;
-        }
-        .action-btn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.1); }
-        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .token-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-        .token-btn {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-            padding: 16px; border-radius: 18px; color: white; cursor: pointer;
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+        .selector-btn {
+            background: rgba(35, 45, 77, 0.6); border: 1px solid var(--border);
+            padding: 16px; border-radius: 16px; color: white; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; gap: 8px;
-            transition: 0.2s;
+            transition: var(--transition);
         }
-        .token-btn:hover { background: rgba(102, 126, 234, 0.1); border-color: var(--primary); }
-        .token-btn.active { background: rgba(102, 126, 234, 0.2); border-color: var(--primary); box-shadow: 0 0 15px rgba(102, 126, 234, 0.2); }
-        .token-btn img { width: 32px; height: 32px; border-radius: 50%; }
-        .token-btn span { font-weight: 700; font-size: 13px; }
+        .selector-btn:hover { background: rgba(102, 126, 234, 0.1); border-color: var(--primary); }
+        .selector-btn.active { background: rgba(102, 126, 234, 0.2); border-color: var(--primary); box-shadow: 0 0 15px rgba(102, 126, 234, 0.2); }
+        .selector-btn img { width: 32px; height: 32px; border-radius: 50%; }
+        .selector-btn span { font-weight: 700; font-size: 13px; }
 
-        .status-box {
-            margin-top: 16px; padding: 14px; border-radius: 14px;
-            font-size: 13px; text-align: center; font-weight: 600; display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .input-section { margin-bottom: 12px; }
+        .input-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; color: var(--text-secondary); font-weight: 600; }
+        .balance-display { color: var(--primary-light); cursor: pointer; font-family: 'Space Mono', monospace; }
+        .input-box { background: rgba(35, 45, 77, 0.6); border: 1px solid var(--border); border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+        .token-display { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(102, 126, 234, 0.15); border-radius: 12px; border: 1px solid rgba(102, 126, 234, 0.3); min-width: 120px; }
+        .token-logo { width: 24px; height: 24px; border-radius: 50%; }
+        input[type="number"] { flex: 1; background: transparent; border: none; color: var(--text-primary); font-size: 20px; font-weight: 700; outline: none; font-family: 'Space Mono', monospace; }
+        
+        .addr-display { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--text-tertiary); margin-top: 8px; background: rgba(0,0,0,0.2); padding: 6px 10px; border-radius: 8px; word-break: break-all; opacity: 0.8; }
 
-        .pair-select-custom {
-            width: 100%; padding: 14px; background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border); border-radius: 18px;
-            color: white; font-weight: 700; margin-bottom: 20px; cursor: pointer; outline: none;
-        }
+        .swap-divider { display: flex; justify-content: center; margin: -20px 0; position: relative; z-index: 10; }
+        .toggle-btn { width: 40px; height: 40px; background: var(--dark-4); border: 4px solid var(--dark-2); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); }
+        .toggle-btn:hover { transform: rotate(180deg); background: var(--primary); }
+
+        .action-button { width: 100%; padding: 18px; background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); border: none; border-radius: 16px; color: white; font-size: 16px; font-weight: 800; cursor: pointer; transition: var(--transition); margin-top: 16px; }
+        .action-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4); }
+        .action-button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .status-msg { margin-top: 16px; padding: 14px; border-radius: 12px; font-size: 13px; text-align: center; font-weight: 600; display: none; background: rgba(102, 126, 234, 0.1); }
+        
+        .wallet-info { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(35, 45, 77, 0.6); border: 1px solid var(--border); border-radius: 20px; font-size: 13px; font-weight: 600; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--error); }
+        .status-dot.connected { background: var(--success); box-shadow: 0 0 8px var(--success); }
 
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .admin-item { background: rgba(255,255,255,0.03); border-radius: 18px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--border); }
-        .admin-item h4 { font-size: 14px; margin-bottom: 12px; color: var(--accent); }
-        .admin-input {
-            width: 100%; padding: 12px; background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border); border-radius: 10px; color: white;
-            font-size: 13px; margin-bottom: 10px; outline: none;
-        }
+        .admin-box { background: rgba(255,255,255,0.03); border-radius: 18px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--border); }
+        .admin-box h4 { font-size: 14px; margin-bottom: 12px; color: var(--primary-light); }
+        .admin-input { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 10px; color: white; font-size: 13px; margin-bottom: 10px; outline: none; }
     </style>
 </head>
 <body>
     <nav>
-        <a href="#" class="logo-nav">
-            <img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU">
-            ShibOwesYou
-        </a>
+        <a href="#" class="logo-nav"><img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU">SOU Ecosystem</a>
         <div class="nav-right">
-            <div class="wallet-status">
-                <div class="dot" id="walletDot"></div>
-                <span id="walletAddr">未连接钱包</span>
+            <div class="wallet-info">
+                <div class="status-dot" id="walletDot"></div>
+                <span id="walletAddr">Disconnected</span>
             </div>
         </div>
     </nav>
@@ -181,120 +106,128 @@
     <div class="wrapper">
         <div class="app-container">
             <div class="card">
-                <div class="card-tabs">
-                    <button class="tab-btn active" data-tab="swap">兑换</button>
-                    <button class="tab-btn" data-tab="deposit">存入</button>
-                    <button class="tab-btn" id="adminTabBtn" data-tab="admin" style="display: none;">管理</button>
+                <div class="tab-nav">
+                    <button class="tab-btn active" data-tab="swap">Swap</button>
+                    <button class="tab-btn" data-tab="deposit">Deposit</button>
+                    <button class="tab-btn" id="adminTabBtn" data-tab="admin" style="display: none;">Admin</button>
                 </div>
 
                 <div class="card-content">
-                    <!-- 兑换 -->
+                    <!-- Swap Tab -->
                     <div class="tab-content active" id="swapTab">
-                        <div style="margin-bottom: 10px; font-size: 12px; color: var(--text-dim); font-weight: 700; margin-left: 4px;">选择代币对</div>
-                        <select id="pairSelect" class="pair-select-custom">
-                            <option value="oscar">OSCAR 对 (1:1 兑换)</option>
-                            <option value="ltd">LTD 对 (1:1 兑换)</option>
-                        </select>
+                        <div style="margin-bottom: 12px; font-size: 12px; color: var(--text-secondary); font-weight: 700;">Select Pair</div>
+                        <div class="btn-grid">
+                            <button class="selector-btn active" id="pairOscar">
+                                <img src="https://raw.githubusercontent.com/ChewySwap/chewy-tokenlist/main/tokens/oscar.webp">
+                                <span>OSCAR Pair</span>
+                            </button>
+                            <button class="selector-btn" id="pairLtd">
+                                <img src="https://cdn.dexscreener.com/cms/images/d724eb4e72a137c57c94e9eec7e0f3bab1f4e1b8efb2ed2c70c1df9852d5a15f?width=256&height=256&quality=90&format=webp">
+                                <span>LTD Pair</span>
+                            </button>
+                        </div>
 
-                        <div class="input-group">
-                            <div class="group-header">
-                                <span>从</span>
-                                <span>余额: <span class="balance-val" id="balFrom">0.00</span></span>
+                        <div class="input-section">
+                            <div class="input-label">
+                                <span>From</span>
+                                <span>Balance: <span class="balance-display" id="balFrom">0.00</span></span>
                             </div>
-                            <div class="input-row">
-                                <div class="token-badge">
-                                    <img src="" id="iconFrom">
-                                    <span class="token-symbol" id="symFrom">---</span>
+                            <div class="input-box">
+                                <div class="token-display">
+                                    <img src="" id="iconFrom" class="token-logo">
+                                    <span id="symFrom">---</span>
                                 </div>
                                 <input type="number" id="amtIn" placeholder="0.0">
                             </div>
-                            <div class="addr-tag" id="addrFrom">0x...</div>
+                            <div class="addr-display" id="addrFrom">0x...</div>
                         </div>
 
                         <div class="swap-divider">
-                            <div class="swap-btn-circle" id="reverseBtn">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4L3 8M7 4L11 8M17 8v12M17 20l4-4M17 20l-4-4"/></svg>
+                            <div class="toggle-btn" id="reverseBtn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4L3 8M7 4L11 8M17 8v12M17 20l4-4M17 20l-4-4"/></svg>
                             </div>
                         </div>
 
-                        <div class="input-group" style="margin-top: 12px;">
-                            <div class="group-header">
-                                <span>到 (1:1)</span>
-                                <span>余额: <span class="balance-val" id="balTo">0.00</span></span>
+                        <div class="input-section" style="margin-top: 12px;">
+                            <div class="input-label">
+                                <span>To (1:1)</span>
+                                <span>Balance: <span class="balance-display" id="balTo">0.00</span></span>
                             </div>
-                            <div class="input-row">
-                                <div class="token-badge">
-                                    <img src="" id="iconTo">
-                                    <span class="token-symbol" id="symTo">---</span>
+                            <div class="input-box">
+                                <div class="token-display">
+                                    <img src="" id="iconTo" class="token-logo">
+                                    <span id="symTo">---</span>
                                 </div>
                                 <input type="number" id="amtOut" placeholder="0.0" readonly>
                             </div>
-                            <div class="addr-tag" id="addrTo">0x...</div>
+                            <div class="addr-display" id="addrTo">0x...</div>
                         </div>
 
-                        <button class="action-btn" id="mainAction">连接钱包</button>
-                        <div class="status-box" id="swapStatus"></div>
+                        <button class="action-button" id="mainAction">Connect Wallet</button>
+                        <div class="status-msg" id="swapStatus"></div>
                     </div>
 
-                    <!-- 存入 -->
+                    <!-- Deposit Tab -->
                     <div class="tab-content" id="depositTab">
-                        <div style="margin-bottom: 12px; font-size: 12px; color: var(--text-dim); font-weight: 700; margin-left: 4px;">选择存入代币</div>
-                        <div class="token-grid">
-                            <div class="token-btn active" data-token="oscar1">
+                        <div style="margin-bottom: 12px; font-size: 12px; color: var(--text-secondary); font-weight: 700;">Select Asset to Deposit</div>
+                        <div class="btn-grid" id="depGrid">
+                            <button class="selector-btn active" data-token="oscar1">
                                 <img src="https://raw.githubusercontent.com/ChewySwap/chewy-tokenlist/main/tokens/oscar.webp">
                                 <span>OSCAR (1)</span>
-                            </div>
-                            <div class="token-btn" data-token="oscar2">
+                            </button>
+                            <button class="selector-btn" data-token="oscar2">
                                 <img src="https://raw.githubusercontent.com/ChewySwap/chewy-tokenlist/main/tokens/oscar.webp">
                                 <span>OSCAR (2)</span>
-                            </div>
-                            <div class="token-btn" data-token="ltd1">
+                            </button>
+                            <button class="selector-btn" data-token="ltd1">
                                 <img src="https://cdn.dexscreener.com/cms/images/d724eb4e72a137c57c94e9eec7e0f3bab1f4e1b8efb2ed2c70c1df9852d5a15f?width=256&height=256&quality=90&format=webp">
                                 <span>LTD (1)</span>
-                            </div>
-                            <div class="token-btn" data-token="ltd2">
+                            </button>
+                            <button class="selector-btn" data-token="ltd2">
                                 <img src="https://cdn.dexscreener.com/cms/images/d724eb4e72a137c57c94e9eec7e0f3bab1f4e1b8efb2ed2c70c1df9852d5a15f?width=256&height=256&quality=90&format=webp">
                                 <span>LTD (2)</span>
-                            </div>
+                            </button>
                         </div>
 
-                        <div class="input-group">
-                            <div class="group-header">
-                                <span>存入数量</span>
-                                <span>余额: <span class="balance-val" id="balDep">0.00</span></span>
+                        <div class="input-section">
+                            <div class="input-label">
+                                <span>Amount</span>
+                                <span>Balance: <span class="balance-display" id="balDep">0.00</span></span>
                             </div>
-                            <input type="number" id="amtDep" placeholder="0.0">
-                            <div class="addr-tag" id="addrDep">0x...</div>
+                            <div class="input-box">
+                                <input type="number" id="amtDep" placeholder="0.0">
+                            </div>
+                            <div class="addr-display" id="addrDep">0x...</div>
                         </div>
-                        <button class="action-btn" id="depAction">确认存入</button>
-                        <div class="status-box" id="depStatus"></div>
+                        <button class="action-button" id="depAction">Confirm Deposit</button>
+                        <div class="status-msg" id="depStatus"></div>
                     </div>
 
-                    <!-- 管理 -->
+                    <!-- Admin Tab -->
                     <div class="tab-content" id="adminTab">
-                        <div class="admin-item">
-                            <h4>合约状态</h4>
-                            <p id="pStatus" style="font-size: 13px; margin-bottom: 12px;">当前状态: <span style="color:var(--success)">正常</span></p>
-                            <button class="admin-input" id="pBtn" style="cursor: pointer; background: var(--primary);">切换 暂停/恢复</button>
+                        <div class="admin-box">
+                            <h4>Contract Status</h4>
+                            <p id="pStatus" style="font-size: 13px; margin-bottom: 12px;">Current: <span style="color:var(--success)">Active</span></p>
+                            <button class="admin-input" id="pBtn" style="cursor: pointer; background: var(--primary); font-weight: 700;">Toggle Pause/Unpause</button>
                         </div>
-                        <div class="admin-item">
-                            <h4>紧急提取</h4>
-                            <input type="text" id="wAddr" class="admin-input" placeholder="代币合约地址 (0x...)">
-                            <input type="text" id="wAmt" class="admin-input" placeholder="原始数量 (包含精度)">
-                            <button class="admin-input" id="wBtn" style="cursor: pointer; background: var(--danger); border: none; font-weight: 700;">执行提取</button>
+                        <div class="admin-box">
+                            <h4>Emergency Withdraw</h4>
+                            <input type="text" id="wAddr" class="admin-input" placeholder="Token Contract Address">
+                            <input type="text" id="wAmt" class="admin-input" placeholder="Raw Amount (with decimals)">
+                            <button class="admin-input" id="wBtn" style="cursor: pointer; background: var(--error); border: none; font-weight: 700;">Withdraw Tokens</button>
                         </div>
-                        <div class="status-box" id="adminStatus"></div>
+                        <div class="status-msg" id="adminStatus"></div>
                     </div>
                 </div>
             </div>
             
-            <div style="text-align: center; margin-top: 24px; font-size: 11px; color: var(--text-dim); letter-spacing: 0.5px;">
-                兑换合约: <a href="https://www.shibariumscan.io/address/0xF5aA5b002eeC9196b9DBd7f6782f3f7FC4Ec42d5" target="_blank" style="color: var(--accent); text-decoration: none; font-weight: 700;">0xF5aA5b002eeC9196b9DBd7f6782f3f7FC4Ec42d5</a>
+            <div style="text-align: center; margin-top: 24px; font-size: 11px; color: var(--text-tertiary); letter-spacing: 0.5px;">
+                Contract: <a href="https://www.shibariumscan.io/address/0xF5aA5b002eeC9196b9DBd7f6782f3f7FC4Ec42d5" target="_blank" style="color: var(--primary-light); text-decoration: none; font-weight: 700;">0xF5aA5...42d5</a>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script>
         const CONTRACT_ADDR = '0xF5aA5b002eeC9196b9DBd7f6782f3f7FC4Ec42d5';
         const CHAIN_ID = 109;
@@ -321,15 +254,23 @@
             selectedDep: 'oscar1'
         };
 
-        const ERC20_ABI = ["function balanceOf(address) view returns (uint256)", "function approve(address,uint256) returns (bool)", "function allowance(address,address) view returns (uint256)"];
-        const APP_ABI = [
-            "function swap(address,address,uint256) external",
-            "function deposit(address,uint256) external",
-            "function pause() external",
-            "function unpause() external",
-            "function paused() view returns (bool)",
-            "function emergencyWithdrawToken(address,uint256) external"
+        const ERC20_ABI = [
+            { "constant": true, "inputs": [{ "name": "_owner", "type": "address" }], "name": "balanceOf", "outputs": [{ "name": "balance", "type": "uint256" }], "type": "function" },
+            { "constant": false, "inputs": [{ "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" }], "name": "approve", "outputs": [{ "name": "success", "type": "bool" }], "type": "function" },
+            { "constant": true, "inputs": [{ "name": "_owner", "type": "address" }, { "name": "_spender", "type": "address" }], "name": "allowance", "outputs": [{ "name": "remaining", "type": "uint256" }], "type": "function" }
         ];
+
+        const APP_ABI = [
+            { "inputs": [{ "name": "fromToken", "type": "address" }, { "name": "toToken", "type": "address" }, { "name": "displayAmount", "type": "uint256" }], "name": "swap", "outputs": [], "type": "function" },
+            { "inputs": [{ "name": "token", "type": "address" }, { "name": "amount", "type": "uint256" }], "name": "deposit", "outputs": [], "type": "function" },
+            { "inputs": [], "name": "pause", "outputs": [], "type": "function" },
+            { "inputs": [], "name": "unpause", "outputs": [], "type": "function" },
+            { "inputs": [], "name": "paused", "outputs": [{ "name": "", "type": "bool" }], "type": "function" },
+            { "inputs": [{ "name": "token", "type": "address" }, { "name": "amount", "type": "uint256" }], "name": "emergencyWithdrawToken", "outputs": [], "type": "function" },
+            { "inputs": [], "name": "owner", "outputs": [{ "name": "", "type": "address" }], "type": "function" }
+        ];
+
+        let web3;
 
         async function updateUI() {
             const p = PAIRS[state.pair];
@@ -349,41 +290,41 @@
             if (state.connected) {
                 document.getElementById('walletDot').classList.add('connected');
                 document.getElementById('walletAddr').textContent = `${state.account.slice(0,6)}...${state.account.slice(-4)}`;
-                document.getElementById('mainAction').textContent = '立即兑换';
+                document.getElementById('mainAction').textContent = 'Swap Now';
                 if (state.isOwner) document.getElementById('adminTabBtn').style.display = 'block';
-                await fetchAllBalances();
+                await fetchBalances();
             } else {
-                document.getElementById('mainAction').textContent = '连接钱包';
+                document.getElementById('mainAction').textContent = 'Connect Wallet';
             }
         }
 
-        async function fetchAllBalances() {
+        async function fetchBalances() {
             if (!state.connected || !window.ethereum) return;
             try {
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                web3 = new Web3(window.ethereum);
                 const p = PAIRS[state.pair];
                 const from = state.reversed ? TOKEN_MAP[p.t2] : TOKEN_MAP[p.t1];
                 const to = state.reversed ? TOKEN_MAP[p.t1] : TOKEN_MAP[p.t2];
                 const dep = TOKEN_MAP[state.selectedDep];
 
-                const cFrom = new ethers.Contract(from.addr, ERC20_ABI, provider);
-                const cTo = new ethers.Contract(to.addr, ERC20_ABI, provider);
-                const cDep = new ethers.Contract(dep.addr, ERC20_ABI, provider);
+                const cFrom = new web3.eth.Contract(ERC20_ABI, from.addr);
+                const cTo = new web3.eth.Contract(ERC20_ABI, to.addr);
+                const cDep = new web3.eth.Contract(ERC20_ABI, dep.addr);
 
                 const [bFrom, bTo, bDep] = await Promise.all([
-                    cFrom.balanceOf(state.account),
-                    cTo.balanceOf(state.account),
-                    cDep.balanceOf(state.account)
+                    cFrom.methods.balanceOf(state.account).call(),
+                    cTo.methods.balanceOf(state.account).call(),
+                    cDep.methods.balanceOf(state.account).call()
                 ]);
 
-                document.getElementById('balFrom').textContent = ethers.utils.formatUnits(bFrom, from.decimals);
-                document.getElementById('balTo').textContent = ethers.utils.formatUnits(bTo, to.decimals);
-                document.getElementById('balDep').textContent = ethers.utils.formatUnits(bDep, dep.decimals);
+                document.getElementById('balFrom').textContent = (bFrom / (10 ** from.decimals)).toFixed(4);
+                document.getElementById('balTo').textContent = (bTo / (10 ** to.decimals)).toFixed(4);
+                document.getElementById('balDep').textContent = (bDep / (10 ** dep.decimals)).toFixed(4);
             } catch (e) { console.error("Balance Error:", e); }
         }
 
         async function connect() {
-            if (!window.ethereum) return alert("请安装 MetaMask");
+            if (!window.ethereum) return alert("MetaMask not found");
             try {
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 state.account = accounts[0];
@@ -409,9 +350,9 @@
                     }
                 }
 
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                const appC = new ethers.Contract(CONTRACT_ADDR, ["function owner() view returns (address)"], provider);
-                const owner = await appC.owner();
+                web3 = new Web3(window.ethereum);
+                const appC = new web3.eth.Contract(APP_ABI, CONTRACT_ADDR);
+                const owner = await appC.methods.owner().call();
                 state.isOwner = state.account.toLowerCase() === owner.toLowerCase();
 
                 updateUI();
@@ -424,38 +365,30 @@
             if (!amt || amt <= 0) return;
 
             const status = document.getElementById('swapStatus');
-            status.style.display = 'block'; status.style.background = 'rgba(102, 126, 234, 0.1)';
-            status.textContent = '准备交易...';
+            status.style.display = 'block'; status.textContent = 'Processing...';
 
             try {
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                const signer = provider.getSigner();
+                web3 = new Web3(window.ethereum);
                 const p = PAIRS[state.pair];
                 const from = state.reversed ? TOKEN_MAP[p.t2] : TOKEN_MAP[p.t1];
                 const to = state.reversed ? TOKEN_MAP[p.t1] : TOKEN_MAP[p.t2];
                 
-                const tokenC = new ethers.Contract(from.addr, ERC20_ABI, signer);
-                const appC = new ethers.Contract(CONTRACT_ADDR, APP_ABI, signer);
+                const tokenC = new web3.eth.Contract(ERC20_ABI, from.addr);
+                const appC = new web3.eth.Contract(APP_ABI, CONTRACT_ADDR);
 
-                status.textContent = '正在授权...';
-                const rawAmount = ethers.utils.parseUnits(amt, from.decimals);
-                const allowance = await tokenC.allowance(state.account, CONTRACT_ADDR);
+                const rawAmt = web3.utils.toBN(Math.floor(amt * (10 ** from.decimals)).toString());
+                const allowance = await tokenC.methods.allowance(state.account, CONTRACT_ADDR).call();
                 
-                if (allowance.lt(rawAmount)) {
-                    const tx = await tokenC.approve(CONTRACT_ADDR, ethers.constants.MaxUint256);
-                    await tx.wait();
+                if (web3.utils.toBN(allowance).lt(rawAmt)) {
+                    status.textContent = 'Approving...';
+                    await tokenC.methods.approve(CONTRACT_ADDR, '115792089237316195423570985008687907853269984665640564039457584007913129639935').send({ from: state.account });
                 }
 
-                status.textContent = '正在兑换...';
-                const tx = await appC.swap(from.addr, to.addr, amt); // Contract takes display amount
-                await tx.wait();
-                status.textContent = '✅ 兑换成功！';
-                status.style.color = 'var(--success)';
-                fetchAllBalances();
-            } catch (e) {
-                status.textContent = `❌ 失败: ${e.reason || e.message}`;
-                status.style.color = 'var(--danger)';
-            }
+                status.textContent = 'Swapping...';
+                await appC.methods.swap(from.addr, to.addr, amt).send({ from: state.account });
+                status.textContent = '✅ Success!';
+                fetchBalances();
+            } catch (e) { status.textContent = `❌ Error: ${e.message}`; }
         }
 
         async function handleDeposit() {
@@ -464,39 +397,49 @@
             if (!amt || amt <= 0) return;
 
             const status = document.getElementById('depStatus');
-            status.style.display = 'block'; status.textContent = '处理中...';
+            status.style.display = 'block'; status.textContent = 'Processing...';
 
             try {
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                const signer = provider.getSigner();
+                web3 = new Web3(window.ethereum);
                 const dep = TOKEN_MAP[state.selectedDep];
-                const tokenC = new ethers.Contract(dep.addr, ERC20_ABI, signer);
-                const appC = new ethers.Contract(CONTRACT_ADDR, APP_ABI, signer);
+                const tokenC = new web3.eth.Contract(ERC20_ABI, dep.addr);
+                const appC = new web3.eth.Contract(APP_ABI, CONTRACT_ADDR);
 
-                const rawAmount = ethers.utils.parseUnits(amt, dep.decimals);
-                const allowance = await tokenC.allowance(state.account, CONTRACT_ADDR);
-                if (allowance.lt(rawAmount)) {
-                    const tx = await tokenC.approve(CONTRACT_ADDR, ethers.constants.MaxUint256);
-                    await tx.wait();
+                const rawAmt = web3.utils.toBN(Math.floor(amt * (10 ** dep.decimals)).toString());
+                const allowance = await tokenC.methods.allowance(state.account, CONTRACT_ADDR).call();
+                
+                if (web3.utils.toBN(allowance).lt(rawAmt)) {
+                    await tokenC.methods.approve(CONTRACT_ADDR, '115792089237316195423570985008687907853269984665640564039457584007913129639935').send({ from: state.account });
                 }
 
-                const tx = await appC.deposit(dep.addr, rawAmount);
-                await tx.wait();
-                status.textContent = '✅ 存入成功！';
-                fetchAllBalances();
+                await appC.methods.deposit(dep.addr, rawAmt).send({ from: state.account });
+                status.textContent = '✅ Deposited!';
+                fetchBalances();
             } catch (e) { status.textContent = `❌ ${e.message}`; }
         }
 
-        // Listeners
-        document.getElementById('pairSelect').onchange = (e) => { state.pair = e.target.value; updateUI(); };
+        // Event Listeners
+        document.getElementById('pairOscar').onclick = (e) => { 
+            state.pair = 'oscar'; 
+            document.getElementById('pairOscar').classList.add('active');
+            document.getElementById('pairLtd').classList.remove('active');
+            updateUI(); 
+        };
+        document.getElementById('pairLtd').onclick = (e) => { 
+            state.pair = 'ltd'; 
+            document.getElementById('pairLtd').classList.add('active');
+            document.getElementById('pairOscar').classList.remove('active');
+            updateUI(); 
+        };
+
         document.getElementById('reverseBtn').onclick = () => { state.reversed = !state.reversed; updateUI(); };
         document.getElementById('amtIn').oninput = (e) => { document.getElementById('amtOut').value = e.target.value; };
         document.getElementById('mainAction').onclick = handleSwap;
         document.getElementById('depAction').onclick = handleDeposit;
 
-        document.querySelectorAll('.token-btn').forEach(btn => {
+        document.querySelectorAll('#depGrid .selector-btn').forEach(btn => {
             btn.onclick = (e) => {
-                document.querySelectorAll('.token-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('#depGrid .selector-btn').forEach(b => b.classList.remove('active'));
                 const target = e.currentTarget;
                 target.classList.add('active');
                 state.selectedDep = target.dataset.token;
@@ -513,33 +456,30 @@
             };
         });
 
-        // Admin
+        // Admin Actions
         document.getElementById('pBtn').onclick = async () => {
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner();
-            const appC = new ethers.Contract(CONTRACT_ADDR, APP_ABI, signer);
+            web3 = new Web3(window.ethereum);
+            const appC = new web3.eth.Contract(APP_ABI, CONTRACT_ADDR);
             try {
-                const isPaused = await appC.paused();
-                const tx = isPaused ? await appC.unpause() : await appC.pause();
-                await tx.wait();
-                document.getElementById('pStatus').innerHTML = `当前状态: <span style="color:${!isPaused ? 'var(--danger)' : 'var(--success)'}">${!isPaused ? '已暂停' : '正常'}</span>`;
+                const isPaused = await appC.methods.paused().call();
+                if (isPaused) await appC.methods.unpause().send({ from: state.account });
+                else await appC.methods.pause().send({ from: state.account });
+                window.location.reload();
             } catch (e) { alert(e.message); }
         };
 
         document.getElementById('wBtn').onclick = async () => {
             const addr = document.getElementById('wAddr').value;
             const amt = document.getElementById('wAmt').value;
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner();
-            const appC = new ethers.Contract(CONTRACT_ADDR, APP_ABI, signer);
+            web3 = new Web3(window.ethereum);
+            const appC = new web3.eth.Contract(APP_ABI, CONTRACT_ADDR);
             try {
-                const tx = await appC.emergencyWithdrawToken(addr, amt);
-                await tx.wait();
-                alert("提取成功");
+                await appC.methods.emergencyWithdrawToken(addr, amt).send({ from: state.account });
+                alert("Withdrawal Successful");
             } catch (e) { alert(e.message); }
         };
 
-        // Init
+        // Initialize
         updateUI();
         if (window.ethereum) {
             window.ethereum.on('accountsChanged', (accs) => {
