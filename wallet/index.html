@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOU Wallet - Smart Contract Asset Management</title>
+    <link rel="icon" type="image/png" href="https://www.woofswap.finance/image/tokens/sou.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #667eea; --primary-light: #8b9eff; --primary-dark: #5568d3;
+            --accent: #764ba2; --accent-light: #9b7ec4; --success: #10b981;
+            --warning: #f59e0b; --error: #ef4444; --dark-1: #0a0e27;
+            --dark-2: #0f1629; --dark-3: #1a1f3a; --dark-4: #232d4d;
+            --text-primary: #f8fafc; --text-secondary: #cbd5e1; --text-tertiary: #94a3b8;
+            --border: #334155; --border-light: #475569; --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, var(--dark-1) 0%, var(--dark-2) 50%, var(--dark-3) 100%);
+            color: var(--text-primary); min-height: 100vh; position: relative;
+            overflow-x: hidden; display: flex; flex-direction: column;
+        }
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.08) 0%, transparent 50%);
+            pointer-events: none; z-index: 0;
+        }
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(20px); border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+            padding: 12px 40px; display: flex; justify-content: space-between; align-items: center; z-index: 1000;
+        }
+        .logo-nav { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 800; color: var(--text-primary); text-decoration: none; }
+        .logo-nav img { width: 32px; height: 32px; border-radius: 8px; }
+        
+        .nav-right { display: flex; align-items: center; gap: 16px; }
+        .lang-switch { display: flex; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 4px; border: 1px solid var(--border); }
+        .lang-btn { padding: 6px 12px; border: none; background: transparent; color: var(--text-tertiary); font-size: 12px; font-weight: 700; cursor: pointer; border-radius: 8px; transition: 0.3s; }
+        .lang-btn.active { background: var(--primary); color: white; }
+
+        .wrapper { position: relative; z-index: 1; padding-top: 80px; flex: 1; }
+        .app-container { max-width: 520px; margin: 0 auto; padding: 40px 20px 80px; display: flex; flex-direction: column; gap: 32px; }
+        
+        .card { background: rgba(26, 31, 58, 0.85); backdrop-filter: blur(30px); border-radius: 24px; border: 1px solid rgba(102, 126, 234, 0.15); overflow: hidden; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6); }
+        .card-content { padding: 24px; }
+
+        .tab-nav { display: flex; background: rgba(0, 0, 0, 0.3); padding: 6px; margin-bottom: 24px; border-radius: 14px; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: var(--text-secondary); font-weight: 700; font-size: 14px; cursor: pointer; border-radius: 10px; transition: var(--transition); }
+        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3); }
+
+        .balance-card {
+            background: rgba(35, 45, 77, 0.6); border: 1px solid var(--border);
+            padding: 20px; border-radius: 20px; margin-bottom: 24px; text-align: center;
+        }
+        .balance-val { font-size: 32px; font-weight: 800; color: var(--text-primary); margin: 8px 0; }
+        .balance-label { font-size: 12px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+        .input-section { margin-bottom: 16px; }
+        .input-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; color: var(--text-secondary); font-weight: 600; }
+        .input-box { background: rgba(35, 45, 77, 0.6); border: 1px solid var(--border); border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+        .token-display { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(102, 126, 234, 0.15); border-radius: 12px; border: 1px solid rgba(102, 126, 234, 0.3); }
+        .token-logo { width: 20px; height: 20px; border-radius: 50%; }
+        input { flex: 1; background: transparent; border: none; color: var(--text-primary); font-size: 16px; font-weight: 600; outline: none; }
+        
+        .info-row { display: flex; justify-content: space-between; font-size: 12px; margin-top: 8px; color: var(--text-tertiary); font-family: 'Space Mono', monospace; }
+
+        .action-button { width: 100%; padding: 18px; background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); border: none; border-radius: 16px; color: white; font-size: 16px; font-weight: 800; cursor: pointer; transition: var(--transition); margin-top: 8px; }
+        .action-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4); }
+        .action-button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .wallet-info { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(35, 45, 77, 0.6); border: 1px solid var(--border); border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--error); }
+        .status-dot.connected { background: var(--success); box-shadow: 0 0 8px var(--success); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .empty-state { text-align: center; padding: 20px 0; }
+        .empty-state p { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="#" class="logo-nav"><img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU">SOU Wallet</a>
+        <div class="nav-right">
+            <div class="lang-switch">
+                <button class="lang-btn active" id="btn-zh" onclick="setLang('zh')">中</button>
+                <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+            </div>
+            <div class="wallet-info" onclick="connectWallet()">
+                <div class="status-dot" id="walletDot"></div>
+                <span id="walletAddr" data-i18n="connectWallet">连接钱包</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="wrapper">
+        <div class="app-container">
+            <div class="card">
+                <div class="tab-nav">
+                    <button class="tab-btn active" data-tab="assets" data-i18n="tabAssets">资产</button>
+                    <button class="tab-btn" data-tab="send" data-i18n="tabSend">发送</button>
+                    <button class="tab-btn" data-tab="query" data-i18n="tabQuery">查询</button>
+                </div>
+
+                <div class="card-content">
+                    <!-- Assets Tab -->
+                    <div class="tab-content active" id="assetsTab">
+                        <div id="noWalletUI" class="empty-state">
+                            <p data-i18n="noWalletTip">您尚未拥有 SOU 智能钱包</p>
+                            <div class="input-section">
+                                <div class="input-box">
+                                    <input type="text" id="regID" data-i18n-placeholder="idPlaceholder" placeholder="输入数字 ID (如: 888)">
+                                </div>
+                            </div>
+                            <button class="action-button" onclick="createWallet()" data-i18n="btnCreate">创建钱包</button>
+                        </div>
+
+                        <div id="hasWalletUI" style="display: none;">
+                            <div class="balance-card">
+                                <div class="balance-label" data-i18n="souBalanceLabel">SOU 余额</div>
+                                <div class="balance-val" id="souBalance">0.00</div>
+                                <div class="info-row">
+                                    <span>ID: <b id="myID">-</b></span>
+                                    <span id="myWalletAddr">0x...</span>
+                                </div>
+                            </div>
+                            <div class="info-row" style="margin-top: 20px;">
+                                <span data-i18n="tokenAddrLabel">代币地址</span>
+                                <span style="font-size: 10px;">0xb65...7777</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Send Tab -->
+                    <div class="tab-content" id="sendTab">
+                        <div class="input-section">
+                            <div class="input-label" data-i18n="receiverLabel">接收者 (地址或数字 ID)</div>
+                            <div class="input-box">
+                                <input type="text" id="sendTarget" data-i18n-placeholder="targetPlaceholder" placeholder="0x... 或 数字 ID">
+                            </div>
+                        </div>
+                        <div class="input-section">
+                            <div class="input-label" data-i18n="amountLabel">数量</div>
+                            <div class="input-box">
+                                <input type="number" id="sendAmt" placeholder="0.0">
+                                <div class="token-display">
+                                    <img src="https://www.woofswap.finance/image/tokens/sou.png" class="token-logo">
+                                    <span>SOU</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="action-button" onclick="handleSend()" data-i18n="btnSend">立即发送</button>
+                        <p style="font-size: 11px; color: var(--text-tertiary); margin-top: 12px; text-align: center;" data-i18n="sendWarning">注意：仅支持向本系统内的智能钱包转账</p>
+                    </div>
+
+                    <!-- Query Tab -->
+                    <div class="tab-content" id="queryTab">
+                        <div class="input-section">
+                            <div class="input-label" data-i18n="searchLabel">搜索地址或 ID</div>
+                            <div class="input-box">
+                                <input type="text" id="queryInput" data-i18n-placeholder="searchPlaceholder" placeholder="输入地址或数字 ID">
+                            </div>
+                        </div>
+                        <button class="action-button" style="background: var(--dark-4);" onclick="handleQuery()" data-i18n="btnSearch">搜索</button>
+                        <div id="queryResult" class="info-row" style="flex-direction: column; gap: 8px; margin-top: 16px; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 12px; display: none;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const FACTORY_ADDR = "0x02E54e08Be9fE047C6E6aEd89A430AcBe4708E9e";
+        const SOU_ADDR = "0xb65bd36fef84ebc5114cfd803a4f25b2b57f7777";
+        
+        const i18n = {
+            zh: {
+                connectWallet: "连接钱包",
+                tabAssets: "资产",
+                tabSend: "发送",
+                tabQuery: "查询",
+                noWalletTip: "您尚未拥有 SOU 智能钱包",
+                idPlaceholder: "输入数字 ID (如: 888)",
+                btnCreate: "创建钱包",
+                souBalanceLabel: "SOU 余额",
+                tokenAddrLabel: "代币地址",
+                receiverLabel: "接收者 (地址或数字 ID)",
+                targetPlaceholder: "0x... 或 数字 ID",
+                amountLabel: "数量",
+                btnSend: "立即发送",
+                sendWarning: "注意：仅支持向本系统内的智能钱包转账",
+                searchLabel: "搜索地址或 ID",
+                searchPlaceholder: "输入地址或数字 ID",
+                btnSearch: "搜索",
+                msgCreateSuccess: "创建成功！",
+                msgSendSuccess: "转账成功！",
+                msgIdNotFound: "该 ID 未绑定钱包",
+                msgInvalidTarget: "目标地址不是合法的 SOU 智能钱包，无法转账",
+                msgQueryEmpty: "该 ID 尚未被使用",
+                msgQueryWallet: "关联钱包",
+                msgQueryOwner: "所有者",
+                msgQueryIsSOU: "是否为 SOU 钱包",
+                msgYes: "是",
+                msgNo: "否",
+                msgError: "操作失败",
+                msgConnectMetaMask: "请安装 MetaMask"
+            },
+            en: {
+                connectWallet: "Connect Wallet",
+                tabAssets: "Assets",
+                tabSend: "Send",
+                tabQuery: "Query",
+                noWalletTip: "No SOU Wallet Found",
+                idPlaceholder: "Enter numeric ID (e.g., 888)",
+                btnCreate: "Create Wallet",
+                souBalanceLabel: "SOU Balance",
+                tokenAddrLabel: "Token Address",
+                receiverLabel: "Receiver (Address or ID)",
+                targetPlaceholder: "0x... or Numeric ID",
+                amountLabel: "Amount",
+                btnSend: "Send Now",
+                sendWarning: "Note: Internal transfers only (SOU Wallets only)",
+                searchLabel: "Search Address or ID",
+                searchPlaceholder: "Enter Address or Numeric ID",
+                btnSearch: "Search",
+                msgCreateSuccess: "Created Successfully!",
+                msgSendSuccess: "Sent Successfully!",
+                msgIdNotFound: "ID not bound to any wallet",
+                msgInvalidTarget: "Invalid target: Only internal SOU Wallets supported",
+                msgQueryEmpty: "ID not in use",
+                msgQueryWallet: "Linked Wallet",
+                msgQueryOwner: "Owner",
+                msgQueryIsSOU: "Is SOU Wallet",
+                msgYes: "Yes",
+                msgNo: "No",
+                msgError: "Operation Failed",
+                msgConnectMetaMask: "Please install MetaMask"
+            }
+        };
+
+        let currentLang = 'zh';
+        function setLang(lang) {
+            currentLang = lang;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                el.innerText = i18n[lang][el.dataset.i18n];
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                el.placeholder = i18n[lang][el.dataset.i18nPlaceholder];
+            });
+            document.getElementById('btn-zh').classList.toggle('active', lang === 'zh');
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+        }
+
+        const FACTORY_ABI = [
+            "function createWallet(string id) external returns (address)",
+            "function ownerToWallet(address) view returns (address)",
+            "function walletToOwner(address) view returns (address)",
+            "function isSOUWallet(address) view returns (bool)",
+            "function idToWallet(string) view returns (address)",
+            "function walletToId(address) view returns (string)"
+        ];
+        const WALLET_ABI = ["function transfer(address to, uint256 amount, address token) external"];
+        const ERC20_ABI = ["function balanceOf(address) view returns (uint256)"];
+
+        let provider, signer, userAddr, userWallet;
+
+        async function connectWallet() {
+            if (!window.ethereum) return alert(i18n[currentLang].msgConnectMetaMask);
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            signer = provider.getSigner();
+            userAddr = await signer.getAddress();
+            
+            document.getElementById('walletAddr').innerText = userAddr.substring(0,6) + "..." + userAddr.substring(38);
+            document.getElementById('walletDot').classList.add('connected');
+            await refreshUI();
+        }
+
+        async function refreshUI() {
+            const factory = new ethers.Contract(FACTORY_ADDR, FACTORY_ABI, provider);
+            userWallet = await factory.ownerToWallet(userAddr);
+            if (userWallet !== "0x0000000000000000000000000000000000000000") {
+                document.getElementById('noWalletUI').style.display = 'none';
+                document.getElementById('hasWalletUI').style.display = 'block';
+                document.getElementById('myID').innerText = await factory.walletToId(userWallet);
+                document.getElementById('myWalletAddr').innerText = userWallet.substring(0,10) + "..." + userWallet.substring(32);
+                const sou = new ethers.Contract(SOU_ADDR, ERC20_ABI, provider);
+                const bal = await sou.balanceOf(userWallet);
+                document.getElementById('souBalance').innerText = ethers.utils.formatUnits(bal, 18);
+            } else {
+                document.getElementById('noWalletUI').style.display = 'block';
+                document.getElementById('hasWalletUI').style.display = 'none';
+            }
+        }
+
+        async function createWallet() {
+            const id = document.getElementById('regID').value;
+            if (!id || isNaN(id)) return;
+            try {
+                const factory = new ethers.Contract(FACTORY_ADDR, FACTORY_ABI, signer);
+                const tx = await factory.createWallet(id);
+                await tx.wait();
+                alert(i18n[currentLang].msgCreateSuccess);
+                await refreshUI();
+            } catch (e) { alert(i18n[currentLang].msgError + ": " + (e.data?.message || e.message)); }
+        }
+
+        async function handleSend() {
+            let target = document.getElementById('sendTarget').value.trim();
+            const amt = document.getElementById('sendAmt').value;
+            if (!target || !amt) return;
+            try {
+                const factory = new ethers.Contract(FACTORY_ADDR, FACTORY_ABI, provider);
+                let targetAddr = target;
+                if (!target.startsWith("0x") && !isNaN(target)) {
+                    targetAddr = await factory.idToWallet(target);
+                    if (targetAddr === "0x0000000000000000000000000000000000000000") return alert(i18n[currentLang].msgIdNotFound);
+                }
+                if (!(await factory.isSOUWallet(targetAddr))) return alert(i18n[currentLang].msgInvalidTarget);
+                const wallet = new ethers.Contract(userWallet, WALLET_ABI, signer);
+                const tx = await wallet.transfer(targetAddr, ethers.utils.parseUnits(amt, 18), SOU_ADDR);
+                await tx.wait();
+                alert(i18n[currentLang].msgSendSuccess);
+                await refreshUI();
+            } catch (e) { alert(i18n[currentLang].msgError); }
+        }
+
+        async function handleQuery() {
+            const input = document.getElementById('queryInput').value.trim();
+            const resBox = document.getElementById('queryResult');
+            const factory = new ethers.Contract(FACTORY_ADDR, FACTORY_ABI, provider);
+            try {
+                let resHtml = "";
+                const lang = i18n[currentLang];
+                if (input.startsWith("0x")) {
+                    const wallet = await factory.ownerToWallet(input);
+                    const owner = await factory.walletToOwner(input);
+                    if (wallet !== "0x0000000000000000000000000000000000000000") resHtml += `<div>${lang.msgQueryWallet}: ${wallet}</div>`;
+                    if (owner !== "0x0000000000000000000000000000000000000000") resHtml += `<div>${lang.msgQueryOwner}: ${owner}</div>`;
+                    resHtml += `<div>${lang.msgQueryIsSOU}: ${await factory.isSOUWallet(input) ? lang.msgYes : lang.msgNo}</div>`;
+                } else {
+                    const wallet = await factory.idToWallet(input);
+                    resHtml = wallet !== "0x0000000000000000000000000000000000000000" ? `<div>${lang.msgQueryWallet}: ${wallet}</div>` : `<div>${lang.msgQueryEmpty}</div>`;
+                }
+                resBox.innerHTML = resHtml;
+                resBox.style.display = 'flex';
+            } catch (e) { alert(lang.msgError); }
+        }
+
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab + 'Tab').classList.add('active');
+            };
+        });
+
+        if (window.ethereum && window.ethereum.selectedAddress) connectWallet();
+        setLang('zh');
+    </script>
+</body>
+</html>
