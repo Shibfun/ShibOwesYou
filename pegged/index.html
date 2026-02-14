@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PeggedToken Swap - Wrap & Unwrap</title>
+    <link rel="icon" type="image/png" href="https://www.woofswap.finance/image/tokens/sou.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-light: #8b9eff;
+            --primary-dark: #5568d3;
+            --accent: #764ba2;
+            --accent-light: #9b7ec4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --dark-1: #0a0e27;
+            --dark-2: #0f1629;
+            --dark-3: #1a1f3a;
+            --dark-4: #232d4d;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #94a3b8;
+            --border: #334155;
+            --border-light: #475569;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, var(--dark-1) 0%, var(--dark-2) 50%, var(--dark-3) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .logo-nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo-nav img {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+        }
+
+        .wallet-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: rgba(35, 45, 77, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .wallet-info:hover {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--error);
+        }
+
+        .status-dot.connected {
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        /* Main Container */
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            padding-top: 100px;
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 40px;
+        }
+
+        .swap-container {
+            width: 100%;
+            max-width: 480px;
+            padding: 20px;
+        }
+
+        .swap-card {
+            background: rgba(26, 31, 58, 0.85);
+            backdrop-filter: blur(30px);
+            border-radius: 24px;
+            border: 1px solid rgba(102, 126, 234, 0.15);
+            padding: 24px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .swap-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .swap-title {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        /* Pair Selector */
+        .pair-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .pair-btn {
+            background: rgba(35, 45, 77, 0.6);
+            border: 1px solid var(--border);
+            padding: 14px;
+            border-radius: 16px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: var(--transition);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .pair-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: var(--primary);
+        }
+
+        .pair-btn.active {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .pair-btn img {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+        }
+
+        /* Input Section */
+        .input-group {
+            background: rgba(15, 22, 41, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 8px;
+            transition: var(--transition);
+        }
+
+        .input-group:focus-within {
+            border-color: var(--primary);
+            background: rgba(15, 22, 41, 0.8);
+        }
+
+        .input-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .balance-label {
+            color: var(--primary-light);
+            cursor: pointer;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .token-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(102, 126, 234, 0.15);
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            min-width: 110px;
+        }
+
+        .token-info img {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+        }
+
+        .token-symbol {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        input[type="number"] {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 24px;
+            font-weight: 700;
+            outline: none;
+            font-family: 'Space Mono', monospace;
+            text-align: right;
+        }
+
+        input[type="number"]::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        /* Swap Divider */
+        .swap-divider {
+            display: flex;
+            justify-content: center;
+            margin: -20px 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        .toggle-btn {
+            width: 44px;
+            height: 44px;
+            background: var(--dark-4);
+            border: 4px solid var(--dark-2);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            color: white;
+        }
+
+        .toggle-btn:hover {
+            background: var(--primary);
+            transform: rotate(180deg);
+        }
+
+        .toggle-btn svg {
+            transition: transform 0.3s ease;
+        }
+
+        /* Action Buttons */
+        .action-group {
+            margin-top: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-main {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border: none;
+            border-radius: 18px;
+            color: white;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .btn-main:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-main:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-approve {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-approve:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-light);
+        }
+
+        /* Info Display */
+        .contract-info {
+            margin-top: 20px;
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 14px;
+            font-size: 11px;
+            font-family: 'Space Mono', monospace;
+            color: var(--text-tertiary);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .info-row:last-child { margin-bottom: 0; }
+
+        .addr-link {
+            color: var(--primary-light);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .addr-link:hover { text-decoration: underline; }
+
+        /* Status Message */
+        .status-msg {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+            background: rgba(102, 126, 234, 0.1);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: auto;
+        }
+
+        .footer-text {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        /* Spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            nav { padding: 12px 20px; }
+            .logo-nav span { display: none; }
+            .swap-container { padding: 10px; }
+            .swap-card { padding: 20px; }
+            input[type="number"] { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="#" class="logo-nav">
+            <img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU">
+            <span>PeggedToken Swap</span>
+        </a>
+        <div class="wallet-info" id="connectBtn">
+            <div class="status-dot" id="walletDot"></div>
+            <span id="walletAddr">Connect Wallet</span>
+        </div>
+    </nav>
+
+    <div class="wrapper">
+        <div class="swap-container">
+            <div class="swap-card">
+                <div class="swap-header">
+                    <div class="swap-title">Swap</div>
+                    <div style="font-size: 18px; cursor: pointer; opacity: 0.6;">⚙️</div>
+                </div>
+
+                <!-- Pair Selection -->
+                <div class="pair-grid">
+                    <button class="pair-btn active" data-pair="WOSCAR">
+                        <img src="https://raw.githubusercontent.com/ChewySwap/chewy-tokenlist/main/tokens/oscar.webp" alt="OSCAR">
+                        OSCAR
+                    </button>
+                    <button class="pair-btn" data-pair="WLTD">
+                        <img src="https://cdn.dexscreener.com/cms/images/d724eb4e72a137c57c94e9eec7e0f3bab1f4e1b8efb2ed2c70c1df9852d5a15f?width=256&height=256&quality=90&format=webp" alt="LTD">
+                        LTD
+                    </button>
+                </div>
+
+                <!-- From Section -->
+                <div class="input-group">
+                    <div class="input-header">
+                        <span>From</span>
+                        <span class="balance-label" id="balFromLabel">Balance: 0.00</span>
+                    </div>
+                    <div class="input-row">
+                        <div class="token-info">
+                            <img src="" id="iconFrom" alt="Token">
+                            <span class="token-symbol" id="symFrom">---</span>
+                        </div>
+                        <input type="number" id="amtIn" placeholder="0.0" step="any">
+                    </div>
+                </div>
+
+                <!-- Toggle Divider -->
+                <div class="swap-divider">
+                    <div class="toggle-btn" id="reverseBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M7 16V4M7 4L3 8M7 4L11 8M17 8v12M17 20l4-4M17 20l-4-4"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- To Section -->
+                <div class="input-group" style="margin-top: 12px;">
+                    <div class="input-header">
+                        <span>To (1:1)</span>
+                        <span class="balance-label" id="balToLabel">Balance: 0.00</span>
+                    </div>
+                    <div class="input-row">
+                        <div class="token-info">
+                            <img src="" id="iconTo" alt="Token">
+                            <span class="token-symbol" id="symTo">---</span>
+                        </div>
+                        <input type="number" id="amtOut" placeholder="0.0" readonly>
+                    </div>
+                </div>
+
+                <!-- Contract Info -->
+                <div class="contract-info">
+                    <div class="info-row">
+                        <span>Target Address:</span>
+                        <span class="addr-link" id="targetAddrDisplay">0x...</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Pegged Address:</span>
+                        <span class="addr-link" id="peggedAddrDisplay">0x...</span>
+                    </div>
+                </div>
+
+                <!-- Status Message -->
+                <div class="status-msg" id="statusMsg"></div>
+
+                <!-- Action Buttons -->
+                <div class="action-group">
+                    <button class="btn-main btn-approve" id="approveBtn" style="display: none;">Approve Token</button>
+                    <button class="btn-main" id="actionBtn" disabled>Connect Wallet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p class="footer-text">
+                PeggedToken Protocol allows users to wrap their assets 1:1 on Ethereum. 
+                All contracts are verified and open-source. Use at your own risk.
+                <br>
+                © 2026 PeggedToken Ecosystem. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <script>
+        // ============================================================================
+        // Configuration
+        // ============================================================================
+        const CONFIG = {
+            WOSCAR: {
+                pegged: '0xf2cb8cd8b2b2f070b293aa2ead196c1ad93dcdc3',
+                target: '0xeBb66a88cEdd12bfE3a289df6DFEe377F2963F12',
+                symbol: 'OSCAR',
+                logo: 'https://raw.githubusercontent.com/ChewySwap/chewy-tokenlist/main/tokens/oscar.webp'
+            },
+            WLTD: {
+                pegged: '0x1f8206d2feb37c6d2d4b5dc4a2dbf064c0181118',
+                target: '0x1FdB29Ad49330B07aE5a87483F598AA6b292039E',
+                symbol: 'LTD',
+                logo: 'https://cdn.dexscreener.com/cms/images/d724eb4e72a137c57c94e9eec7e0f3bab1f4e1b8efb2ed2c70c1df9852d5a15f?width=256&height=256&quality=90&format=webp'
+            }
+        };
+
+        const PEGGED_ABI = [
+            {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"deposit","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
+        ];
+
+        const ERC20_ABI = [
+            {"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"},
+            {"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"success","type":"bool"}],"type":"function"},
+            {"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"remaining","type":"uint256"}],"type":"function"}
+        ];
+
+        // ============================================================================
+        // State
+        // ============================================================================
+        let web3 = null;
+        let account = null;
+        let currentPair = 'WOSCAR';
+        let isWrapping = true; // true: Target -> Pegged, false: Pegged -> Target
+        let balances = { from: '0', to: '0' };
+
+        // ============================================================================
+        // Core Logic
+        // ============================================================================
+        async function connect() {
+            if (!window.ethereum) return showMsg("MetaMask not found", "error");
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                account = accounts[0];
+                web3 = new Web3(window.ethereum);
+                
+                const chainId = await web3.eth.getChainId();
+                if (chainId !== 1) {
+                    showMsg("Switching to Ethereum...", "info");
+                    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x1' }] });
+                }
+                
+                updateUI();
+                await refreshData();
+                showMsg("Wallet connected!", "success");
+            } catch (e) {
+                showMsg("Connection failed", "error");
+            }
+        }
+
+        async function refreshData() {
+            if (!account || !web3) return;
+            const pair = CONFIG[currentPair];
+            const targetToken = new web3.eth.Contract(ERC20_ABI, pair.target);
+            const peggedToken = new web3.eth.Contract(PEGGED_ABI, pair.pegged);
+
+            try {
+                const targetBal = await targetToken.methods.balanceOf(account).call();
+                const peggedBal = await peggedToken.methods.balanceOf(account).call();
+                
+                balances.target = web3.utils.fromWei(targetBal, 'ether');
+                balances.pegged = web3.utils.fromWei(peggedBal, 'ether');
+
+                updateBalances();
+                await checkAllowance();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function checkAllowance() {
+            if (!isWrapping) {
+                document.getElementById('approveBtn').style.display = 'none';
+                return;
+            }
+            const pair = CONFIG[currentPair];
+            const targetToken = new web3.eth.Contract(ERC20_ABI, pair.target);
+            const allowance = await targetToken.methods.allowance(account, pair.pegged).call();
+            
+            const amtIn = document.getElementById('amtIn').value || '0';
+            const amtInWei = web3.utils.toWei(amtIn === '0' ? '1' : amtIn, 'ether');
+
+            if (web3.utils.toBN(allowance).lt(web3.utils.toBN(amtInWei))) {
+                document.getElementById('approveBtn').style.display = 'block';
+            } else {
+                document.getElementById('approveBtn').style.display = 'none';
+            }
+        }
+
+        async function handleApprove() {
+            const pair = CONFIG[currentPair];
+            const targetToken = new web3.eth.Contract(ERC20_ABI, pair.target);
+            const max = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+            
+            setBtnLoading('approveBtn', true, "Approving...");
+            try {
+                await targetToken.methods.approve(pair.pegged, max).send({ from: account });
+                showMsg("Approved successfully!", "success");
+                await checkAllowance();
+            } catch (e) {
+                showMsg("Approval failed", "error");
+            }
+            setBtnLoading('approveBtn', false);
+        }
+
+        async function handleAction() {
+            if (!account) return connect();
+            
+            const amt = document.getElementById('amtIn').value;
+            if (!amt || parseFloat(amt) <= 0) return showMsg("Enter an amount", "error");
+            
+            const amtWei = web3.utils.toWei(amt, 'ether');
+            const pair = CONFIG[currentPair];
+            const peggedToken = new web3.eth.Contract(PEGGED_ABI, pair.pegged);
+
+            setBtnLoading('actionBtn', true, isWrapping ? "Wrapping..." : "Unwrapping...");
+            try {
+                if (isWrapping) {
+                    await peggedToken.methods.deposit(amtWei).send({ from: account });
+                } else {
+                    await peggedToken.methods.withdraw(amtWei).send({ from: account });
+                }
+                showMsg("Transaction success!", "success");
+                document.getElementById('amtIn').value = '';
+                document.getElementById('amtOut').value = '';
+                await refreshData();
+            } catch (e) {
+                showMsg("Transaction failed", "error");
+            }
+            setBtnLoading('actionBtn', false);
+        }
+
+        // ============================================================================
+        // UI Helpers
+        // ============================================================================
+        function updateUI() {
+            const pair = CONFIG[currentPair];
+            
+            // Update symbols and icons
+            if (isWrapping) {
+                document.getElementById('symFrom').textContent = pair.symbol;
+                document.getElementById('iconFrom').src = pair.logo;
+                document.getElementById('symTo').textContent = 'W' + pair.symbol;
+                document.getElementById('iconTo').src = pair.logo;
+                document.querySelector('.swap-title').textContent = "Wrap " + pair.symbol;
+            } else {
+                document.getElementById('symFrom').textContent = 'W' + pair.symbol;
+                document.getElementById('iconFrom').src = pair.logo;
+                document.getElementById('symTo').textContent = pair.symbol;
+                document.getElementById('iconTo').src = pair.logo;
+                document.querySelector('.swap-title').textContent = "Unwrap " + pair.symbol;
+            }
+
+            document.getElementById('targetAddrDisplay').textContent = pair.target.substring(0, 12) + "...";
+            document.getElementById('peggedAddrDisplay').textContent = pair.pegged.substring(0, 12) + "...";
+
+            if (account) {
+                document.getElementById('walletAddr').textContent = account.substring(0, 6) + "..." + account.substring(38);
+                document.getElementById('walletDot').classList.add('connected');
+                document.getElementById('actionBtn').disabled = false;
+                document.getElementById('actionBtn').textContent = isWrapping ? "Wrap Tokens" : "Unwrap Tokens";
+            } else {
+                document.getElementById('walletAddr').textContent = "Connect Wallet";
+                document.getElementById('walletDot').classList.remove('connected');
+                document.getElementById('actionBtn').disabled = false;
+                document.getElementById('actionBtn').textContent = "Connect Wallet";
+            }
+            updateBalances();
+        }
+
+        function updateBalances() {
+            if (isWrapping) {
+                document.getElementById('balFromLabel').textContent = "Balance: " + parseFloat(balances.target || 0).toFixed(4);
+                document.getElementById('balToLabel').textContent = "Balance: " + parseFloat(balances.pegged || 0).toFixed(4);
+            } else {
+                document.getElementById('balFromLabel').textContent = "Balance: " + parseFloat(balances.pegged || 0).toFixed(4);
+                document.getElementById('balToLabel').textContent = "Balance: " + parseFloat(balances.target || 0).toFixed(4);
+            }
+        }
+
+        function showMsg(txt, type) {
+            const el = document.getElementById('statusMsg');
+            el.textContent = txt;
+            el.style.display = 'block';
+            el.style.color = type === 'error' ? 'var(--error)' : (type === 'success' ? 'var(--success)' : 'var(--primary-light)');
+            setTimeout(() => el.style.display = 'none', 5000);
+        }
+
+        function setBtnLoading(id, loading, txt) {
+            const btn = document.getElementById(id);
+            btn.disabled = loading;
+            if (loading) {
+                btn.innerHTML = `<span class="spinner"></span> ${txt}`;
+            } else {
+                if (id === 'approveBtn') btn.textContent = "Approve Token";
+                else updateUI();
+            }
+        }
+
+        // ============================================================================
+        // Event Listeners
+        // ============================================================================
+        document.getElementById('connectBtn').onclick = connect;
+        document.getElementById('actionBtn').onclick = handleAction;
+        document.getElementById('approveBtn').onclick = handleApprove;
+
+        document.getElementById('reverseBtn').onclick = () => {
+            isWrapping = !isWrapping;
+            updateUI();
+            checkAllowance();
+            // Trigger animation
+            const svg = document.querySelector('#reverseBtn svg');
+            svg.style.transform = isWrapping ? 'rotate(0deg)' : 'rotate(180deg)';
+        };
+
+        document.getElementById('amtIn').oninput = (e) => {
+            const val = e.target.value;
+            document.getElementById('amtOut').value = val;
+            if (account) checkAllowance();
+        };
+
+        document.getElementById('balFromLabel').onclick = () => {
+            const bal = isWrapping ? balances.target : balances.pegged;
+            document.getElementById('amtIn').value = bal;
+            document.getElementById('amtOut').value = bal;
+            if (account) checkAllowance();
+        };
+
+        document.querySelectorAll('.pair-btn').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('.pair-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentPair = btn.dataset.pair;
+                updateUI();
+                if (account) refreshData();
+            };
+        });
+
+        // Initialize
+        updateUI();
+
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', (accs) => {
+                account = accs[0];
+                updateUI();
+                if (account) refreshData();
+            });
+            window.ethereum.on('chainChanged', () => window.location.reload());
+        }
+    </script>
+</body>
+</html>
