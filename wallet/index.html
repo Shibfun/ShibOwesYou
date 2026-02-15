@@ -134,6 +134,24 @@
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--error); }
         .status-dot.connected { background: var(--success); box-shadow: 0 0 10px var(--success); }
 
+        /* Toast Styles */
+        #toast-container {
+            position: fixed; top: 100px; left: 50%; transform: translateX(-50%);
+            z-index: 9999; display: flex; flex-direction: column; gap: 12px; pointer-events: none;
+        }
+        .toast {
+            min-width: 300px; max-width: 90vw; padding: 16px 24px; border-radius: 20px;
+            background: rgba(15, 22, 41, 0.95); backdrop-filter: blur(20px);
+            border: 1px solid var(--border); color: white; font-weight: 600; font-size: 14px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4); display: flex; align-items: center; gap: 12px;
+            animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; pointer-events: auto;
+        }
+        .toast.success { border-color: var(--success); }
+        .toast.error { border-color: var(--error); }
+        .toast.info { border-color: var(--primary); }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
+
         footer { text-align: center; padding: 30px; font-size: 12px; color: var(--text-tertiary); opacity: 0.5; font-weight: 500; letter-spacing: 0.5px; }
 
         .tab-content { display: none; }
@@ -162,6 +180,8 @@
             </div>
         </div>
     </nav>
+
+    <div id="toast-container"></div>
 
     <div class="wrapper">
         <div class="app-container">
@@ -385,8 +405,20 @@
         };
 
         let currentLang = 'zh';
-        let userSmartSouBal = "0"; // SOU Smart Wallet Balance
-        let userDirectSouBal = "0"; // MetaMask EOA Balance
+        let userSmartSouBal = "0";
+        let userDirectSouBal = "0";
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
 
         function setLang(lang) {
             currentLang = lang;
@@ -421,10 +453,10 @@
         let provider, signer, userAddr, userWallet;
 
         async function connectWallet() {
-            if (!window.ethereum) return alert(i18n[currentLang].msgConnectMetaMask);
+            if (!window.ethereum) return showToast(i18n[currentLang].msgConnectMetaMask, 'error');
             provider = new ethers.providers.Web3Provider(window.ethereum);
             const { chainId } = await provider.getNetwork();
-            if (chainId !== BSC_CHAIN_ID) return alert(i18n[currentLang].msgNetworkError);
+            if (chainId !== BSC_CHAIN_ID) return showToast(i18n[currentLang].msgNetworkError, 'error');
 
             await provider.send("eth_requestAccounts", []);
             signer = provider.getSigner();
@@ -467,10 +499,11 @@
             try {
                 const factory = new ethers.Contract(FACTORY_ADDR, FACTORY_ABI, signer);
                 const tx = await factory.createWallet(id);
+                showToast("交易已提交...", 'info');
                 await tx.wait();
-                alert(i18n[currentLang].msgCreateSuccess);
+                showToast(i18n[currentLang].msgCreateSuccess, 'success');
                 await refreshUI();
-            } catch (e) { alert(i18n[currentLang].msgError + ": " + (e.data?.message || e.message)); }
+            } catch (e) { showToast(i18n[currentLang].msgError, 'error'); }
         }
 
         async function previewTarget() {
@@ -497,7 +530,6 @@
 
             if (!domainInput) { previewBox.style.display = 'none'; return; }
             
-            // The user only enters the name, we handle logic with suffix
             let searchName = domainInput.toLowerCase();
             if (searchName.endsWith(".sou")) {
                 searchName = searchName.substring(0, searchName.length - 4);
@@ -529,7 +561,7 @@
             const factory = new ethers.Contract(FACTORY_ADDR, FACTORY_ABI, provider);
             if (!target.startsWith("0x") && !isNaN(target)) {
                 targetAddr = await factory.idToWallet(target);
-                if (targetAddr === "0x0000000000000000000000000000000000000000") return alert(i18n[currentLang].msgIdNotFound);
+                if (targetAddr === "0x0000000000000000000000000000000000000000") return showToast(i18n[currentLang].msgIdNotFound, 'error');
             }
 
             try {
@@ -537,14 +569,15 @@
                 const globalLifted = await factory.globalRestrictionLifted();
                 const isWhite = await factory.whitelist(userWallet);
                 
-                if (!isSOU && !globalLifted && !isWhite) return alert(i18n[currentLang].msgInvalidTarget);
+                if (!isSOU && !globalLifted && !isWhite) return showToast(i18n[currentLang].msgInvalidTarget, 'error');
 
                 const wallet = new ethers.Contract(userWallet, WALLET_ABI, signer);
                 const tx = await wallet.transfer(targetAddr, ethers.utils.parseUnits(amt.toString(), 18), SOU_ADDR);
+                showToast("交易已提交...", 'info');
                 await tx.wait();
-                alert(i18n[currentLang].msgSendSuccess);
+                showToast(i18n[currentLang].msgSendSuccess, 'success');
                 await refreshUI();
-            } catch (e) { alert(i18n[currentLang].msgError); }
+            } catch (e) { showToast(i18n[currentLang].msgError, 'error'); }
         }
 
         async function handleDomainSend() {
@@ -560,14 +593,15 @@
             try {
                 const idContract = new ethers.Contract(ID_CONTRACT_ADDR, ID_ABI, provider);
                 const targetAddr = await idContract.resolve(searchName);
-                if (targetAddr === "0x0000000000000000000000000000000000000000") return alert(i18n[currentLang].msgIdNotFound);
+                if (targetAddr === "0x0000000000000000000000000000000000000000") return showToast(i18n[currentLang].msgIdNotFound, 'error');
                 
                 const sou = new ethers.Contract(SOU_ADDR, ERC20_ABI, signer);
                 const tx = await sou.transfer(targetAddr, ethers.utils.parseUnits(amt.toString(), 18));
+                showToast("交易已提交...", 'info');
                 await tx.wait();
-                alert(i18n[currentLang].msgSendSuccess);
+                showToast(i18n[currentLang].msgSendSuccess, 'success');
                 await refreshUI();
-            } catch (e) { alert(i18n[currentLang].msgError); }
+            } catch (e) { showToast(i18n[currentLang].msgError, 'error'); }
         }
 
         async function handleQuery() {
@@ -597,15 +631,15 @@
                 
                 resBox.innerHTML = resHtml || `<div>${lang.msgQueryEmpty}</div>`;
                 resBox.style.display = 'flex';
-            } catch (e) { alert(lang.msgError); }
+            } catch (e) { showToast(lang.msgError, 'error'); }
         }
 
         function copyText(id) {
             const txt = document.getElementById(id).innerText;
-            navigator.clipboard.writeText(txt).then(() => alert(i18n[currentLang].msgCopySuccess));
+            navigator.clipboard.writeText(txt).then(() => showToast(i18n[currentLang].msgCopySuccess, 'success'));
         }
         function copyValue(val) {
-            navigator.clipboard.writeText(val).then(() => alert(i18n[currentLang].msgCopySuccess));
+            navigator.clipboard.writeText(val).then(() => showToast(i18n[currentLang].msgCopySuccess, 'success'));
         }
 
         document.querySelectorAll('.tab-btn').forEach(btn => {
