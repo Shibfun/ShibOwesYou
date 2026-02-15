@@ -49,8 +49,8 @@
         .card { background: rgba(26, 31, 58, 0.7); backdrop-filter: blur(40px); border-radius: 32px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5); }
         .card-content { padding: 28px; }
 
-        .tab-nav { display: flex; background: rgba(0, 0, 0, 0.25); padding: 6px; margin-bottom: 24px; border-radius: 18px; border: 1px solid var(--border); }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: var(--text-tertiary); font-weight: 700; font-size: 14px; cursor: pointer; border-radius: 14px; transition: var(--transition); }
+        .tab-nav { display: flex; background: rgba(0, 0, 0, 0.25); padding: 6px; margin-bottom: 24px; border-radius: 18px; border: 1px solid var(--border); flex-wrap: wrap; }
+        .tab-btn { flex: 1; min-width: 80px; padding: 12px 8px; border: none; background: transparent; color: var(--text-tertiary); font-weight: 700; font-size: 13px; cursor: pointer; border-radius: 14px; transition: var(--transition); }
         .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 8px 16px rgba(102, 126, 234, 0.25); }
 
         .balance-card {
@@ -132,6 +132,10 @@
         
         .id-preview { margin-top: 14px; padding: 14px; background: rgba(0,0,0,0.25); border-radius: 18px; display: none; border: 1px solid var(--border); }
         .id-preview-label { font-size: 10px; color: var(--text-tertiary); margin-bottom: 6px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
+        
+        .info-row { display: flex; justify-content: space-between; align-items: center; width: 100%; font-size: 13px; }
+        .info-row span:first-child { color: var(--text-tertiary); }
+        .info-row span:last-child { color: var(--text-primary); font-weight: 600; word-break: break-all; text-align: right; margin-left: 10px; }
     </style>
 </head>
 <body>
@@ -155,6 +159,7 @@
                 <div class="tab-nav">
                     <button class="tab-btn active" data-tab="assets" data-i18n="tabAssets">资产</button>
                     <button class="tab-btn" data-tab="send" data-i18n="tabSend">发送</button>
+                    <button class="tab-btn" data-tab="domain" data-i18n="tabDomain">域名转账</button>
                     <button class="tab-btn" data-tab="query" data-i18n="tabQuery">查询</button>
                 </div>
 
@@ -170,7 +175,6 @@
                             </div>
                             <button class="action-button" onclick="createWallet()" data-i18n="btnCreate">创建钱包</button>
                         </div>
-
                         <div id="hasWalletUI" style="display: none;">
                             <div class="balance-card">
                                 <div class="balance-header">
@@ -189,7 +193,7 @@
                         </div>
                     </div>
 
-                    <!-- Send Tab -->
+                    <!-- Send Tab (Address or Numeric ID) -->
                     <div class="tab-content" id="sendTab">
                         <div class="input-section">
                             <div class="input-label" data-i18n="receiverLabel">接收者 (地址或数字 ID)</div>
@@ -207,7 +211,7 @@
                         <div class="input-section">
                             <div class="input-label">
                                 <span data-i18n="amountLabel">数量</span>
-                                <span style="font-size: 11px; opacity: 0.6; font-family: 'Space Mono';">Balance: <span id="sendBal">0.00</span> SOU</span>
+                                <span style="font-size: 11px; opacity: 0.6; font-family: 'Space Mono';">Balance: <span class="sendBalText">0.00</span> SOU</span>
                             </div>
                             <div class="input-box">
                                 <input type="number" id="sendAmt" placeholder="0.0">
@@ -217,21 +221,58 @@
                                 </div>
                             </div>
                             <div class="percent-row">
-                                <button class="percent-btn" onclick="setPercent(0.25)">25%</button>
-                                <button class="percent-btn" onclick="setPercent(0.5)">50%</button>
-                                <button class="percent-btn" onclick="setPercent(0.75)">75%</button>
-                                <button class="percent-btn" onclick="setPercent(1.0)">MAX</button>
+                                <button class="percent-btn" onclick="setPercent(0.25, 'sendAmt')">25%</button>
+                                <button class="percent-btn" onclick="setPercent(0.5, 'sendAmt')">50%</button>
+                                <button class="percent-btn" onclick="setPercent(0.75, 'sendAmt')">75%</button>
+                                <button class="percent-btn" onclick="setPercent(1.0, 'sendAmt')">MAX</button>
                             </div>
                         </div>
                         <button class="action-button" onclick="handleSend()" data-i18n="btnSend">立即发送</button>
                     </div>
 
+                    <!-- Domain Transfer Tab (New Feature) -->
+                    <div class="tab-content" id="domainTab">
+                        <div class="input-section">
+                            <div class="input-label" data-i18n="domainLabel">接收者域名 (.sou)</div>
+                            <div class="input-box">
+                                <input type="text" id="domainTarget" oninput="previewDomain()" data-i18n-placeholder="domainPlaceholder" placeholder="例如: woof.sou">
+                            </div>
+                            <div id="domainPreview" class="id-preview">
+                                <div class="id-preview-label" data-i18n="targetAddrLabel">解析地址</div>
+                                <div class="addr-pill" style="margin-top: 6px; background: rgba(0,0,0,0.15);">
+                                    <span id="previewDomainAddr" style="font-size: 10px;">-</span>
+                                    <span class="copy-icon" onclick="copyText('previewDomainAddr')">📋</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-section">
+                            <div class="input-label">
+                                <span data-i18n="amountLabel">数量</span>
+                                <span style="font-size: 11px; opacity: 0.6; font-family: 'Space Mono';">Balance: <span class="sendBalText">0.00</span> SOU</span>
+                            </div>
+                            <div class="input-box">
+                                <input type="number" id="domainAmt" placeholder="0.0">
+                                <div class="token-badge">
+                                    <img src="https://www.woofswap.finance/image/tokens/sou.png" class="token-logo-small">
+                                    <span style="font-size: 13px; font-weight: 800;">SOU</span>
+                                </div>
+                            </div>
+                            <div class="percent-row">
+                                <button class="percent-btn" onclick="setPercent(0.25, 'domainAmt')">25%</button>
+                                <button class="percent-btn" onclick="setPercent(0.5, 'domainAmt')">50%</button>
+                                <button class="percent-btn" onclick="setPercent(0.75, 'domainAmt')">75%</button>
+                                <button class="percent-btn" onclick="setPercent(1.0, 'domainAmt')">MAX</button>
+                            </div>
+                        </div>
+                        <button class="action-button" onclick="handleDomainSend()" data-i18n="btnSend">立即发送</button>
+                    </div>
+
                     <!-- Query Tab -->
                     <div class="tab-content" id="queryTab">
                         <div class="input-section">
-                            <div class="input-label" data-i18n="searchLabel">搜索地址或 ID</div>
+                            <div class="input-label" data-i18n="searchLabel">搜索地址、ID 或域名</div>
                             <div class="input-box">
-                                <input type="text" id="queryInput" data-i18n-placeholder="searchPlaceholder" placeholder="输入地址或数字 ID">
+                                <input type="text" id="queryInput" data-i18n-placeholder="searchPlaceholder" placeholder="输入地址、数字 ID 或域名">
                             </div>
                         </div>
                         <button class="action-button" style="background: var(--dark-4); box-shadow: none;" onclick="handleQuery()" data-i18n="btnSearch">搜索</button>
@@ -249,6 +290,7 @@
 
     <script>
         const FACTORY_ADDR = "0x02E54e08Be9fE047C6E6aEd89A430AcBe4708E9e";
+        const ID_CONTRACT_ADDR = "0x31CCB08535398AFEe394E8cd8d34e72973C08cc9";
         const SOU_ADDR = "0xb65bd36fef84ebc5114cfd803a4f25b2b57f7777";
         const BSC_CHAIN_ID = 56;
         
@@ -257,24 +299,27 @@
                 connectWallet: "连接钱包",
                 tabAssets: "资产",
                 tabSend: "发送",
+                tabDomain: "域名转账",
                 tabQuery: "查询",
                 noWalletTip: "您尚未拥有 SOU 智能钱包",
                 idPlaceholder: "输入数字 ID (如: 888)",
                 btnCreate: "创建钱包",
                 souBalanceLabel: "SOU 余额",
                 receiverLabel: "接收者 (地址或数字 ID)",
+                domainLabel: "接收者域名 (.sou)",
                 targetPlaceholder: "0x... 或 数字 ID",
+                domainPlaceholder: "例如: woof.sou",
                 targetAddrLabel: "解析地址",
                 amountLabel: "数量",
                 btnSend: "立即发送",
-                searchLabel: "搜索地址或 ID",
-                searchPlaceholder: "输入地址或数字 ID",
+                searchLabel: "搜索地址、ID 或域名",
+                searchPlaceholder: "输入地址、数字 ID 或域名",
                 btnSearch: "搜索",
                 msgCreateSuccess: "创建成功！",
                 msgSendSuccess: "转账成功！",
-                msgIdNotFound: "该 ID 未绑定钱包",
+                msgIdNotFound: "该 ID 或域名未绑定钱包",
                 msgInvalidTarget: "目标地址非法：非 SOU 钱包或未在白名单中",
-                msgQueryEmpty: "该 ID 尚未被使用",
+                msgQueryEmpty: "未查询到相关信息",
                 msgQueryWallet: "关联钱包",
                 msgQueryOwner: "所有者",
                 msgQueryIsSOU: "是否为 SOU 钱包",
@@ -289,24 +334,27 @@
                 connectWallet: "Connect Wallet",
                 tabAssets: "Assets",
                 tabSend: "Send",
+                tabDomain: "Domain Send",
                 tabQuery: "Query",
                 noWalletTip: "No SOU Wallet Found",
                 idPlaceholder: "Enter numeric ID (e.g., 888)",
                 btnCreate: "Create Wallet",
                 souBalanceLabel: "SOU Balance",
                 receiverLabel: "Receiver (Address or ID)",
+                domainLabel: "Receiver Domain (.sou)",
                 targetPlaceholder: "0x... or Numeric ID",
+                domainPlaceholder: "e.g., woof.sou",
                 targetAddrLabel: "Resolved Address",
                 amountLabel: "Amount",
                 btnSend: "Send Now",
-                searchLabel: "Search Address or ID",
-                searchPlaceholder: "Enter Address or Numeric ID",
+                searchLabel: "Search Address, ID or Domain",
+                searchPlaceholder: "Enter Address, Numeric ID or Domain",
                 btnSearch: "Search",
                 msgCreateSuccess: "Created Successfully!",
                 msgSendSuccess: "Sent Successfully!",
-                msgIdNotFound: "ID not bound to any wallet",
+                msgIdNotFound: "ID or Domain not bound",
                 msgInvalidTarget: "Invalid target: Not a SOU Wallet or not whitelisted",
-                msgQueryEmpty: "ID not in use",
+                msgQueryEmpty: "No information found",
                 msgQueryWallet: "Linked Wallet",
                 msgQueryOwner: "Owner",
                 msgQueryIsSOU: "Is SOU Wallet",
@@ -339,6 +387,12 @@
             "function walletToId(address) view returns (string)",
             "function globalRestrictionLifted() view returns (bool)",
             "function whitelist(address) view returns (bool)"
+        ];
+        const ID_ABI = [
+            "function resolve(string calldata inputName) external view returns (address)",
+            "function primaryName(address) view returns (string)",
+            "function tokenIdByIdLower(string) view returns (uint256)",
+            "function ownerOf(uint256) view returns (address)"
         ];
         const WALLET_ABI = ["function transfer(address to, uint256 amount, address token) external"];
         const ERC20_ABI = ["function balanceOf(address) view returns (uint256)"];
@@ -373,7 +427,7 @@
                 const bal = await sou.balanceOf(userWallet);
                 userSouBal = ethers.utils.formatUnits(bal, 18);
                 document.getElementById('souBalance').innerText = userSouBal;
-                document.getElementById('sendBal').innerText = userSouBal;
+                document.querySelectorAll('.sendBalText').forEach(el => el.innerText = userSouBal);
             } else {
                 document.getElementById('noWalletUI').style.display = 'block';
                 document.getElementById('hasWalletUI').style.display = 'none';
@@ -396,8 +450,9 @@
             const target = document.getElementById('sendTarget').value.trim();
             const previewBox = document.getElementById('targetPreview');
             const previewAddr = document.getElementById('previewAddr');
-            if (!target) { previewBox.style.display = 'none'; return; }
             
+            if (!target) { previewBox.style.display = 'none'; return; }
+
             const factory = new ethers.Contract(FACTORY_ADDR, FACTORY_ABI, provider);
             if (!target.startsWith("0x") && !isNaN(target)) {
                 const addr = await factory.idToWallet(target);
@@ -408,24 +463,39 @@
             } else { previewBox.style.display = 'none'; }
         }
 
-        function setPercent(p) {
-            let val = parseFloat(userSouBal) * p;
-            if (p === 1.0) val = Math.floor(val);
-            document.getElementById('sendAmt').value = val;
+        async function previewDomain() {
+            let domain = document.getElementById('domainTarget').value.trim();
+            const previewBox = document.getElementById('domainPreview');
+            const previewAddr = document.getElementById('previewDomainAddr');
+
+            if (!domain) { previewBox.style.display = 'none'; return; }
+            
+            // Handle both "name" and "name.sou"
+            let searchName = domain.toLowerCase();
+            if (searchName.endsWith(".sou")) {
+                searchName = searchName.substring(0, searchName.length - 4);
+            }
+
+            try {
+                const idContract = new ethers.Contract(ID_CONTRACT_ADDR, ID_ABI, provider);
+                const addr = await idContract.resolve(searchName);
+                if (addr !== "0x0000000000000000000000000000000000000000") {
+                    previewAddr.innerText = addr;
+                    previewBox.style.display = 'block';
+                } else { previewBox.style.display = 'none'; }
+            } catch (e) { previewBox.style.display = 'none'; }
         }
 
-        async function handleSend() {
-            let target = document.getElementById('sendTarget').value.trim();
-            const amt = document.getElementById('sendAmt').value;
-            if (!target || !amt) return;
+        function setPercent(p, inputId) {
+            let val = parseFloat(userSouBal) * p;
+            if (p === 1.0) val = Math.floor(val * 1000000) / 1000000; // Keep some precision
+            document.getElementById(inputId).value = val;
+        }
+
+        async function commonSend(targetAddr, amt) {
+            if (!targetAddr || !amt) return;
             try {
                 const factory = new ethers.Contract(FACTORY_ADDR, FACTORY_ABI, provider);
-                let targetAddr = target;
-                if (!target.startsWith("0x") && !isNaN(target)) {
-                    targetAddr = await factory.idToWallet(target);
-                    if (targetAddr === "0x0000000000000000000000000000000000000000") return alert(i18n[currentLang].msgIdNotFound);
-                }
-                
                 const isSOU = await factory.isSOUWallet(targetAddr);
                 const globalLifted = await factory.globalRestrictionLifted();
                 const isWhite = await factory.whitelist(userWallet);
@@ -440,24 +510,67 @@
             } catch (e) { alert(i18n[currentLang].msgError); }
         }
 
+        async function handleSend() {
+            let target = document.getElementById('sendTarget').value.trim();
+            const amt = document.getElementById('sendAmt').value;
+            if (!target || !amt) return;
+            
+            let targetAddr = target;
+            if (!target.startsWith("0x") && !isNaN(target)) {
+                const factory = new ethers.Contract(FACTORY_ADDR, FACTORY_ABI, provider);
+                targetAddr = await factory.idToWallet(target);
+                if (targetAddr === "0x0000000000000000000000000000000000000000") return alert(i18n[currentLang].msgIdNotFound);
+            }
+            await commonSend(targetAddr, amt);
+        }
+
+        async function handleDomainSend() {
+            let domain = document.getElementById('domainTarget').value.trim();
+            const amt = document.getElementById('domainAmt').value;
+            if (!domain || !amt) return;
+
+            let searchName = domain.toLowerCase();
+            if (searchName.endsWith(".sou")) {
+                searchName = searchName.substring(0, searchName.length - 4);
+            }
+
+            try {
+                const idContract = new ethers.Contract(ID_CONTRACT_ADDR, ID_ABI, provider);
+                const targetAddr = await idContract.resolve(searchName);
+                if (targetAddr === "0x0000000000000000000000000000000000000000") return alert(i18n[currentLang].msgIdNotFound);
+                await commonSend(targetAddr, amt);
+            } catch (e) { alert(i18n[currentLang].msgError); }
+        }
+
         async function handleQuery() {
             const input = document.getElementById('queryInput').value.trim();
             const resBox = document.getElementById('queryResult');
             const factory = new ethers.Contract(FACTORY_ADDR, FACTORY_ABI, provider);
+            const idContract = new ethers.Contract(ID_CONTRACT_ADDR, ID_ABI, provider);
             try {
                 let resHtml = "";
                 const lang = i18n[currentLang];
+                
                 if (input.startsWith("0x") && input.length === 42) {
+                    // Query Address
                     const wallet = await factory.ownerToWallet(input);
                     const owner = await factory.walletToOwner(input);
                     if (wallet !== "0x0000000000000000000000000000000000000000") resHtml += `<div class="info-row"><span>${lang.msgQueryWallet}:</span><span>${wallet} <span class="copy-icon" onclick="copyValue('${wallet}')">📋</span></span></div>`;
                     if (owner !== "0x0000000000000000000000000000000000000000") resHtml += `<div class="info-row"><span>${lang.msgQueryOwner}:</span><span>${owner} <span class="copy-icon" onclick="copyValue('${owner}')">📋</span></span></div>`;
                     resHtml += `<div class="info-row"><span>${lang.msgQueryIsSOU}:</span><span>${await factory.isSOUWallet(input) ? lang.msgYes : lang.msgNo}</span></div>`;
                 } else if (!isNaN(input) && input.length > 0) {
+                    // Query Numeric ID
                     const wallet = await factory.idToWallet(input);
                     resHtml = wallet !== "0x0000000000000000000000000000000000000000" ? `<div class="info-row"><span>${lang.msgQueryWallet}:</span><span>${wallet} <span class="copy-icon" onclick="copyValue('${wallet}')">📋</span></span></div>` : `<div>${lang.msgQueryEmpty}</div>`;
+                } else if (input.length > 0) {
+                    // Query Domain Name
+                    let searchName = input.toLowerCase();
+                    if (searchName.endsWith(".sou")) searchName = searchName.substring(0, searchName.length - 4);
+                    const addr = await idContract.resolve(searchName);
+                    resHtml = addr !== "0x0000000000000000000000000000000000000000" ? `<div class="info-row"><span>${lang.msgQueryWallet}:</span><span>${addr} <span class="copy-icon" onclick="copyValue('${addr}')">📋</span></span></div>` : `<div>${lang.msgQueryEmpty}</div>`;
                 }
-                resBox.innerHTML = resHtml;
+                
+                resBox.innerHTML = resHtml || `<div>${lang.msgQueryEmpty}</div>`;
                 resBox.style.display = 'flex';
             } catch (e) { alert(lang.msgError); }
         }
