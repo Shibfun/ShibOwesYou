@@ -53,20 +53,23 @@
         .tab-btn { flex: 1; min-width: 80px; padding: 12px 8px; border: none; background: transparent; color: var(--text-tertiary); font-weight: 700; font-size: 13px; cursor: pointer; border-radius: 14px; transition: var(--transition); }
         .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 8px 16px rgba(102, 126, 234, 0.25); }
 
+        .balance-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 24px; }
         .balance-card {
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border: 1px solid var(--border); padding: 28px; border-radius: 28px; margin-bottom: 24px; text-align: center;
+            border: 1px solid var(--border); padding: 20px; border-radius: 24px; text-align: center;
         }
-        .balance-header { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; }
-        .balance-header img { width: 32px; height: 32px; object-fit: contain; }
-        .balance-val { font-size: 40px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; font-family: 'Space Mono', monospace; letter-spacing: -1px; }
-        .balance-label { font-size: 11px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+        .balance-card.direct { background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(102, 126, 234, 0.1) 100%); }
+        
+        .balance-header { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px; }
+        .balance-header img { width: 24px; height: 24px; object-fit: contain; }
+        .balance-val { font-size: 32px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; font-family: 'Space Mono', monospace; letter-spacing: -1px; }
+        .balance-label { font-size: 10px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
 
         .addr-pill {
             display: flex; align-items: center; justify-content: space-between;
             background: rgba(0,0,0,0.2); padding: 12px 16px; border-radius: 16px;
             font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-secondary);
-            margin-top: 20px; border: 1px solid var(--border);
+            margin-top: 12px; border: 1px solid var(--border);
         }
         .copy-icon { cursor: pointer; padding: 4px; transition: 0.2s; color: var(--primary-light); opacity: 0.7; }
         .copy-icon:hover { color: white; opacity: 1; transform: scale(1.1); }
@@ -97,13 +100,7 @@
         }
         .token-logo-small { width: 18px; height: 18px; object-fit: contain; }
         
-        .domain-suffix {
-            font-weight: 700;
-            color: var(--primary-light);
-            font-size: 16px;
-            opacity: 0.9;
-            padding-right: 4px;
-        }
+        .domain-suffix { font-weight: 700; color: var(--primary-light); font-size: 16px; opacity: 0.9; padding-right: 4px; }
 
         input { flex: 1; background: transparent; border: none; color: var(--text-primary); font-size: 16px; font-weight: 600; outline: none; }
         input::placeholder { color: var(--text-tertiary); opacity: 0.5; }
@@ -134,18 +131,8 @@
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--error); }
         .status-dot.connected { background: var(--success); box-shadow: 0 0 10px var(--success); }
 
-        /* Toast Styles */
-        #toast-container {
-            position: fixed; top: 100px; left: 50%; transform: translateX(-50%);
-            z-index: 9999; display: flex; flex-direction: column; gap: 12px; pointer-events: none;
-        }
-        .toast {
-            min-width: 300px; max-width: 90vw; padding: 16px 24px; border-radius: 20px;
-            background: rgba(15, 22, 41, 0.95); backdrop-filter: blur(20px);
-            border: 1px solid var(--border); color: white; font-weight: 600; font-size: 14px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4); display: flex; align-items: center; gap: 12px;
-            animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; pointer-events: auto;
-        }
+        #toast-container { position: fixed; top: 100px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
+        .toast { min-width: 300px; max-width: 90vw; padding: 16px 24px; border-radius: 20px; background: rgba(15, 22, 41, 0.95); backdrop-filter: blur(20px); border: 1px solid var(--border); color: white; font-weight: 600; font-size: 14px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); display: flex; align-items: center; gap: 12px; animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; pointer-events: auto; }
         .toast.success { border-color: var(--success); }
         .toast.error { border-color: var(--error); }
         .toast.info { border-color: var(--primary); }
@@ -196,20 +183,35 @@
                 <div class="card-content">
                     <!-- Assets Tab -->
                     <div class="tab-content active" id="assetsTab">
-                        <div id="noWalletUI" class="empty-state" style="text-align: center;">
-                            <p data-i18n="noWalletTip" style="margin-bottom: 24px; font-size: 14px; color: var(--text-secondary); font-weight: 500;">您尚未拥有 SOU 智能钱包</p>
-                            <div class="input-section">
-                                <div class="input-box">
-                                    <input type="text" id="regID" data-i18n-placeholder="idPlaceholder" placeholder="输入数字 ID (如: 888)">
-                                </div>
-                            </div>
-                            <button class="action-button" onclick="createWallet()" data-i18n="btnCreate">创建钱包</button>
-                        </div>
-                        <div id="hasWalletUI" style="display: none;">
-                            <div class="balance-card">
+                        <div class="balance-grid">
+                            <!-- MetaMask EOA Balance -->
+                            <div class="balance-card direct">
                                 <div class="balance-header">
                                     <img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU">
-                                    <span class="balance-label" data-i18n="souBalanceLabel">SOU 余额</span>
+                                    <span class="balance-label" data-i18n="eoaBalanceLabel">连接钱包余额 (EOA)</span>
+                                </div>
+                                <div class="balance-val" id="eoaBalanceDisplay">0.00</div>
+                                <div class="addr-pill">
+                                    <span id="eoaAddrFull" style="opacity: 0.8;">未连接</span>
+                                    <span class="copy-icon" onclick="copyText('eoaAddrFull')">📋</span>
+                                </div>
+                            </div>
+
+                            <!-- SOU Smart Wallet Balance -->
+                            <div id="noWalletUI" class="empty-state" style="text-align: center; padding: 20px; border: 1px dashed var(--border); border-radius: 24px;">
+                                <p data-i18n="noWalletTip" style="margin-bottom: 16px; font-size: 14px; color: var(--text-secondary); font-weight: 500;">您尚未拥有 SOU 智能钱包</p>
+                                <div class="input-section" style="margin-bottom: 16px;">
+                                    <div class="input-box">
+                                        <input type="text" id="regID" data-i18n-placeholder="idPlaceholder" placeholder="输入数字 ID (如: 888)">
+                                    </div>
+                                </div>
+                                <button class="action-button" onclick="createWallet()" data-i18n="btnCreate">创建钱包</button>
+                            </div>
+
+                            <div id="hasWalletUI" class="balance-card" style="display: none;">
+                                <div class="balance-header">
+                                    <img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU">
+                                    <span class="balance-label" data-i18n="smartBalanceLabel">SOU 智能钱包余额</span>
                                 </div>
                                 <div class="balance-val" id="souBalance">0.00</div>
                                 <div class="info-row" style="justify-content: center; gap: 8px;">
@@ -223,7 +225,7 @@
                         </div>
                     </div>
 
-                    <!-- Send Tab (Address or Numeric ID) -->
+                    <!-- Send Tab (Smart Wallet Transfer) -->
                     <div class="tab-content" id="sendTab">
                         <div class="input-section">
                             <div class="input-label" data-i18n="receiverLabel">接收者 (地址或数字 ID)</div>
@@ -261,7 +263,7 @@
                         <div class="tip-text" data-i18n="smartTip">温馨提示：SOU 智能钱包仅支持在 SOU 钱包地址之间进行转账</div>
                     </div>
 
-                    <!-- Domain Transfer Tab (Direct Transfer) -->
+                    <!-- Domain Transfer Tab (Direct EOA Transfer) -->
                     <div class="tab-content" id="domainTab">
                         <div class="input-section">
                             <div class="input-label" data-i18n="domainLabel">接收者域名</div>
@@ -305,7 +307,7 @@
                         <div class="input-section">
                             <div class="input-label" data-i18n="searchLabel">搜索地址、ID 或域名</div>
                             <div class="input-box">
-                                <input type="text" id="queryInput" data-i18n-placeholder="searchPlaceholder" placeholder="输入地址、数字 ID 或域名">
+                                <input type="text" id="queryInput" data-i18n-placeholder="searchPlaceholder" placeholder="地址、数字 ID 或 .sou 域名">
                             </div>
                         </div>
                         <button class="action-button" style="background: var(--dark-4); box-shadow: none;" onclick="handleQuery()" data-i18n="btnSearch">搜索</button>
@@ -334,6 +336,8 @@
                 tabSend: "发送",
                 tabDomain: "域名转账",
                 tabQuery: "查询",
+                eoaBalanceLabel: "连接钱包余额 (EOA)",
+                smartBalanceLabel: "SOU 智能钱包余额",
                 noWalletTip: "您尚未拥有 SOU 智能钱包",
                 idPlaceholder: "输入数字 ID (如: 888)",
                 btnCreate: "创建钱包",
@@ -346,11 +350,11 @@
                 amountLabel: "数量",
                 btnSend: "立即发送",
                 searchLabel: "搜索地址、ID 或域名",
-                searchPlaceholder: "输入地址、数字 ID 或域名",
+                searchPlaceholder: "地址、数字 ID 或 .sou 域名",
                 btnSearch: "搜索",
                 msgCreateSuccess: "创建成功！",
                 msgSendSuccess: "转账成功！",
-                msgIdNotFound: "该 ID 或域名未绑定钱包",
+                msgIdNotFound: "未查询到相关 ID 或域名",
                 msgInvalidTarget: "目标地址非法：非 SOU 钱包或未在白名单中",
                 msgQueryEmpty: "未查询到相关信息",
                 msgQueryWallet: "关联钱包",
@@ -371,6 +375,8 @@
                 tabSend: "Send",
                 tabDomain: "Domain Send",
                 tabQuery: "Query",
+                eoaBalanceLabel: "Connected Balance (EOA)",
+                smartBalanceLabel: "SOU Smart Wallet Balance",
                 noWalletTip: "No SOU Wallet Found",
                 idPlaceholder: "Enter numeric ID (e.g., 888)",
                 btnCreate: "Create Wallet",
@@ -383,11 +389,11 @@
                 amountLabel: "Amount",
                 btnSend: "Send Now",
                 searchLabel: "Search Address, ID or Domain",
-                searchPlaceholder: "Enter Address, Numeric ID or Domain",
+                searchPlaceholder: "Address, ID or .sou Domain",
                 btnSearch: "Search",
                 msgCreateSuccess: "Created Successfully!",
                 msgSendSuccess: "Sent Successfully!",
-                msgIdNotFound: "ID or Domain not bound",
+                msgIdNotFound: "ID or Domain not found",
                 msgInvalidTarget: "Invalid target: Not a SOU Wallet or not whitelisted",
                 msgQueryEmpty: "No information found",
                 msgQueryWallet: "Linked Wallet",
@@ -463,6 +469,7 @@
             userAddr = await signer.getAddress();
             
             document.getElementById('walletAddr').innerText = userAddr.substring(0,6) + "..." + userAddr.substring(38);
+            document.getElementById('eoaAddrFull').innerText = userAddr;
             document.getElementById('walletDot').classList.add('connected');
             await refreshUI();
         }
@@ -473,6 +480,7 @@
 
             const directBal = await sou.balanceOf(userAddr);
             userDirectSouBal = ethers.utils.formatUnits(directBal, 18);
+            document.getElementById('eoaBalanceDisplay').innerText = userDirectSouBal;
             document.querySelectorAll('.directBalText').forEach(el => el.innerText = userDirectSouBal);
 
             userWallet = await factory.ownerToWallet(userAddr);
@@ -614,28 +622,33 @@
                 const lang = i18n[currentLang];
                 
                 if (input.startsWith("0x") && input.length === 42) {
+                    // 1. Query by Address
                     const wallet = await factory.ownerToWallet(input);
                     const owner = await factory.walletToOwner(input);
                     if (wallet !== "0x0000000000000000000000000000000000000000") resHtml += `<div class="info-row"><span>${lang.msgQueryWallet}:</span><span>${wallet} <span class="copy-icon" onclick="copyValue('${wallet}')">📋</span></span></div>`;
                     if (owner !== "0x0000000000000000000000000000000000000000") resHtml += `<div class="info-row"><span>${lang.msgQueryOwner}:</span><span>${owner} <span class="copy-icon" onclick="copyValue('${owner}')">📋</span></span></div>`;
                     resHtml += `<div class="info-row"><span>${lang.msgQueryIsSOU}:</span><span>${await factory.isSOUWallet(input) ? lang.msgYes : lang.msgNo}</span></div>`;
-                } else if (!isNaN(input) && input.length > 0) {
-                    const wallet = await factory.idToWallet(input);
-                    resHtml = wallet !== "0x0000000000000000000000000000000000000000" ? `<div class="info-row"><span>${lang.msgQueryWallet}:</span><span>${wallet} <span class="copy-icon" onclick="copyValue('${wallet}')">📋</span></span></div>` : `<div>${lang.msgQueryEmpty}</div>`;
-                } else if (input.length > 0) {
-                    let searchName = input.toLowerCase();
-                    if (searchName.endsWith(".sou")) searchName = searchName.substring(0, searchName.length - 4);
+                } else if (input.toLowerCase().endsWith(".sou")) {
+                    // 2. Query by Domain (Must end with .sou)
+                    let searchName = input.toLowerCase().substring(0, input.length - 4);
                     const addr = await idContract.resolve(searchName);
-                    resHtml = addr !== "0x0000000000000000000000000000000000000000" ? `<div class="info-row"><span>${lang.msgQueryWallet}:</span><span>${addr} <span class="copy-icon" onclick="copyValue('${addr}')">📋</span></span></div>` : `<div>${lang.msgQueryEmpty}</div>`;
+                    resHtml = addr !== "0x0000000000000000000000000000000000000000" ? `<div class="info-row"><span>${lang.msgQueryWallet}:</span><span>${addr} <span class="copy-icon" onclick="copyValue('${addr}')">📋</span></span></div>` : `<div>${lang.msgIdNotFound}</div>`;
+                } else if (!isNaN(input) && input.length > 0) {
+                    // 3. Query by Numeric ID
+                    const wallet = await factory.idToWallet(input);
+                    resHtml = wallet !== "0x0000000000000000000000000000000000000000" ? `<div class="info-row"><span>${lang.msgQueryWallet}:</span><span>${wallet} <span class="copy-icon" onclick="copyValue('${wallet}')">📋</span></span></div>` : `<div>${lang.msgIdNotFound}</div>`;
+                } else {
+                    resHtml = `<div>${lang.msgQueryEmpty}</div>`;
                 }
                 
-                resBox.innerHTML = resHtml || `<div>${lang.msgQueryEmpty}</div>`;
+                resBox.innerHTML = resHtml;
                 resBox.style.display = 'flex';
             } catch (e) { showToast(lang.msgError, 'error'); }
         }
 
         function copyText(id) {
             const txt = document.getElementById(id).innerText;
+            if (txt === "未连接" || txt === "0x...") return;
             navigator.clipboard.writeText(txt).then(() => showToast(i18n[currentLang].msgCopySuccess, 'success'));
         }
         function copyValue(val) {
