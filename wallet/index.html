@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SOU Wallet - Optimized Vertical Layout</title>
+    <title>SOU Wallet - Identity Focused</title>
     <link rel="icon" type="image/png" href="https://www.woofswap.finance/image/tokens/sou.png">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
@@ -63,7 +63,6 @@
         .tab-btn { flex: 1; min-width: 85px; padding: 12px 10px; border: none; background: transparent; color: var(--text-secondary); font-weight: 700; font-size: 13px; cursor: pointer; border-radius: 16px; transition: var(--transition); white-space: nowrap; }
         .tab-btn.active { background: var(--primary); color: white; }
 
-        /* Unified Vertical Layout for Balances */
         .balance-grid { display: flex; flex-direction: column; gap: 20px; margin-bottom: 24px; }
         
         .balance-card {
@@ -97,6 +96,14 @@
         .addr-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; text-align: left; }
         .copy-icon { cursor: pointer; padding: 4px; transition: 0.2s; color: var(--primary-light); opacity: 0.8; flex-shrink: 0; }
         .copy-icon:hover { color: white; opacity: 1; transform: scale(1.2); }
+
+        /* Primary Name Display Style */
+        .primary-name-box {
+            display: flex; align-items: center; gap: 8px; margin-top: 12px;
+            padding: 8px 16px; background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 14px;
+            font-weight: 700; color: var(--primary-light); font-size: 14px;
+        }
 
         .input-section { margin-bottom: 24px; }
         .input-label { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 12px; color: var(--text-secondary); font-weight: 700; padding-left: 6px; }
@@ -142,7 +149,7 @@
 
         .tip-text { margin-top: 20px; font-size: 11px; color: var(--text-tertiary); text-align: center; font-weight: 500; line-height: 1.6; max-width: 85%; margin: 20px auto 0; }
 
-        .wallet-info { display: flex; align-items: center; gap: 10px; padding: 10px 18px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 18px; font-size: 13px; font-weight: 700; cursor: pointer; max-width: 180px; }
+        .wallet-info { display: flex; align-items: center; gap: 10px; padding: 10px 18px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 18px; font-size: 13px; font-weight: 700; cursor: pointer; max-width: 200px; }
         .wallet-info span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--error); flex-shrink: 0; }
         .status-dot.connected { background: var(--success); box-shadow: 0 0 12px var(--success); }
@@ -225,7 +232,14 @@
                                     <span class="balance-label" data-i18n="smartBalanceLabel">智能钱包余额</span>
                                 </div>
                                 <div class="balance-val" id="souBalance">0.00</div>
-                                <div class="info-row" style="justify-content: center; gap: 8px; margin-bottom: 6px;">
+                                
+                                <!-- Primary Domain Name Section -->
+                                <div class="primary-name-box" id="primaryNameContainer" style="display: none;">
+                                    <span id="primaryNameText">-.sou</span>
+                                    <span class="copy-icon" onclick="copyText('primaryNameText')" style="font-size: 12px;">📋</span>
+                                </div>
+
+                                <div class="info-row" style="justify-content: center; gap: 8px; margin-bottom: 6px; margin-top: 10px;">
                                     <span style="font-size: 11px; opacity: 0.5;">ID:</span> <b id="myID" style="color: var(--primary-light); font-size: 14px;">-</b>
                                 </div>
                                 <div class="addr-pill">
@@ -327,7 +341,7 @@
         </div>
     </div>
 
-    <footer>&copy; 2026 SOU Ecosystem. Perfect Space Management.</footer>
+    <footer>&copy; 2026 SOU Ecosystem. Identity & Data Optimized.</footer>
 
     <script>
         const FACTORY_ADDR = "0x02E54e08Be9fE047C6E6aEd89A430AcBe4708E9e";
@@ -373,6 +387,7 @@
         let currentLang = 'zh';
         let userSmartSouBal = "0";
         let userDirectSouBal = "0";
+        let userPrimaryName = "";
 
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
@@ -407,7 +422,10 @@
             "function globalRestrictionLifted() view returns (bool)",
             "function whitelist(address) view returns (bool)"
         ];
-        const ID_ABI = ["function resolve(string calldata inputName) external view returns (address)"];
+        const ID_ABI = [
+            "function resolve(string calldata inputName) external view returns (address)",
+            "function primaryName(address) view returns (string)"
+        ];
         const WALLET_ABI = ["function transfer(address to, uint256 amount, address token) external"];
         const ERC20_ABI = ["function balanceOf(address) view returns (uint256)", "function transfer(address to, uint256 amount) external returns (bool)"];
 
@@ -421,9 +439,12 @@
             await provider.send("eth_requestAccounts", []);
             signer = provider.getSigner();
             userAddr = await signer.getAddress();
+            
+            // Initial display before primary name lookup
             document.getElementById('walletAddr').innerText = userAddr.substring(0,6) + "..." + userAddr.substring(38);
             document.getElementById('eoaAddrFull').innerText = userAddr;
             document.getElementById('walletDot').classList.add('connected');
+            
             await refreshUI();
         }
 
@@ -431,6 +452,23 @@
             if (!userAddr) return;
             const factory = new ethers.Contract(FACTORY_ADDR, FACTORY_ABI, provider);
             const sou = new ethers.Contract(SOU_ADDR, ERC20_ABI, provider);
+            const idContract = new ethers.Contract(ID_CONTRACT_ADDR, ID_ABI, provider);
+
+            // Fetch Primary Name
+            try {
+                const name = await idContract.primaryName(userAddr);
+                if (name) {
+                    userPrimaryName = name + ".sou";
+                    document.getElementById('walletAddr').innerText = userPrimaryName;
+                    document.getElementById('primaryNameText').innerText = userPrimaryName;
+                    document.getElementById('primaryNameContainer').style.display = 'flex';
+                } else {
+                    userPrimaryName = "";
+                    document.getElementById('walletAddr').innerText = userAddr.substring(0,6) + "..." + userAddr.substring(38);
+                    document.getElementById('primaryNameContainer').style.display = 'none';
+                }
+            } catch (e) { console.error("Name lookup failed", e); }
+
             const directBal = await sou.balanceOf(userAddr);
             userDirectSouBal = ethers.utils.formatUnits(directBal, 18);
             document.getElementById('eoaBalanceDisplay').innerText = formatNumber(userDirectSouBal);
@@ -573,6 +611,11 @@
         function copyText(id) {
             const txt = document.getElementById(id).innerText;
             if (txt === "未连接" || txt === "0x..." || txt === "Connect") return;
+            // Handle primary name copy (already contains .sou)
+            if (id === 'primaryNameText') {
+                navigator.clipboard.writeText(userPrimaryName).then(() => showToast(i18n[currentLang].msgCopySuccess, 'success'));
+                return;
+            }
             const fullTxt = (id === 'eoaAddrFull') ? userAddr : (id === 'myWalletAddrFull' ? userWallet : txt);
             navigator.clipboard.writeText(fullTxt).then(() => showToast(i18n[currentLang].msgCopySuccess, 'success'));
         }
