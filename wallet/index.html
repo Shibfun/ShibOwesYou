@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SOU Wallet - Identity Focused</title>
+    <title>SOU Wallet - Ecosystem Hub</title>
     <link rel="icon" type="image/png" href="https://www.woofswap.finance/image/tokens/sou.png">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
@@ -97,7 +97,6 @@
         .copy-icon { cursor: pointer; padding: 4px; transition: 0.2s; color: var(--primary-light); opacity: 0.8; flex-shrink: 0; }
         .copy-icon:hover { color: white; opacity: 1; transform: scale(1.2); }
 
-        /* Primary Name Display Style */
         .primary-name-box {
             display: flex; align-items: center; gap: 8px; margin-top: 12px;
             padding: 8px 16px; background: rgba(99, 102, 241, 0.1);
@@ -158,7 +157,42 @@
         .toast { padding: 16px 24px; border-radius: 20px; background: var(--glass-heavy); backdrop-filter: blur(25px); border: 1px solid var(--border); color: white; font-weight: 600; font-size: 14px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 12px; animation: toastIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; pointer-events: auto; }
         @keyframes toastIn { from { opacity: 0; transform: translateY(-30px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
         
-        footer { text-align: center; padding: 40px 20px; font-size: 11px; color: var(--text-tertiary); opacity: 0.6; }
+        /* Ecosystem Hub Styles */
+        .eco-hub { margin-top: 60px; padding: 0 16px; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .eco-title { font-size: 28px; font-weight: 800; text-align: center; margin-bottom: 40px; background: linear-gradient(to right, #fff, var(--text-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .eco-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+        @media (min-width: 768px) { .eco-grid { grid-template-columns: 1fr 1fr; } }
+
+        .eco-card { 
+            background: var(--glass); border: 1px solid var(--border); 
+            border-radius: 24px; padding: 24px; transition: var(--transition);
+        }
+        .eco-card:hover { transform: translateY(-5px); border-color: var(--primary-light); background: rgba(255,255,255,0.02); }
+        .eco-card h3 { font-size: 16px; font-weight: 700; color: var(--primary-light); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .eco-card h3::before { content: ''; width: 4px; height: 16px; background: var(--primary); border-radius: 2px; }
+        
+        .eco-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+        .eco-item { display: flex; flex-direction: column; gap: 4px; }
+        .eco-label { font-size: 11px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; }
+        .eco-link { 
+            font-size: 13px; color: var(--text-primary); text-decoration: none; 
+            word-break: break-all; transition: 0.2s; display: flex; align-items: center; gap: 6px;
+        }
+        .eco-link:hover { color: var(--primary-light); }
+        .eco-link i { font-size: 10px; opacity: 0.5; }
+        
+        .eco-addr-box {
+            background: rgba(0,0,0,0.2); border-radius: 12px; padding: 10px;
+            font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-secondary);
+            display: flex; justify-content: space-between; align-items: center; margin-top: 4px;
+        }
+
+        .shiu-step { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
+        .shiu-num { width: 20px; height: 20px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0; }
+        .shiu-text { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+
+        footer { text-align: center; padding: 60px 20px; font-size: 11px; color: var(--text-tertiary); opacity: 0.6; }
 
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: contentFade 0.5s ease-out; }
@@ -201,7 +235,6 @@
                 <div class="card-content">
                     <div class="tab-content active" id="assetsTab">
                         <div class="balance-grid">
-                            <!-- EOA Balance Card -->
                             <div class="balance-card direct">
                                 <div class="balance-header">
                                     <img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU">
@@ -214,7 +247,6 @@
                                 </div>
                             </div>
 
-                            <!-- SOU Smart Wallet Placeholder -->
                             <div id="noWalletUI">
                                 <div class="balance-card" style="border: 2px dashed var(--border); background: transparent; min-height: 180px; justify-content: center;">
                                     <p data-i18n="noWalletTip" style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; font-weight: 600;">未拥有 SOU 智能钱包</p>
@@ -225,7 +257,6 @@
                                 </div>
                             </div>
 
-                            <!-- SOU Smart Wallet Card -->
                             <div id="hasWalletUI" class="balance-card smart" style="display: none;">
                                 <div class="balance-header">
                                     <img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU">
@@ -233,7 +264,6 @@
                                 </div>
                                 <div class="balance-val" id="souBalance">0.00</div>
                                 
-                                <!-- Primary Domain Name Section -->
                                 <div class="primary-name-box" id="primaryNameContainer" style="display: none;">
                                     <span id="primaryNameText">-.sou</span>
                                     <span class="copy-icon" onclick="copyText('primaryNameText')" style="font-size: 12px;">📋</span>
@@ -339,9 +369,148 @@
                 </div>
             </div>
         </div>
+
+        <!-- Ecosystem Hub Section -->
+        <div class="eco-hub">
+            <h2 class="eco-title" data-i18n="ecoTitle">SOU 生态指南</h2>
+            <div class="eco-grid">
+                <!-- Contract Addresses -->
+                <div class="eco-card">
+                    <h3 data-i18n="ecoContracts">合约地址</h3>
+                    <div class="eco-list">
+                        <div class="eco-item">
+                            <span class="eco-label">BSC SOU</span>
+                            <div class="eco-addr-box">
+                                <span>0xb65b...7777</span>
+                                <span class="copy-icon" onclick="copyValue('0xb65bd36fef84ebc5114cfd803a4f25b2b57f7777')">📋</span>
+                            </div>
+                        </div>
+                        <div class="eco-item">
+                            <span class="eco-label">Ethereum SOU</span>
+                            <div class="eco-addr-box">
+                                <span>0xdea2...a09c</span>
+                                <span class="copy-icon" onclick="copyValue('0xdea2a2a166e2fdc47b934bee68e6032f8f1ca09c')">📋</span>
+                            </div>
+                        </div>
+                        <div class="eco-item">
+                            <span class="eco-label">Shibarium SOU</span>
+                            <div class="eco-addr-box">
+                                <span>0x5e1a...d799</span>
+                                <span class="copy-icon" onclick="copyValue('0x5e1aee526d1aa049b4d95e5b68ae7bb556e2d799')">📋</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trade & Buy -->
+                <div class="eco-card">
+                    <h3 data-i18n="ecoTrade">交易与购买</h3>
+                    <div class="eco-list">
+                        <div class="eco-item">
+                            <span class="eco-label">Pancakeswap (BSC)</span>
+                            <a href="https://pancakeswap.finance/swap?chain=bsc&outputCurrency=0xb65bD36fef84ebc5114Cfd803A4F25B2b57F7777" target="_blank" class="eco-link">立即前往 ↗</a>
+                        </div>
+                        <div class="eco-item">
+                            <span class="eco-label">Uniswap (ETH)</span>
+                            <a href="https://app.uniswap.org/swap?inputCurrency=ETH&outputCurrency=0xdea2a2a166e2fdc47b934bee68e6032f8f1ca09c" target="_blank" class="eco-link">立即前往 ↗</a>
+                        </div>
+                        <div class="eco-item">
+                            <span class="eco-label">Woofswap (Shibarium)</span>
+                            <a href="https://woofswap.finance/swap?inputCurrency=BONE&outputCurrency=0x5e1aee526d1aa049b4d95e5b68ae7bb556e2d799" target="_blank" class="eco-link">立即前往 ↗</a>
+                        </div>
+                        <div class="eco-item" style="margin-top: 8px; padding: 12px; background: rgba(99,102,241,0.1); border-radius: 12px; border: 1px dashed rgba(99,102,241,0.3);">
+                            <span class="eco-label" style="color: var(--primary-light);">直接转账购买 (BSC)</span>
+                            <p style="font-size: 11px; color: var(--text-secondary); margin: 4px 0;">往下方地址转 BNB 即可获得 SOU</p>
+                            <div class="eco-addr-box">
+                                <span>0x1401...Df2C</span>
+                                <span class="copy-icon" onclick="copyValue('0x1401ADEf004F94aD27F13Ad7ad48de38b8F1Df2C')">📋</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bridge & Tools -->
+                <div class="eco-card">
+                    <h3 data-i18n="ecoBridge">跨链与工具</h3>
+                    <div class="eco-list">
+                        <div class="eco-item">
+                            <span class="eco-label">BSC ➡️ ETH Bridge</span>
+                            <a href="https://shibfun.github.io/ShibOwesYou/bridge/" target="_blank" class="eco-link">官方跨链桥 ↗</a>
+                        </div>
+                        <div class="eco-item">
+                            <span class="eco-label">ETH ➡️ Shibarium Bridge</span>
+                            <a href="https://shibfun.github.io/ShibOwesYou/bridgev1/" target="_blank" class="eco-link">官方跨链桥 ↗</a>
+                        </div>
+                        <div class="eco-item" style="margin-top: 8px;">
+                            <span class="eco-label" style="color: var(--success);">一键增加持有人 (BSC)</span>
+                            <p style="font-size: 11px; color: var(--text-secondary); margin: 4px 0;">往该地址转 0 BNB 即可增加 200 个持有人</p>
+                            <div class="eco-addr-box" style="border: 1px solid rgba(16,185,129,0.3);">
+                                <span>0x4a7D...56cc</span>
+                                <span class="copy-icon" onclick="copyValue('0x4a7D7f1e44a7B3bEd43f2EdeB2c653f9C86756cc')">📋</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ShibOwesYouID -->
+                <div class="eco-card">
+                    <h3 data-i18n="ecoID">ShibOwesYouID</h3>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6;">
+                        您的 BSC 个人 .sou 域名。仅需销毁 1000 $SOU 即可拥有独一无二的 Web3 身份。
+                    </p>
+                    <a href="https://shibfun.github.io/ShibOwesYou/DSOU/" target="_blank" class="action-button" style="padding: 12px; font-size: 13px; text-decoration: none; display: block; text-align: center; margin-top: 0;">立即铸造 .sou 域名 ↗</a>
+                </div>
+
+                <!-- SHIU Logic -->
+                <div class="eco-card" style="grid-column: 1 / -1;">
+                    <h3 data-i18n="ecoSHIU">SHIU 工作原理</h3>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
+                        <div>
+                            <div class="shiu-step">
+                                <div class="shiu-num">1</div>
+                                <div class="shiu-text">在 Ethereum 上使用 USDT/USDC 兑换 $SHIU <a href="https://shibfun.github.io/ShibOwesYou/shiu/" target="_blank" class="eco-link" style="display: inline;">前往兑换 ↗</a></div>
+                            </div>
+                            <div class="shiu-step">
+                                <div class="shiu-num">2</div>
+                                <div class="shiu-text">通过 Transporter 将 $SHIU 从 Ethereum 跨链至 Shibarium <a href="https://app.transporter.io/?from=mainnet&tab=token&to=shibarium" target="_blank" class="eco-link" style="display: inline;">前往跨链 ↗</a></div>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="eco-item">
+                                <span class="eco-label">SHIU ETH 合约</span>
+                                <div class="eco-addr-box"><span>0x393a...765f</span><span class="copy-icon" onclick="copyValue('0x393a0ff130702c2dc6bfc500368394953450765f')">📋</span></div>
+                            </div>
+                            <div class="eco-item">
+                                <span class="eco-label">SHIU Shibarium 合约</span>
+                                <div class="eco-addr-box"><span>0x43bc...c8fd</span><span class="copy-icon" onclick="copyValue('0x43bcc765ea97f48f5ba5b0801cefecb703f6c8fd')">📋</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recovery -->
+                <div class="eco-card" style="grid-column: 1 / -1; border-color: var(--warning);">
+                    <h3 style="color: var(--warning);" data-i18n="ecoRecovery">Shibarium 被盗资金赔偿流程</h3>
+                    <div class="eco-list" style="gap: 16px;">
+                        <div class="shiu-step">
+                            <div class="shiu-num" style="background: var(--warning);">1</div>
+                            <div class="shiu-text">在 Shibarium 网络，将资产 1:1 兑换为 SOU 版本 <a href="https://shibfun.github.io/ShibOwesYou/GO/" target="_blank" class="eco-link" style="display: inline;">兑换页面 ↗</a></div>
+                        </div>
+                        <div class="shiu-step">
+                            <div class="shiu-num" style="background: var(--warning);">2</div>
+                            <div class="shiu-text">使用 Transporter 将 SOU 版本资产从 Shibarium 跨链至 Ethereum <a href="https://app.transporter.io/" target="_blank" class="eco-link" style="display: inline;">跨链桥 ↗</a></div>
+                        </div>
+                        <div class="shiu-step">
+                            <div class="shiu-num" style="background: var(--warning);">3</div>
+                            <div class="shiu-text">在 Ethereum 上拆包，获得原生代币资产 <a href="https://shibfun.github.io/ShibOwesYou/pegged/" target="_blank" class="eco-link" style="display: inline;">拆包页面 ↗</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <footer>&copy; 2026 SOU Ecosystem. Identity & Data Optimized.</footer>
+    <footer>&copy; 2026 SOU Ecosystem. Hub for the Community.</footer>
 
     <script>
         const FACTORY_ADDR = "0x02E54e08Be9fE047C6E6aEd89A430AcBe4708E9e";
@@ -364,7 +533,10 @@
                 msgYes: "是", msgNo: "否", msgError: "操作失败", msgConnectMetaMask: "请安装 MetaMask",
                 msgNetworkError: "请切换至 BSC 主网 (56)", msgCopySuccess: "已复制",
                 smartTip: "温馨提示：SOU 智能钱包仅支持在 SOU 钱包地址之间进行转账",
-                domainTip: "温馨提示：域名转账支持将 SOU 发送至任意解析后的地址"
+                domainTip: "温馨提示：域名转账支持将 SOU 发送至任意解析后的地址",
+                ecoTitle: "SOU 生态指南", ecoContracts: "合约地址", ecoTrade: "交易与购买",
+                ecoBridge: "跨链与工具", ecoID: "ShibOwesYouID", ecoSHIU: "SHIU 工作原理",
+                ecoRecovery: "被盗资金赔偿流程"
             },
             en: {
                 connectWallet: "Connect", tabAssets: "Assets", tabSend: "Send", tabDomain: "Domain", tabQuery: "Query",
@@ -380,7 +552,10 @@
                 msgYes: "Yes", msgNo: "No", msgError: "Failed", msgConnectMetaMask: "Install MetaMask",
                 msgNetworkError: "Switch to BSC (56)", msgCopySuccess: "Copied!",
                 smartTip: "Tip: Smart Wallet only supports transfers between SOU addresses",
-                domainTip: "Tip: Domain Send supports any resolved address"
+                domainTip: "Tip: Domain Send supports any resolved address",
+                ecoTitle: "SOU Ecosystem Guide", ecoContracts: "Contracts", ecoTrade: "Trade & Buy",
+                ecoBridge: "Bridge & Tools", ecoID: "ShibOwesYouID", ecoSHIU: "SHIU Principles",
+                ecoRecovery: "Recovery Process"
             }
         };
 
@@ -439,12 +614,9 @@
             await provider.send("eth_requestAccounts", []);
             signer = provider.getSigner();
             userAddr = await signer.getAddress();
-            
-            // Initial display before primary name lookup
             document.getElementById('walletAddr').innerText = userAddr.substring(0,6) + "..." + userAddr.substring(38);
             document.getElementById('eoaAddrFull').innerText = userAddr;
             document.getElementById('walletDot').classList.add('connected');
-            
             await refreshUI();
         }
 
@@ -454,7 +626,6 @@
             const sou = new ethers.Contract(SOU_ADDR, ERC20_ABI, provider);
             const idContract = new ethers.Contract(ID_CONTRACT_ADDR, ID_ABI, provider);
 
-            // Fetch Primary Name
             try {
                 const name = await idContract.primaryName(userAddr);
                 if (name) {
@@ -611,7 +782,6 @@
         function copyText(id) {
             const txt = document.getElementById(id).innerText;
             if (txt === "未连接" || txt === "0x..." || txt === "Connect") return;
-            // Handle primary name copy (already contains .sou)
             if (id === 'primaryNameText') {
                 navigator.clipboard.writeText(userPrimaryName).then(() => showToast(i18n[currentLang].msgCopySuccess, 'success'));
                 return;
