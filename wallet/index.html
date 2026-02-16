@@ -143,6 +143,7 @@
             border: none; border-radius: 22px; color: white; font-size: 16px; 
             font-weight: 800; cursor: pointer; transition: var(--transition); 
             margin-top: 12px; box-shadow: 0 15px 30px rgba(99, 102, 241, 0.3);
+            display: flex; align-items: center; justify-content: center; text-decoration: none;
         }
         .action-button:disabled { opacity: 0.4; cursor: not-allowed; }
 
@@ -242,7 +243,7 @@
                                 </div>
                                 <div class="balance-val" id="eoaBalanceDisplay">0.00</div>
                                 <div class="addr-pill">
-                                    <span id="eoaAddrFull" class="addr-text">未连接</span>
+                                    <span id="eoaAddrFull" class="addr-text" data-i18n="notConnected">未连接</span>
                                     <span class="copy-icon" onclick="copyText('eoaAddrFull')">📋</span>
                                 </div>
                             </div>
@@ -408,19 +409,19 @@
                     <div class="eco-list">
                         <div class="eco-item">
                             <span class="eco-label">Pancakeswap (BSC)</span>
-                            <a href="https://pancakeswap.finance/swap?chain=bsc&outputCurrency=0xb65bD36fef84ebc5114Cfd803A4F25B2b57F7777" target="_blank" class="eco-link">立即前往 ↗</a>
+                            <a href="https://pancakeswap.finance/swap?chain=bsc&outputCurrency=0xb65bD36fef84ebc5114Cfd803A4F25B2b57F7777" target="_blank" class="eco-link"><span data-i18n="goNow">立即前往</span> ↗</a>
                         </div>
                         <div class="eco-item">
                             <span class="eco-label">Uniswap (ETH)</span>
-                            <a href="https://app.uniswap.org/swap?inputCurrency=ETH&outputCurrency=0xdea2a2a166e2fdc47b934bee68e6032f8f1ca09c" target="_blank" class="eco-link">立即前往 ↗</a>
+                            <a href="https://app.uniswap.org/swap?inputCurrency=ETH&outputCurrency=0xdea2a2a166e2fdc47b934bee68e6032f8f1ca09c" target="_blank" class="eco-link"><span data-i18n="goNow">立即前往</span> ↗</a>
                         </div>
                         <div class="eco-item">
                             <span class="eco-label">Woofswap (Shibarium)</span>
-                            <a href="https://woofswap.finance/swap?inputCurrency=BONE&outputCurrency=0x5e1aee526d1aa049b4d95e5b68ae7bb556e2d799" target="_blank" class="eco-link">立即前往 ↗</a>
+                            <a href="https://woofswap.finance/swap?inputCurrency=BONE&outputCurrency=0x5e1aee526d1aa049b4d95e5b68ae7bb556e2d799" target="_blank" class="eco-link"><span data-i18n="goNow">立即前往</span> ↗</a>
                         </div>
                         <div class="eco-item" style="margin-top: 8px; padding: 12px; background: rgba(99,102,241,0.1); border-radius: 12px; border: 1px dashed rgba(99,102,241,0.3);">
-                            <span class="eco-label" style="color: var(--primary-light);">直接转账购买 (BSC)</span>
-                            <p style="font-size: 11px; color: var(--text-secondary); margin: 4px 0;">往下方地址转 BNB 即可获得 SOU</p>
+                            <span class="eco-label" style="color: var(--primary-light);" data-i18n="directBuyTitle">直接转账购买 (BSC)</span>
+                            <p style="font-size: 11px; color: var(--text-secondary); margin: 4px 0;" data-i18n="directBuyTip">往下方地址转 BNB 即可获得 SOU</p>
                             <div class="eco-addr-box">
                                 <span>0x1401...Df2C</span>
                                 <span class="copy-icon" onclick="copyValue('0x1401ADEf004F94aD27F13Ad7ad48de38b8F1Df2C')">📋</span>
@@ -435,15 +436,15 @@
                     <div class="eco-list">
                         <div class="eco-item">
                             <span class="eco-label">BSC ➡️ ETH Bridge</span>
-                            <a href="https://shibfun.github.io/ShibOwesYou/bridge/" target="_blank" class="eco-link">官方跨链桥 ↗</a>
+                            <a href="https://shibfun.github.io/ShibOwesYou/bridge/" target="_blank" class="eco-link" data-i18n="officialBridge">官方跨链桥 ↗</a>
                         </div>
                         <div class="eco-item">
                             <span class="eco-label">ETH ➡️ Shibarium Bridge</span>
-                            <a href="https://shibfun.github.io/ShibOwesYou/bridgev1/" target="_blank" class="eco-link">官方跨链桥 ↗</a>
+                            <a href="https://shibfun.github.io/ShibOwesYou/bridgev1/" target="_blank" class="eco-link" data-i18n="officialBridge">官方跨链桥 ↗</a>
                         </div>
                         <div class="eco-item" style="margin-top: 8px;">
-                            <span class="eco-label" style="color: var(--success);">一键增加持有人 (BSC)</span>
-                            <p style="font-size: 11px; color: var(--text-secondary); margin: 4px 0;">往该地址转 0 BNB 即可增加 200 个持有人</p>
+                            <span class="eco-label" style="color: var(--success);" data-i18n="addHolderTitle">一键增加持有人 (BSC)</span>
+                            <p style="font-size: 11px; color: var(--text-secondary); margin: 4px 0;" data-i18n="addHolderTip">往该地址转 0 BNB 即可增加 200 个持有人</p>
                             <div class="eco-addr-box" style="border: 1px solid rgba(16,185,129,0.3);">
                                 <span>0x4a7D...56cc</span>
                                 <span class="copy-icon" onclick="copyValue('0x4a7D7f1e44a7B3bEd43f2EdeB2c653f9C86756cc')">📋</span>
@@ -455,10 +456,10 @@
                 <!-- ShibOwesYouID -->
                 <div class="eco-card">
                     <h3 data-i18n="ecoID">ShibOwesYouID</h3>
-                    <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6;">
+                    <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6;" data-i18n="ecoIDDesc">
                         您的 BSC 个人 .sou 域名。仅需销毁 1000 $SOU 即可拥有独一无二的 Web3 身份。
                     </p>
-                    <a href="https://shibfun.github.io/ShibOwesYou/DSOU/" target="_blank" class="action-button" style="padding: 12px; font-size: 13px; text-decoration: none; display: block; text-align: center; margin-top: 0;">立即铸造 .sou 域名 ↗</a>
+                    <a href="https://shibfun.github.io/ShibOwesYou/DSOU/" target="_blank" class="action-button" style="padding: 12px; font-size: 13px; margin-top: 0;" data-i18n="btnMintID">立即铸造 .sou 域名 ↗</a>
                 </div>
 
                 <!-- SHIU Logic -->
@@ -468,11 +469,11 @@
                         <div>
                             <div class="shiu-step">
                                 <div class="shiu-num">1</div>
-                                <div class="shiu-text">在 Ethereum 上使用 USDT/USDC 兑换 $SHIU <a href="https://shibfun.github.io/ShibOwesYou/shiu/" target="_blank" class="eco-link" style="display: inline;">前往兑换 ↗</a></div>
+                                <div class="shiu-text"><span data-i18n="shiuStep1">在 Ethereum 上使用 USDT/USDC 兑换 $SHIU</span> <a href="https://shibfun.github.io/ShibOwesYou/shiu/" target="_blank" class="eco-link" style="display: inline;"><span data-i18n="goSwap">前往兑换</span> ↗</a></div>
                             </div>
                             <div class="shiu-step">
                                 <div class="shiu-num">2</div>
-                                <div class="shiu-text">通过 Transporter 将 $SHIU 从 Ethereum 跨链至 Shibarium <a href="https://app.transporter.io/?from=mainnet&tab=token&to=shibarium" target="_blank" class="eco-link" style="display: inline;">前往跨链 ↗</a></div>
+                                <div class="shiu-text"><span data-i18n="shiuStep2">通过 Transporter 将 $SHIU 从 Ethereum 跨链至 Shibarium</span> <a href="https://app.transporter.io/?from=mainnet&tab=token&to=shibarium" target="_blank" class="eco-link" style="display: inline;"><span data-i18n="goBridge">前往跨链</span> ↗</a></div>
                             </div>
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 10px;">
@@ -494,15 +495,15 @@
                     <div class="eco-list" style="gap: 16px;">
                         <div class="shiu-step">
                             <div class="shiu-num" style="background: var(--warning);">1</div>
-                            <div class="shiu-text">在 Shibarium 网络，将资产 1:1 兑换为 SOU 版本 <a href="https://shibfun.github.io/ShibOwesYou/GO/" target="_blank" class="eco-link" style="display: inline;">兑换页面 ↗</a></div>
+                            <div class="shiu-text"><span data-i18n="recoveryStep1">在 Shibarium 网络，将资产 1:1 兑换为 SOU 版本</span> <a href="https://shibfun.github.io/ShibOwesYou/GO/" target="_blank" class="eco-link" style="display: inline;"><span data-i18n="swapPage">兑换页面</span> ↗</a></div>
                         </div>
                         <div class="shiu-step">
                             <div class="shiu-num" style="background: var(--warning);">2</div>
-                            <div class="shiu-text">使用 Transporter 将 SOU 版本资产从 Shibarium 跨链至 Ethereum <a href="https://app.transporter.io/" target="_blank" class="eco-link" style="display: inline;">跨链桥 ↗</a></div>
+                            <div class="shiu-text"><span data-i18n="recoveryStep2">在 Ethereum 上跨链至 BSC</span> <a href="https://shibfun.github.io/ShibOwesYou/bridge/" target="_blank" class="eco-link" style="display: inline;"><span data-i18n="bridgePage">跨链页面</span> ↗</a></div>
                         </div>
                         <div class="shiu-step">
                             <div class="shiu-num" style="background: var(--warning);">3</div>
-                            <div class="shiu-text">在 Ethereum 上拆包，获得原生代币资产 <a href="https://shibfun.github.io/ShibOwesYou/pegged/" target="_blank" class="eco-link" style="display: inline;">拆包页面 ↗</a></div>
+                            <div class="shiu-text"><span data-i18n="recoveryStep3">在 Ethereum 上拆包，获得原生代币资产</span> <a href="https://shibfun.github.io/ShibOwesYou/pegged/" target="_blank" class="eco-link" style="display: inline;"><span data-i18n="unwrapPage">拆包页面</span> ↗</a></div>
                         </div>
                     </div>
                 </div>
@@ -536,18 +537,30 @@
                 domainTip: "温馨提示：域名转账支持将 SOU 发送至任意解析后的地址",
                 ecoTitle: "SOU 生态指南", ecoContracts: "合约地址", ecoTrade: "交易与购买",
                 ecoBridge: "跨链与工具", ecoID: "ShibOwesYouID", ecoSHIU: "SHIU 工作原理",
-                ecoRecovery: "被盗资金赔偿流程"
+                ecoRecovery: "Shibarium 被盗资金赔偿流程",
+                notConnected: "未连接", goNow: "立即前往", directBuyTitle: "直接转账购买 (BSC)",
+                directBuyTip: "往下方地址转 BNB 即可获得 SOU", officialBridge: "官方跨链桥",
+                addHolderTitle: "一键增加持有人 (BSC)", addHolderTip: "往该地址转 0 BNB 即可增加 200 个持有人",
+                ecoIDDesc: "您的 BSC 个人 .sou 域名。仅需销毁 1000 $SOU 即可拥有独一无二的 Web3 身份。",
+                btnMintID: "立即铸造 .sou 域名", shiuStep1: "在 Ethereum 上使用 USDT/USDC 兑换 $SHIU",
+                shiuStep2: "通过 Transporter 将 $SHIU 从 Ethereum 跨链至 Shibarium",
+                goSwap: "前往兑换", goBridge: "前往跨链",
+                recoveryStep1: "在 Shibarium 网络，将资产 1:1 兑换为 SOU 版本",
+                recoveryStep2: "在 Ethereum 上跨链至 BSC",
+                recoveryStep3: "在 Ethereum 上拆包，获得原生代币资产",
+                swapPage: "兑换页面", bridgePage: "跨链页面", unwrapPage: "拆包页面",
+                pending: "处理中...", sending: "发送中..."
             },
             en: {
-                connectWallet: "Connect", tabAssets: "Assets", tabSend: "Send", tabDomain: "Domain", tabQuery: "Query",
+                connectWallet: "Connect Wallet", tabAssets: "Assets", tabSend: "Send", tabDomain: "Domain", tabQuery: "Query",
                 eoaBalanceLabel: "Direct Balance (EOA)", smartBalanceLabel: "Smart Balance",
-                noWalletTip: "No Smart Wallet", idPlaceholder: "Numeric ID", btnCreate: "Create",
+                noWalletTip: "No SOU Smart Wallet yet", idPlaceholder: "Numeric ID", btnCreate: "Create Wallet",
                 receiverLabel: "Receiver (Addr/ID)", domainLabel: "Receiver Domain",
                 targetPlaceholder: "0x... or ID", domainPlaceholder: "Name",
-                targetAddrLabel: "Resolved", amountLabel: "Amount", btnSend: "Send Now",
-                searchLabel: "Search Info", searchPlaceholder: "Addr, ID or .sou", btnSearch: "Search",
+                targetAddrLabel: "Resolved Address", amountLabel: "Amount", btnSend: "Send Now",
+                searchLabel: "Search Assets & Info", searchPlaceholder: "Addr, ID or .sou", btnSearch: "Search",
                 msgCreateSuccess: "Success!", msgSendSuccess: "Sent!", msgIdNotFound: "Not Found",
-                msgInvalidTarget: "Invalid target", msgQueryEmpty: "No info",
+                msgInvalidTarget: "Invalid: Not SOU wallet or not whitelisted", msgQueryEmpty: "No info",
                 msgQueryWallet: "Wallet", msgQueryOwner: "Owner", msgQueryIsSOU: "Is SOU Wallet",
                 msgYes: "Yes", msgNo: "No", msgError: "Failed", msgConnectMetaMask: "Install MetaMask",
                 msgNetworkError: "Switch to BSC (56)", msgCopySuccess: "Copied!",
@@ -555,7 +568,19 @@
                 domainTip: "Tip: Domain Send supports any resolved address",
                 ecoTitle: "SOU Ecosystem Guide", ecoContracts: "Contracts", ecoTrade: "Trade & Buy",
                 ecoBridge: "Bridge & Tools", ecoID: "ShibOwesYouID", ecoSHIU: "SHIU Principles",
-                ecoRecovery: "Recovery Process"
+                ecoRecovery: "Shibarium Recovery Process",
+                notConnected: "Not Connected", goNow: "Go Now", directBuyTitle: "Direct Buy (BSC)",
+                directBuyTip: "Send BNB to the address below to get SOU", officialBridge: "Official Bridge",
+                addHolderTitle: "Add Holders (BSC)", addHolderTip: "Send 0 BNB to add 200 holders",
+                ecoIDDesc: "Your personal .sou domain on BSC. Burn 1000 $SOU for a unique Web3 ID.",
+                btnMintID: "Mint .sou ID Now", shiuStep1: "Swap USDT/USDC for $SHIU on Ethereum",
+                shiuStep2: "Bridge $SHIU from Ethereum to Shibarium via Transporter",
+                goSwap: "Go to Swap", goBridge: "Go to Bridge",
+                recoveryStep1: "On Shibarium, swap assets 1:1 for SOU version",
+                recoveryStep2: "Bridge to BSC on Ethereum",
+                recoveryStep3: "Unwrap on Ethereum for native assets",
+                swapPage: "Swap Page", bridgePage: "Bridge Page", unwrapPage: "Unwrap Page",
+                pending: "Pending...", sending: "Sending..."
             }
         };
 
@@ -575,10 +600,22 @@
 
         function setLang(lang) {
             currentLang = lang;
-            document.querySelectorAll('[data-i18n]').forEach(el => el.innerText = i18n[lang][el.dataset.i18n]);
-            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.placeholder = i18n[lang][el.dataset.i18nPlaceholder]);
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.dataset.i18n;
+                if (i18n[lang][key]) el.innerText = i18n[lang][key];
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.dataset.i18nPlaceholder;
+                if (i18n[lang][key]) el.placeholder = i18n[lang][key];
+            });
             document.getElementById('btn-zh').classList.toggle('active', lang === 'zh');
             document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            
+            // Special handling for dynamic elements that might need refresh
+            if (!userAddr) {
+                document.getElementById('walletAddr').innerText = i18n[lang].connectWallet;
+                document.getElementById('eoaAddrFull').innerText = i18n[lang].notConnected;
+            }
         }
 
         function formatNumber(numStr) {
@@ -668,7 +705,7 @@
             try {
                 const factory = new ethers.Contract(FACTORY_ADDR, FACTORY_ABI, signer);
                 const tx = await factory.createWallet(id);
-                showToast("Pending...", 'info');
+                showToast(i18n[currentLang].pending, 'info');
                 await tx.wait();
                 showToast(i18n[currentLang].msgCreateSuccess, 'success');
                 await refreshUI();
@@ -706,8 +743,7 @@
         function setPercent(p, inputId, type) {
             let baseBal = (type === 'smart') ? userSmartSouBal : userDirectSouBal;
             let val = parseFloat(baseBal) * p;
-            if (p === 1.0) val = Math.floor(val * 1000000) / 1000000;
-            document.getElementById(inputId).value = val;
+            document.getElementById(inputId).value = val.toFixed(4);
         }
 
         async function handleSend() {
@@ -727,7 +763,7 @@
                 if (!isSOU && !globalLifted && !isWhite) return showToast(i18n[currentLang].msgInvalidTarget, 'error');
                 const wallet = new ethers.Contract(userWallet, WALLET_ABI, signer);
                 const tx = await wallet.transfer(targetAddr, ethers.utils.parseUnits(amt.toString(), 18), SOU_ADDR);
-                showToast("Sending...", 'info');
+                showToast(i18n[currentLang].sending, 'info');
                 await tx.wait();
                 showToast(i18n[currentLang].msgSendSuccess, 'success');
                 await refreshUI();
@@ -746,7 +782,7 @@
                 if (targetAddr === "0x0000000000000000000000000000000000000000") return showToast(i18n[currentLang].msgIdNotFound, 'error');
                 const sou = new ethers.Contract(SOU_ADDR, ERC20_ABI, signer);
                 const tx = await sou.transfer(targetAddr, ethers.utils.parseUnits(amt.toString(), 18));
-                showToast("Sending...", 'info');
+                showToast(i18n[currentLang].sending, 'info');
                 await tx.wait();
                 showToast(i18n[currentLang].msgSendSuccess, 'success');
                 await refreshUI();
@@ -776,12 +812,12 @@
                     resHtml = wallet !== "0x0000000000000000000000000000000000000000" ? `<div class="info-row"><span>${lang.msgQueryWallet}:</span><span>${wallet} <span class="copy-icon" onclick="copyValue('${wallet}')">📋</span></span></div>` : `<div>${lang.msgIdNotFound}</div>`;
                 } else { resHtml = `<div>${lang.msgQueryEmpty}</div>`; }
                 resBox.innerHTML = resHtml; resBox.style.display = 'flex';
-            } catch (e) { showToast(lang.msgError, 'error'); }
+            } catch (e) { showToast(i18n[currentLang].msgError, 'error'); }
         }
 
         function copyText(id) {
             const txt = document.getElementById(id).innerText;
-            if (txt === "未连接" || txt === "0x..." || txt === "Connect") return;
+            if (txt === i18n.zh.notConnected || txt === i18n.en.notConnected || txt === "0x..." || txt === i18n.zh.connectWallet || txt === i18n.en.connectWallet) return;
             if (id === 'primaryNameText') {
                 navigator.clipboard.writeText(userPrimaryName).then(() => showToast(i18n[currentLang].msgCopySuccess, 'success'));
                 return;
