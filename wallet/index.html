@@ -217,6 +217,16 @@
         }
         .legend-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary); }
 
+        /* Buyback Styles */
+        .buyback-item {
+            background: rgba(255,255,255,0.03); border-radius: 16px; padding: 16px;
+            border: 1px solid var(--border); margin-bottom: 12px;
+        }
+        .buyback-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .buyback-token { font-weight: 800; color: var(--primary-light); font-size: 14px; }
+        .buyback-amount { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--text-primary); }
+        .buyback-usage { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+
         footer { text-align: center; padding: 60px 20px; font-size: 11px; color: var(--text-tertiary); opacity: 0.6; }
 
         .tab-content { display: none; }
@@ -486,6 +496,37 @@
                     <a href="https://shibfun.github.io/ShibOwesYou/DSOU/" target="_blank" class="action-button" style="padding: 12px; font-size: 13px; margin-top: 0;" data-i18n="btnMintID">立即铸造 .sou 域名 ↗</a>
                 </div>
 
+                <!-- Buyback Progress -->
+                <div class="eco-card" style="grid-column: 1 / -1;">
+                    <h3 data-i18n="buybackTitle">Shib 生态系统资产回购进度</h3>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 16px;">
+                        <div class="buyback-item">
+                            <div class="buyback-header">
+                                <span class="buyback-token">BONE</span>
+                                <span class="buyback-amount">981,518</span>
+                            </div>
+                            <div class="buyback-usage" data-i18n="buybackUsage1">用途：在 Shibarium 上创建 BONE/SOU 流动性池</div>
+                        </div>
+                        <div class="buyback-item">
+                            <div class="buyback-header">
+                                <span class="buyback-token">BONE</span>
+                                <span class="buyback-amount">18,991</span>
+                            </div>
+                            <div class="buyback-usage" data-i18n="buybackUsage2">用途：预计与 SHIU 创建 BONE/SHIU 流动性池</div>
+                        </div>
+                        <div class="buyback-item">
+                            <div class="buyback-header">
+                                <span class="buyback-token">SHIBOSHIS</span>
+                                <span class="buyback-amount">15</span>
+                            </div>
+                            <div class="buyback-usage">
+                                <span data-i18n="buybackUsage3">捐赠给 SHIBOSHI 的贡献者</span>
+                                <a href="https://opensea.io/ShibOwesYou" target="_blank" class="eco-link" style="display: inline-flex; margin-left: 8px;">OpenSea ↗</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- SHIU Logic -->
                 <div class="eco-card" style="grid-column: 1 / -1;">
                     <h3 data-i18n="ecoSHIU">SHIU 工作原理</h3>
@@ -603,7 +644,11 @@
                 swapPage: "兑换页面", bridgePage: "跨链页面", unwrapPage: "拆包页面",
                 pending: "处理中...", sending: "发送中...",
                 compTitle: "赔偿进度", statusQueue: "排队中", statusDone: "赔偿已完成",
-                statusUncertain: "已离开或流动性不足"
+                statusUncertain: "已离开或流动性不足",
+                buybackTitle: "Shib 生态系统资产回购进度",
+                buybackUsage1: "用途：在 Shibarium 上创建 BONE/SOU 流动性池",
+                buybackUsage2: "用途：预计与 SHIU 创建 BONE/SHIU 流动性池",
+                buybackUsage3: "捐赠给 SHIBOSHI 的贡献者"
             },
             en: {
                 connectWallet: "Connect Wallet", tabAssets: "Assets", tabSend: "Send", tabDomain: "Domain", tabQuery: "Query",
@@ -636,7 +681,11 @@
                 swapPage: "Swap Page", bridgePage: "Bridge Page", unwrapPage: "Unwrap Page",
                 pending: "Pending...", sending: "Sending...",
                 compTitle: "Compensation Progress", statusQueue: "In the queue", statusDone: "Completed",
-                statusUncertain: "Left or insufficient liquidity"
+                statusUncertain: "Left or insufficient liquidity",
+                buybackTitle: "Shib Ecosystem Asset Buyback Progress",
+                buybackUsage1: "Usage: Create BONE/SOU liquidity pool on Shibarium",
+                buybackUsage2: "Usage: Expected to create BONE/SHIU liquidity pool",
+                buybackUsage3: "Donated to SHIBOSHI contributors"
             }
         };
 
