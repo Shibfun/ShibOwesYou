@@ -193,6 +193,30 @@
         .shiu-num { width: 20px; height: 20px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0; }
         .shiu-text { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
 
+        /* Progress List Styles */
+        .progress-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-top: 12px; }
+        .progress-item { 
+            background: rgba(0,0,0,0.2); padding: 10px 14px; border-radius: 12px; 
+            display: flex; align-items: center; gap: 8px; font-size: 12px; 
+            border: 1px solid var(--border); transition: 0.2s;
+        }
+        .progress-item:hover { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); }
+        .progress-item.completed { 
+            background: rgba(16, 185, 129, 0.15); 
+            border-color: rgba(16, 185, 129, 0.3); 
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
+        }
+        .progress-item.completed .progress-name { color: var(--success); }
+        
+        .progress-status { font-size: 14px; }
+        .progress-name { font-weight: 600; color: var(--text-primary); }
+        
+        .progress-legend { 
+            display: flex; flex-wrap: wrap; gap: 16px; margin-top: 24px; 
+            padding-top: 16px; border-top: 1px solid var(--border);
+        }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary); }
+
         footer { text-align: center; padding: 60px 20px; font-size: 11px; color: var(--text-tertiary); opacity: 0.6; }
 
         .tab-content { display: none; }
@@ -507,6 +531,34 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Compensation Progress -->
+                <div class="eco-card" style="grid-column: 1 / -1;">
+                    <h3 data-i18n="compTitle">赔偿进度</h3>
+                    <div class="progress-list">
+                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">ETH</span></div>
+                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">SHIB</span></div>
+                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">TREAT</span></div>
+                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">LEASH</span></div>
+                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">USDC</span></div>
+                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">USDT</span></div>
+                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">DAI</span></div>
+                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">WBTC</span></div>
+                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">BAD</span></div>
+                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">SHIFU</span></div>
+                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">ROAR</span></div>
+                        <div class="progress-item completed"><span class="progress-status">☑️</span><span class="progress-name">LTD</span></div>
+                        <div class="progress-item completed"><span class="progress-status">☑️</span><span class="progress-name">OSCAR</span></div>
+                        <div class="progress-item"><span class="progress-status">❓</span><span class="progress-name">xFUND</span></div>
+                        <div class="progress-item"><span class="progress-status">❓</span><span class="progress-name">FUND</span></div>
+                        <div class="progress-item"><span class="progress-status">❓</span><span class="progress-name">KNINE</span></div>
+                    </div>
+                    <div class="progress-legend">
+                        <div class="legend-item"><span>⌛️</span><span data-i18n="statusQueue">排队中</span></div>
+                        <div class="legend-item"><span>☑️</span><span data-i18n="statusDone">赔偿已完成</span></div>
+                        <div class="legend-item"><span>❓</span><span data-i18n="statusUncertain">已离开或流动性不足</span></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -549,7 +601,9 @@
                 recoveryStep2: "在 Ethereum 上跨链至 BSC",
                 recoveryStep3: "在 Ethereum 上拆包，获得原生代币资产",
                 swapPage: "兑换页面", bridgePage: "跨链页面", unwrapPage: "拆包页面",
-                pending: "处理中...", sending: "发送中..."
+                pending: "处理中...", sending: "发送中...",
+                compTitle: "赔偿进度", statusQueue: "排队中", statusDone: "赔偿已完成",
+                statusUncertain: "已离开或流动性不足"
             },
             en: {
                 connectWallet: "Connect Wallet", tabAssets: "Assets", tabSend: "Send", tabDomain: "Domain", tabQuery: "Query",
@@ -580,7 +634,9 @@
                 recoveryStep2: "Bridge to BSC on Ethereum",
                 recoveryStep3: "Unwrap on Ethereum for native assets",
                 swapPage: "Swap Page", bridgePage: "Bridge Page", unwrapPage: "Unwrap Page",
-                pending: "Pending...", sending: "Sending..."
+                pending: "Pending...", sending: "Sending...",
+                compTitle: "Compensation Progress", statusQueue: "In the queue", statusDone: "Completed",
+                statusUncertain: "Left or insufficient liquidity"
             }
         };
 
@@ -611,7 +667,6 @@
             document.getElementById('btn-zh').classList.toggle('active', lang === 'zh');
             document.getElementById('btn-en').classList.toggle('active', lang === 'en');
             
-            // Special handling for dynamic elements that might need refresh
             if (!userAddr) {
                 document.getElementById('walletAddr').innerText = i18n[lang].connectWallet;
                 document.getElementById('eoaAddrFull').innerText = i18n[lang].notConnected;
