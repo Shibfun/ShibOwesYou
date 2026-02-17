@@ -49,6 +49,7 @@
         .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3); }
 
         .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+        .btn-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
         .selector-btn {
             background: rgba(35, 45, 77, 0.6); border: 1px solid var(--border);
             padding: 16px; border-radius: 16px; color: white; cursor: pointer;
@@ -116,7 +117,7 @@
                     <!-- Swap Tab -->
                     <div class="tab-content active" id="swapTab">
                         <div style="margin-bottom: 12px; font-size: 12px; color: var(--text-secondary); font-weight: 700;">Select Pair</div>
-                        <div class="btn-grid">
+                        <div class="btn-grid btn-grid-3">
                             <button class="selector-btn active" id="pairOscar">
                                 <img src="https://raw.githubusercontent.com/ChewySwap/chewy-tokenlist/main/tokens/oscar.webp">
                                 <span>OSCAR Pair</span>
@@ -124,6 +125,10 @@
                             <button class="selector-btn" id="pairLtd">
                                 <img src="https://cdn.dexscreener.com/cms/images/d724eb4e72a137c57c94e9eec7e0f3bab1f4e1b8efb2ed2c70c1df9852d5a15f?width=256&height=256&quality=90&format=webp">
                                 <span>LTD Pair</span>
+                            </button>
+                            <button class="selector-btn" id="pairWbtc">
+                                <img src="https://etherscan.io/token/images/wrappedbtc_wbtc_64.png">
+                                <span>WBTC Pair</span>
                             </button>
                         </div>
 
@@ -187,6 +192,14 @@
                                 <img src="https://cdn.dexscreener.com/cms/images/d724eb4e72a137c57c94e9eec7e0f3bab1f4e1b8efb2ed2c70c1df9852d5a15f?width=256&height=256&quality=90&format=webp">
                                 <span>LTD (2)</span>
                             </button>
+                            <button class="selector-btn" data-token="wbtc1">
+                                <img src="https://etherscan.io/token/images/wrappedbtc_wbtc_64.png">
+                                <span>WBTC (1)</span>
+                            </button>
+                            <button class="selector-btn" data-token="wbtc2">
+                                <img src="https://etherscan.io/token/images/wrappedbtc_wbtc_64.png">
+                                <span>WBTC (2)</span>
+                            </button>
                         </div>
 
                         <div class="input-section">
@@ -244,7 +257,8 @@
 
         const PAIRS = {
             oscar: { t1: 'oscar1', t2: 'oscar2' },
-            ltd: { t1: 'ltd1', t2: 'ltd2' }
+            ltd: { t1: 'ltd1', t2: 'ltd2' },
+            wbtc: { t1: 'wbtc1', t2: 'wbtc2' }
         };
 
         let state = {
@@ -274,11 +288,9 @@
 
         let web3;
 
-        // Helper to convert float amount to BN without scientific notation issues
         function toRawAmount(amount, decimals) {
             let s = amount.toString();
             if (s.includes('e')) {
-                // Handle scientific notation if any
                 s = Number(amount).toFixed(decimals);
             }
             const parts = s.split('.');
@@ -291,7 +303,6 @@
                     fraction += '0';
                 }
             }
-            // Remove leading zeros from integer part
             integer = integer.replace(/^0+/, '');
             if (integer === '') integer = '0';
             const result = integer + fraction;
@@ -343,7 +354,6 @@
                     cDep.methods.balanceOf(state.account).call()
                 ]);
 
-                // Safe division for display
                 const format = (bal, dec) => {
                     const b = web3.utils.toBN(bal);
                     const d = web3.utils.toBN(10).pow(web3.utils.toBN(dec));
@@ -355,155 +365,139 @@
                 document.getElementById('balFrom').textContent = format(bFrom, from.decimals);
                 document.getElementById('balTo').textContent = format(bTo, to.decimals);
                 document.getElementById('balDep').textContent = format(bDep, dep.decimals);
-            } catch (e) { console.error("Balance Error:", e); }
-        }
-
-        async function connect() {
-            if (!window.ethereum) return alert("MetaMask not found");
-            try {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                state.account = accounts[0];
-                state.connected = true;
-                
-                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-                if (parseInt(chainId, 16) !== CHAIN_ID) {
-                    try {
-                        await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x' + CHAIN_ID.toString(16) }] });
-                    } catch (e) {
-                        if (e.code === 4902) {
-                            await window.ethereum.request({
-                                method: 'wallet_addEthereumChain',
-                                params: [{
-                                    chainId: '0x' + CHAIN_ID.toString(16),
-                                    chainName: 'Shibarium',
-                                    rpcUrls: [RPC],
-                                    nativeCurrency: { name: 'Bone', symbol: 'BONE', decimals: 18 },
-                                    blockExplorerUrls: ['https://www.shibariumscan.io']
-                                }]
-                            });
-                        }
-                    }
-                }
-
-                web3 = new Web3(window.ethereum);
-                const appC = new web3.eth.Contract(APP_ABI, CONTRACT_ADDR);
-                const owner = await appC.methods.owner().call();
-                state.isOwner = state.account.toLowerCase() === owner.toLowerCase();
-
-                updateUI();
             } catch (e) { console.error(e); }
         }
 
-        async function handleSwap() {
-            if (!state.connected) return connect();
+        // Actions
+        document.getElementById('mainAction').onclick = async () => {
+            if (!state.connected) {
+                if (window.ethereum) {
+                    const accs = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    state.account = accs[0];
+                    state.connected = true;
+                    web3 = new Web3(window.ethereum);
+                    const appC = new web3.eth.Contract(APP_ABI, CONTRACT_ADDR);
+                    const owner = await appC.methods.owner().call();
+                    state.isOwner = (owner.toLowerCase() === state.account.toLowerCase());
+                    updateUI();
+                } else { alert("Install MetaMask"); }
+                return;
+            }
+
             const amt = document.getElementById('amtIn').value;
             if (!amt || amt <= 0) return;
 
+            const p = PAIRS[state.pair];
+            const from = state.reversed ? TOKEN_MAP[p.t2] : TOKEN_MAP[p.t1];
+            const to = state.reversed ? TOKEN_MAP[p.t1] : TOKEN_MAP[p.t2];
             const status = document.getElementById('swapStatus');
-            status.style.display = 'block'; status.textContent = 'Processing...';
+            
+            status.style.display = 'block';
+            status.style.color = 'var(--primary-light)';
+            status.textContent = 'Processing...';
 
             try {
-                web3 = new Web3(window.ethereum);
-                const p = PAIRS[state.pair];
-                const from = state.reversed ? TOKEN_MAP[p.t2] : TOKEN_MAP[p.t1];
-                const to = state.reversed ? TOKEN_MAP[p.t1] : TOKEN_MAP[p.t2];
-                
-                const tokenC = new web3.eth.Contract(ERC20_ABI, from.addr);
+                const rawAmt = toRawAmount(amt, from.decimals);
+                const cFrom = new web3.eth.Contract(ERC20_ABI, from.addr);
                 const appC = new web3.eth.Contract(APP_ABI, CONTRACT_ADDR);
 
-                const rawAmt = toRawAmount(amt, from.decimals);
-                const allowance = await tokenC.methods.allowance(state.account, CONTRACT_ADDR).call();
-                
+                const allowance = await cFrom.methods.allowance(state.account, CONTRACT_ADDR).call();
                 if (web3.utils.toBN(allowance).lt(rawAmt)) {
-                    status.textContent = 'Approving...';
-                    await tokenC.methods.approve(CONTRACT_ADDR, '115792089237316195423570985008687907853269984665640564039457584007913129639935').send({ from: state.account });
+                    status.textContent = 'Approving Tokens...';
+                    await cFrom.methods.approve(CONTRACT_ADDR, web3.utils.toBN("115792089237316195423570985008687907853269984665640564039457584007913129639935")).send({ from: state.account });
                 }
 
                 status.textContent = 'Swapping...';
-                // Contract takes display amount (integer part as uint256, scaled inside contract)
-                // Note: If displayAmount in contract logic scales by decimals, we send the float converted to floor integer if that's what's expected.
-                // Looking at contract: uint256 rawAmount = displayAmount * 10 ** p.decimals;
-                // So displayAmount should be the human-readable integer. 
-                // However, if user enters 1.5, displayAmount (uint256) will lose .5.
-                // We should send the amount as a value that the contract can scale correctly.
-                // Given the contract logic, it's best to send the value as the user sees it.
-                await appC.methods.swap(from.addr, to.addr, Math.floor(amt)).send({ from: state.account });
-                status.textContent = '✅ Success!';
+                await appC.methods.swap(from.addr, to.addr, rawAmt).send({ from: state.account });
+                status.style.color = 'var(--success)';
+                status.textContent = 'Swap Successful!';
                 fetchBalances();
-            } catch (e) { status.textContent = `❌ Error: ${e.message}`; }
-        }
+            } catch (e) {
+                status.style.color = 'var(--error)';
+                status.textContent = e.message;
+            }
+        };
 
-        async function handleDeposit() {
-            if (!state.connected) return connect();
+        document.getElementById('depAction').onclick = async () => {
+            if (!state.connected) return alert("Connect Wallet First");
             const amt = document.getElementById('amtDep').value;
             if (!amt || amt <= 0) return;
 
+            const dep = TOKEN_MAP[state.selectedDep];
             const status = document.getElementById('depStatus');
-            status.style.display = 'block'; status.textContent = 'Processing...';
+            status.style.display = 'block';
+            status.style.color = 'var(--primary-light)';
+            status.textContent = 'Processing...';
 
             try {
-                web3 = new Web3(window.ethereum);
-                const dep = TOKEN_MAP[state.selectedDep];
-                const tokenC = new web3.eth.Contract(ERC20_ABI, dep.addr);
+                const rawAmt = toRawAmount(amt, dep.decimals);
+                const cDep = new web3.eth.Contract(ERC20_ABI, dep.addr);
                 const appC = new web3.eth.Contract(APP_ABI, CONTRACT_ADDR);
 
-                const rawAmt = toRawAmount(amt, dep.decimals);
-                const allowance = await tokenC.methods.allowance(state.account, CONTRACT_ADDR).call();
-                
+                const allowance = await cDep.methods.allowance(state.account, CONTRACT_ADDR).call();
                 if (web3.utils.toBN(allowance).lt(rawAmt)) {
                     status.textContent = 'Approving...';
-                    await tokenC.methods.approve(CONTRACT_ADDR, '115792089237316195423570985008687907853269984665640564039457584007913129639935').send({ from: state.account });
+                    await cDep.methods.approve(CONTRACT_ADDR, web3.utils.toBN("115792089237316195423570985008687907853269984665640564039457584007913129639935")).send({ from: state.account });
                 }
 
                 status.textContent = 'Depositing...';
-                await appC.methods.deposit(dep.addr, rawAmt.toString()).send({ from: state.account });
-                status.textContent = '✅ Deposited!';
+                await appC.methods.deposit(dep.addr, rawAmt).send({ from: state.account });
+                status.style.color = 'var(--success)';
+                status.textContent = 'Deposit Successful!';
                 fetchBalances();
-            } catch (e) { 
-                console.error(e);
-                status.textContent = `❌ Error: ${e.message}`; 
+            } catch (e) {
+                status.style.color = 'var(--error)';
+                status.textContent = e.message;
             }
-        }
+        };
 
-        // Event Listeners
-        document.getElementById('pairOscar').onclick = (e) => { 
-            state.pair = 'oscar'; 
+        // Events
+        document.getElementById('pairOscar').onclick = () => {
+            state.pair = 'oscar';
+            document.querySelectorAll('.selector-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('pairOscar').classList.add('active');
-            document.getElementById('pairLtd').classList.remove('active');
-            updateUI(); 
+            updateUI();
         };
-        document.getElementById('pairLtd').onclick = (e) => { 
-            state.pair = 'ltd'; 
+        document.getElementById('pairLtd').onclick = () => {
+            state.pair = 'ltd';
+            document.querySelectorAll('.selector-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('pairLtd').classList.add('active');
-            document.getElementById('pairOscar').classList.remove('active');
-            updateUI(); 
+            updateUI();
+        };
+        document.getElementById('pairWbtc').onclick = () => {
+            state.pair = 'wbtc';
+            document.querySelectorAll('.selector-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('pairWbtc').classList.add('active');
+            updateUI();
         };
 
-        document.getElementById('reverseBtn').onclick = () => { state.reversed = !state.reversed; updateUI(); };
-        document.getElementById('amtIn').oninput = (e) => { document.getElementById('amtOut').value = e.target.value; };
-        document.getElementById('mainAction').onclick = handleSwap;
-        document.getElementById('depAction').onclick = handleDeposit;
+        document.getElementById('reverseBtn').onclick = () => {
+            state.reversed = !state.reversed;
+            updateUI();
+        };
 
-        document.querySelectorAll('#depGrid .selector-btn').forEach(btn => {
+        document.getElementById('amtIn').oninput = (e) => {
+            document.getElementById('amtOut').value = e.target.value;
+        };
+
+        document.getElementById('depGrid').onclick = (e) => {
+            const btn = e.target.closest('.selector-btn');
+            if (!btn) return;
+            state.selectedDep = btn.dataset.token;
+            document.querySelectorAll('#depGrid .selector-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            updateUI();
+        };
+
+        document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.onclick = (e) => {
-                document.querySelectorAll('#depGrid .selector-btn').forEach(b => b.classList.remove('active'));
-                const target = e.currentTarget;
-                target.classList.add('active');
-                state.selectedDep = target.dataset.token;
-                updateUI();
-            };
-        });
-
-        document.querySelectorAll('.tab-btn').forEach(b => {
-            b.onclick = (e) => {
-                document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
                 e.target.classList.add('active');
                 document.getElementById(e.target.dataset.tab + 'Tab').classList.add('active');
             };
         });
 
-        // Admin Actions
         document.getElementById('pBtn').onclick = async () => {
             web3 = new Web3(window.ethereum);
             const appC = new web3.eth.Contract(APP_ABI, CONTRACT_ADDR);
@@ -526,7 +520,6 @@
             } catch (e) { alert(e.message); }
         };
 
-        // Initialize
         updateUI();
         if (window.ethereum) {
             window.ethereum.on('accountsChanged', (accs) => {
