@@ -71,7 +71,7 @@
         .swap-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
         .swap-title { font-size: 20px; font-weight: 800; }
 
-        .pair-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+        .pair-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
         .pair-btn {
             background: rgba(35, 45, 77, 0.6); border: 1px solid var(--border);
             padding: 14px; border-radius: 16px; color: white; cursor: pointer;
@@ -169,6 +169,7 @@
                 <div class="pair-grid">
                     <button class="pair-btn active" data-pair="WOSCAR"><img src="https://raw.githubusercontent.com/ChewySwap/chewy-tokenlist/main/tokens/oscar.webp">OSCAR</button>
                     <button class="pair-btn" data-pair="WLTD"><img src="https://cdn.dexscreener.com/cms/images/d724eb4e72a137c57c94e9eec7e0f3bab1f4e1b8efb2ed2c70c1df9852d5a15f?width=256&height=256&quality=90&format=webp">LTD</button>
+                    <button class="pair-btn" data-pair="SOUBTC"><img src="https://etherscan.io/token/images/wrappedbtc_wbtc_64.png">WBTC</button>
                 </div>
 
                 <div class="input-group">
@@ -181,7 +182,7 @@
                         <button class="pct-btn" onclick="applyPct(0.25)">25%</button>
                         <button class="pct-btn" onclick="applyPct(0.50)">50%</button>
                         <button class="pct-btn" onclick="applyPct(0.75)">75%</button>
-                        <button class="pct-btn" onclick="applyPct(1.00)">MAX</button>
+                        <button class="pct-btn" onclick="applyPct(1.0)">MAX</button>
                     </div>
                 </div>
 
@@ -232,7 +233,7 @@
 
     <footer>
         <div class="footer-content">
-            <p class="footer-text">PeggedToken Protocol | Accurate precision: OSCAR (9), LTD (18)<br>© 2026 PeggedToken Ecosystem. All rights reserved.</p>
+            <p class="footer-text">PeggedToken Protocol | Accurate precision: OSCAR (9), LTD (18), WBTC (8)<br>© 2026 PeggedToken Ecosystem. All rights reserved.</p>
         </div>
     </footer>
 
@@ -399,8 +400,8 @@
 
         function updateUI() {
             const pair = CONFIG[currentPair];
-            const symFrom = isWrapping ? pair.symbol : 'W' + pair.symbol;
-            const symTo = isWrapping ? 'W' + pair.symbol : pair.symbol;
+            const symFrom = isWrapping ? pair.symbol : 'SOU' + pair.symbol;
+            const symTo = isWrapping ? 'SOU' + pair.symbol : pair.symbol;
             document.getElementById('symFrom').textContent = symFrom;
             document.getElementById('symTo').textContent = symTo;
             document.getElementById('iconFrom').src = pair.logo;
@@ -408,57 +409,57 @@
             document.getElementById('mainTitle').textContent = (isWrapping ? "Wrap " : "Unwrap ") + pair.symbol;
             document.getElementById('targetAddrDisplay').textContent = pair.target;
             document.getElementById('peggedAddrDisplay').textContent = pair.pegged;
+            
             if (account) {
-                document.getElementById('walletAddr').textContent = account.substring(0, 6) + "..." + account.substring(38);
+                document.getElementById('walletAddr').textContent = account.slice(0,6) + '...' + account.slice(-4);
                 document.getElementById('walletDot').classList.add('connected');
+                document.getElementById('actionBtn').textContent = isWrapping ? "Wrap " + pair.symbol : "Unwrap " + pair.symbol;
                 document.getElementById('actionBtn').disabled = false;
-                document.getElementById('actionBtn').textContent = isWrapping ? "Wrap Tokens" : "Unwrap Tokens";
-            } else {
-                document.getElementById('walletAddr').textContent = "Connect Wallet";
-                document.getElementById('walletDot').classList.remove('connected');
-                document.getElementById('actionBtn').textContent = "Connect Wallet";
             }
-            updateBalances();
         }
 
         function showMsg(txt, type) {
-            const el = document.getElementById('statusMsg');
-            el.textContent = txt; el.style.display = 'block';
-            el.style.color = type === 'error' ? 'var(--error)' : (type === 'success' ? 'var(--success)' : 'var(--primary-light)');
-            setTimeout(() => el.style.display = 'none', 5000);
+            const msg = document.getElementById('statusMsg');
+            msg.textContent = txt;
+            msg.style.display = 'block';
+            msg.style.color = type === 'success' ? 'var(--success)' : 'var(--error)';
+            setTimeout(() => { msg.style.display = 'none'; }, 3000);
         }
 
         function setBtnLoading(id, loading, txt) {
             const btn = document.getElementById(id);
-            btn.disabled = loading;
-            if (loading) btn.innerHTML = `<span class="spinner"></span> ${txt}`;
-            else updateUI();
+            if (loading) {
+                btn.disabled = true;
+                btn.innerHTML = `<span class="spinner"></span> ${txt}`;
+            } else {
+                btn.disabled = false;
+                if (id === 'approveBtn') btn.textContent = "Approve Token";
+                else updateUI();
+            }
         }
 
+        // Listeners
         document.getElementById('connectBtn').onclick = connect;
-        document.getElementById('actionBtn').onclick = handleAction;
+        document.getElementById('reverseBtn').onclick = () => { isWrapping = !isWrapping; updateUI(); updateBalances(); checkAllowance(); };
+        document.getElementById('amtIn').oninput = (e) => { document.getElementById('amtOut').value = e.target.value; checkAllowance(); };
         document.getElementById('approveBtn').onclick = handleApprove;
-        document.getElementById('reverseBtn').onclick = () => {
-            isWrapping = !isWrapping; updateUI(); checkAllowance();
-            document.querySelector('#reverseBtn svg').style.transform = isWrapping ? 'rotate(0deg)' : 'rotate(180deg)';
-        };
-        document.getElementById('amtIn').oninput = (e) => {
-            document.getElementById('amtOut').value = e.target.value;
-            if (account) checkAllowance();
-        };
+        document.getElementById('actionBtn').onclick = handleAction;
+
         document.querySelectorAll('.pair-btn').forEach(btn => {
-            btn.onclick = () => {
+            btn.onclick = async () => {
                 document.querySelectorAll('.pair-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active'); currentPair = btn.dataset.pair;
-                updateUI(); if (account) refreshData();
+                btn.classList.add('active');
+                currentPair = btn.dataset.pair;
+                updateUI();
+                await refreshData();
             };
         });
 
-        if (window.ethereum) {
-            window.ethereum.on('accountsChanged', (accs) => { account = accs[0]; updateUI(); if (account) refreshData(); });
-            window.ethereum.on('chainChanged', () => window.location.reload());
-        }
         updateUI();
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', (accs) => { if(accs.length) { account = accs[0]; updateUI(); refreshData(); } else location.reload(); });
+            window.ethereum.on('chainChanged', () => location.reload());
+        }
     </script>
 </body>
 </html>
