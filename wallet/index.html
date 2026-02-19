@@ -160,96 +160,62 @@
         
         /* Ecosystem Hub Styles */
         .eco-hub { margin-top: 60px; padding: 0 16px; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; }
-        .eco-title { font-size: 28px; font-weight: 800; text-align: center; margin-bottom: 40px; background: linear-gradient(to right, #fff, var(--text-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .eco-title { font-size: 32px; font-weight: 800; margin-bottom: 40px; text-align: center; background: linear-gradient(135deg, #fff 0%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
         .eco-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
         @media (min-width: 768px) { .eco-grid { grid-template-columns: 1fr 1fr; } }
-
-        .eco-card { 
-            background: var(--glass); border: 1px solid var(--border); 
-            border-radius: 24px; padding: 24px; transition: var(--transition);
-        }
-        .eco-card:hover { transform: translateY(-5px); border-color: var(--primary-light); background: rgba(255,255,255,0.02); }
-        .eco-card h3 { font-size: 16px; font-weight: 700; color: var(--primary-light); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
-        .eco-card h3::before { content: ''; width: 4px; height: 16px; background: var(--primary); border-radius: 2px; }
         
-        .eco-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-        .eco-item { display: flex; flex-direction: column; gap: 4px; }
-        .eco-label { font-size: 11px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; }
-        .eco-link { 
-            font-size: 13px; color: var(--text-primary); text-decoration: none; 
-            word-break: break-all; transition: 0.2s; display: flex; align-items: center; gap: 6px;
-        }
-        .eco-link:hover { color: var(--primary-light); }
-        .eco-link i { font-size: 10px; opacity: 0.5; }
+        .eco-card { background: var(--glass-heavy); border: 1px solid var(--border); border-radius: 24px; padding: 24px; transition: var(--transition); }
+        .eco-card:hover { transform: translateY(-5px); border-color: var(--primary-light); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .eco-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
         
-        .eco-addr-box {
-            background: rgba(0,0,0,0.2); border-radius: 12px; padding: 10px;
-            font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-secondary);
-            display: flex; justify-content: space-between; align-items: center; margin-top: 4px;
-        }
+        .eco-list { display: flex; flex-direction: column; gap: 12px; }
+        .eco-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(255,255,255,0.03); border-radius: 16px; border: 1px solid var(--border); }
+        .eco-item-left { display: flex; align-items: center; gap: 12px; }
+        .eco-item-name { font-size: 14px; font-weight: 600; }
+        .eco-item-desc { font-size: 12px; color: var(--text-tertiary); }
+        .eco-link { color: var(--primary-light); text-decoration: none; font-size: 13px; font-weight: 700; transition: 0.2s; }
+        .eco-link:hover { color: white; text-decoration: underline; }
+        
+        .eco-addr-box { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-secondary); background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 8px; display: flex; align-items: center; gap: 6px; }
+        
+        .shiu-step { display: flex; gap: 16px; align-items: flex-start; }
+        .shiu-num { width: 24px; height: 24px; border-radius: 8px; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; margin-top: 2px; }
+        .shiu-text { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
 
-        .shiu-step { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
-        .shiu-num { width: 20px; height: 20px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0; }
-        .shiu-text { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
-
-        /* Progress List Styles */
-        .progress-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-top: 12px; }
-        .progress-item { 
-            background: rgba(0,0,0,0.2); padding: 10px 14px; border-radius: 12px; 
-            display: flex; align-items: center; gap: 8px; font-size: 12px; 
-            border: 1px solid var(--border); transition: 0.2s;
-        }
-        .progress-item:hover { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); }
-        .progress-item.completed { 
-            background: rgba(16, 185, 129, 0.15); 
-            border-color: rgba(16, 185, 129, 0.3); 
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
-        }
+        .progress-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .progress-item { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 10px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: 0.2s; }
+        .progress-item.completed { border-color: var(--success); background: rgba(16, 185, 129, 0.05); }
+        .progress-status { font-size: 16px; }
+        .progress-name { font-size: 11px; font-weight: 700; color: var(--text-secondary); }
         .progress-item.completed .progress-name { color: var(--success); }
         
-        .progress-status { font-size: 14px; }
-        .progress-name { font-weight: 600; color: var(--text-primary); }
+        .progress-legend { display: flex; flex-wrap: wrap; gap: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-tertiary); font-weight: 600; }
         
-        .progress-legend { 
-            display: flex; flex-wrap: wrap; gap: 16px; margin-top: 24px; 
-            padding-top: 16px; border-top: 1px solid var(--border);
-        }
-        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary); }
+        footer { padding: 40px 20px; text-align: center; color: var(--text-tertiary); font-size: 13px; font-weight: 500; letter-spacing: 1px; }
 
-        /* Buyback Styles */
-        .buyback-item {
-            background: rgba(255,255,255,0.03); border-radius: 16px; padding: 16px;
-            border: 1px solid var(--border); margin-bottom: 12px;
-        }
-        .buyback-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .buyback-token { font-weight: 800; color: var(--primary-light); font-size: 14px; }
-        .buyback-amount { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--text-primary); }
-        .buyback-usage { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
-
-        footer { text-align: center; padding: 60px 20px; font-size: 11px; color: var(--text-tertiary); opacity: 0.6; }
-
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: contentFade 0.5s ease-out; }
-        @keyframes contentFade { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .id-preview { margin-top: 16px; padding: 18px; background: rgba(0,0,0,0.4); border-radius: 20px; display: none; border: 1px solid var(--border); }
-        .info-row { display: flex; justify-content: space-between; align-items: center; width: 100%; font-size: 13px; margin-bottom: 10px; gap: 15px; }
-        .info-row span:first-child { color: var(--text-secondary); font-weight: 500; flex-shrink: 0; }
-        .info-row span:last-child { color: var(--text-primary); font-weight: 700; text-align: right; word-break: break-all; overflow-wrap: break-word; }
+        /* Animation */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .app-container > * { animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .eco-card { animation: fadeIn 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
     </style>
 </head>
 <body>
     <div class="bg-glow"></div>
+    
     <nav>
-        <a href="#" class="logo-nav"><img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU"><span>SOU Wallet</span></a>
+        <a href="#" class="logo-nav">
+            <img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU">
+            <span>SOU Wallet</span>
+        </a>
         <div class="nav-right">
             <div class="lang-switch">
-                <button class="lang-btn active" id="btn-zh" onclick="setLang('zh')">中</button>
-                <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+                <button id="btn-zh" class="lang-btn active" onclick="setLang('zh')">ZH</button>
+                <button id="btn-en" class="lang-btn" onclick="setLang('en')">EN</button>
             </div>
             <div class="wallet-info" onclick="connectWallet()">
-                <div class="status-dot" id="walletDot"></div>
+                <div id="walletDot" class="status-dot"></div>
                 <span id="walletAddr" data-i18n="connectWallet">连接钱包</span>
             </div>
         </div>
@@ -260,15 +226,16 @@
     <div class="wrapper">
         <div class="app-container">
             <div class="card">
-                <div class="tab-nav">
-                    <button class="tab-btn active" data-tab="assets" data-i18n="tabAssets">资产</button>
-                    <button class="tab-btn" data-tab="send" data-i18n="tabSend">发送</button>
-                    <button class="tab-btn" data-tab="domain" data-i18n="tabDomain">域名转账</button>
-                    <button class="tab-btn" data-tab="query" data-i18n="tabQuery">查询</button>
-                </div>
-
                 <div class="card-content">
-                    <div class="tab-content active" id="assetsTab">
+                    <div class="tab-nav">
+                        <button class="tab-btn active" onclick="switchTab('assets')" data-i18n="tabAssets">资产</button>
+                        <button class="tab-btn" onclick="switchTab('send')" data-i18n="tabSend">发送</button>
+                        <button class="tab-btn" onclick="switchTab('domain')" data-i18n="tabDomain">域名转账</button>
+                        <button class="tab-btn" onclick="switchTab('query')" data-i18n="tabQuery">查询</button>
+                    </div>
+
+                    <!-- Assets Tab -->
+                    <div id="tab-assets" class="tab-content">
                         <div class="balance-grid">
                             <div class="balance-card direct">
                                 <div class="balance-header">
@@ -277,68 +244,69 @@
                                 </div>
                                 <div class="balance-val" id="eoaBalanceDisplay">0.00</div>
                                 <div class="addr-pill">
-                                    <span id="eoaAddrFull" class="addr-text" data-i18n="notConnected">未连接</span>
-                                    <span class="copy-icon" onclick="copyText('eoaAddrFull')">📋</span>
+                                    <span class="addr-text" id="eoaAddrFull" data-i18n="notConnected">未连接</span>
+                                    <span class="copy-icon" onclick="copyValue(document.getElementById('eoaAddrFull').innerText)">📋</span>
+                                </div>
+                                <div id="primaryNameContainer" style="display:none;" class="primary-name-box">
+                                    <span>🆔</span>
+                                    <span id="primaryNameText"></span>
                                 </div>
                             </div>
 
-                            <div id="noWalletUI">
-                                <div class="balance-card" style="border: 2px dashed var(--border); background: transparent; min-height: 180px; justify-content: center;">
-                                    <p data-i18n="noWalletTip" style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; font-weight: 600;">未拥有 SOU 智能钱包</p>
-                                    <div class="input-box" style="padding: 14px 18px; border-radius: 18px; margin-bottom: 14px; background: rgba(0,0,0,0.2); width: 80%;">
-                                        <input type="text" id="regID" data-i18n-placeholder="idPlaceholder" placeholder="输入数字 ID">
-                                    </div>
-                                    <button class="action-button" onclick="createWallet()" data-i18n="btnCreate" style="padding: 14px; font-size: 14px; margin-top: 0; border-radius: 18px; box-shadow: none; width: 80%;">创建钱包</button>
-                                </div>
-                            </div>
-
-                            <div id="hasWalletUI" class="balance-card smart" style="display: none;">
+                            <div class="balance-card smart">
                                 <div class="balance-header">
                                     <img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU">
                                     <span class="balance-label" data-i18n="smartBalanceLabel">智能钱包余额</span>
                                 </div>
                                 <div class="balance-val" id="souBalance">0.00</div>
                                 
-                                <div class="primary-name-box" id="primaryNameContainer" style="display: none;">
-                                    <span id="primaryNameText">-.sou</span>
-                                    <span class="copy-icon" onclick="copyText('primaryNameText')" style="font-size: 12px;">📋</span>
+                                <div id="noWalletUI">
+                                    <p class="tip-text" data-i18n="noWalletTip">您尚未拥有 SOU 智能钱包</p>
+                                    <div class="input-section" style="margin-top:20px;">
+                                        <div class="input-box">
+                                            <input type="text" id="regID" placeholder="输入数字 ID" data-i18n-placeholder="idPlaceholder">
+                                        </div>
+                                    </div>
+                                    <button class="action-button" onclick="createWallet()" data-i18n="btnCreate">创建钱包</button>
                                 </div>
 
-                                <div class="info-row" style="justify-content: center; gap: 8px; margin-bottom: 6px; margin-top: 10px;">
-                                    <span style="font-size: 11px; opacity: 0.5;">ID:</span> <b id="myID" style="color: var(--primary-light); font-size: 14px;">-</b>
-                                </div>
-                                <div class="addr-pill">
-                                    <span id="myWalletAddrFull" class="addr-text">0x...</span>
-                                    <span class="copy-icon" onclick="copyText('myWalletAddrFull')">📋</span>
+                                <div id="hasWalletUI" style="display:none;">
+                                    <div class="primary-name-box" style="justify-content:center; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2); color: var(--success);">
+                                        <span>Wallet ID: </span>
+                                        <span id="myID"></span>
+                                    </div>
+                                    <div class="addr-pill">
+                                        <span class="addr-text" id="myWalletAddrFull">0x...</span>
+                                        <span class="copy-icon" onclick="copyValue(document.getElementById('myWalletAddrFull').innerText)">📋</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <p class="tip-text" data-i18n="smartTip">温馨提示：SOU 智能钱包仅支持在 SOU 钱包地址之间进行转账</p>
                     </div>
 
-                    <div class="tab-content" id="sendTab">
+                    <!-- Send Tab -->
+                    <div id="tab-send" class="tab-content" style="display:none;">
                         <div class="input-section">
-                            <div class="input-label" data-i18n="receiverLabel">接收者 (地址或数字 ID)</div>
+                            <label class="input-label">
+                                <span data-i18n="receiverLabel">接收者 (地址或 ID)</span>
+                                <span>Balance: <span class="sendBalText">0.00</span> SOU</span>
+                            </label>
                             <div class="input-box">
-                                <input type="text" id="sendTarget" oninput="previewTarget()" data-i18n-placeholder="targetPlaceholder" placeholder="0x... 或 数字 ID">
+                                <input type="text" id="sendTarget" placeholder="0x... 或 数字 ID" data-i18n-placeholder="targetPlaceholder" oninput="previewTarget()">
                             </div>
-                            <div id="targetPreview" class="id-preview">
-                                <div class="id-preview-label" data-i18n="targetAddrLabel">解析地址</div>
-                                <div class="addr-pill" style="margin-top: 8px; background: rgba(0,0,0,0.2);">
-                                    <span id="previewAddr" class="addr-text">-</span>
-                                    <span class="copy-icon" onclick="copyText('previewAddr')">📋</span>
-                                </div>
+                            <div id="targetPreview" class="addr-pill" style="display:none; margin-top:10px; background: rgba(99,102,241,0.1);">
+                                <span class="addr-text" id="previewAddr"></span>
                             </div>
                         </div>
+
                         <div class="input-section">
-                            <div class="input-label">
-                                <span data-i18n="amountLabel">数量</span>
-                                <span style="font-size: 11px; color: var(--text-tertiary); font-family: 'Space Mono';">Bal: <span class="sendBalText">0.00</span> SOU</span>
-                            </div>
+                            <label class="input-label" data-i18n="amountLabel">转账数量</label>
                             <div class="input-box">
                                 <input type="number" id="sendAmt" placeholder="0.0">
                                 <div class="token-badge">
                                     <img src="https://www.woofswap.finance/image/tokens/sou.png" class="token-logo-small">
-                                    <span style="font-size: 13px; font-weight: 800;">SOU</span>
+                                    <span>SOU</span>
                                 </div>
                             </div>
                             <div class="percent-row">
@@ -348,35 +316,33 @@
                                 <button class="percent-btn" onclick="setPercent(1.0, 'sendAmt', 'smart')">MAX</button>
                             </div>
                         </div>
+
                         <button class="action-button" onclick="handleSend()" data-i18n="btnSend">立即发送</button>
-                        <div class="tip-text" data-i18n="smartTip">温馨提示：SOU 智能钱包仅支持在 SOU 钱包地址之间进行转账</div>
                     </div>
 
-                    <div class="tab-content" id="domainTab">
+                    <!-- Domain Tab -->
+                    <div id="tab-domain" class="tab-content" style="display:none;">
                         <div class="input-section">
-                            <div class="input-label" data-i18n="domainLabel">接收者域名</div>
+                            <label class="input-label">
+                                <span data-i18n="domainLabel">接收者域名</span>
+                                <span>Balance: <span class="directBalText">0.00</span> SOU</span>
+                            </label>
                             <div class="input-box">
-                                <input type="text" id="domainTarget" oninput="previewDomain()" data-i18n-placeholder="domainPlaceholder" placeholder="输入名称">
+                                <input type="text" id="domainTarget" placeholder="输入名称" data-i18n-placeholder="domainPlaceholder" oninput="previewDomain()">
                                 <span class="domain-suffix">.sou</span>
                             </div>
-                            <div id="domainPreview" class="id-preview">
-                                <div class="id-preview-label" data-i18n="targetAddrLabel">解析地址</div>
-                                <div class="addr-pill" style="margin-top: 8px; background: rgba(0,0,0,0.2);">
-                                    <span id="previewDomainAddr" class="addr-text">-</span>
-                                    <span class="copy-icon" onclick="copyText('previewDomainAddr')">📋</span>
-                                </div>
+                            <div id="domainPreview" class="addr-pill" style="display:none; margin-top:10px; background: rgba(16,185,129,0.1);">
+                                <span class="addr-text" id="previewDomainAddr"></span>
                             </div>
                         </div>
+
                         <div class="input-section">
-                            <div class="input-label">
-                                <span data-i18n="amountLabel">数量</span>
-                                <span style="font-size: 11px; color: var(--text-tertiary); font-family: 'Space Mono';">Bal: <span class="directBalText">0.00</span> SOU</span>
-                            </div>
+                            <label class="input-label" data-i18n="amountLabel">转账数量</label>
                             <div class="input-box">
                                 <input type="number" id="domainAmt" placeholder="0.0">
                                 <div class="token-badge">
                                     <img src="https://www.woofswap.finance/image/tokens/sou.png" class="token-logo-small">
-                                    <span style="font-size: 13px; font-weight: 800;">SOU</span>
+                                    <span>SOU</span>
                                 </div>
                             </div>
                             <div class="percent-row">
@@ -386,218 +352,149 @@
                                 <button class="percent-btn" onclick="setPercent(1.0, 'domainAmt', 'direct')">MAX</button>
                             </div>
                         </div>
+
                         <button class="action-button" onclick="handleDomainSend()" data-i18n="btnSend">立即发送</button>
-                        <div class="tip-text" data-i18n="domainTip">温馨提示：域名转账支持将 SOU 发送至任意解析后的地址</div>
+                        <p class="tip-text" data-i18n="domainTip">温馨提示：域名转账支持将 SOU 发送至任意解析后的地址</p>
                     </div>
 
-                    <div class="tab-content" id="queryTab">
+                    <!-- Query Tab -->
+                    <div id="tab-query" class="tab-content" style="display:none;">
                         <div class="input-section">
-                            <div class="input-label" data-i18n="searchLabel">搜索地址、ID 或域名</div>
+                            <label class="input-label" data-i18n="searchLabel">搜索资产与关联信息</label>
                             <div class="input-box">
-                                <input type="text" id="queryInput" data-i18n-placeholder="searchPlaceholder" placeholder="地址、ID 或 .sou 域名">
+                                <input type="text" id="queryInput" placeholder="地址、ID 或 .sou 域名" data-i18n-placeholder="searchPlaceholder">
                             </div>
                         </div>
-                        <button class="action-button" style="background: var(--dark-3); box-shadow: none; border: 1px solid var(--border);" onclick="handleQuery()" data-i18n="btnSearch">搜索</button>
-                        <div id="queryResult" style="flex-direction: column; gap: 10px; margin-top: 24px; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 24px; display: none; border: 1px solid var(--border);">
+                        <button class="action-button" onclick="handleQuery()" data-i18n="btnSearch">开始搜索</button>
+                        
+                        <div id="queryResult" style="display:none; margin-top:24px;">
+                            <!-- Result items injected here -->
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Ecosystem Hub Section -->
-        <div class="eco-hub">
-            <h2 class="eco-title" data-i18n="ecoTitle">SOU 生态指南</h2>
-            <div class="eco-grid">
-                <!-- Contract Addresses -->
-                <div class="eco-card">
-                    <h3 data-i18n="ecoContracts">合约地址</h3>
-                    <div class="eco-list">
-                        <div class="eco-item">
-                            <span class="eco-label">BSC SOU</span>
-                            <div class="eco-addr-box">
-                                <span>0xb65b...7777</span>
-                                <span class="copy-icon" onclick="copyValue('0xb65bd36fef84ebc5114cfd803a4f25b2b57f7777')">📋</span>
-                            </div>
-                        </div>
-                        <div class="eco-item">
-                            <span class="eco-label">Ethereum SOU</span>
-                            <div class="eco-addr-box">
-                                <span>0xdea2...a09c</span>
-                                <span class="copy-icon" onclick="copyValue('0xdea2a2a166e2fdc47b934bee68e6032f8f1ca09c')">📋</span>
-                            </div>
-                        </div>
-                        <div class="eco-item">
-                            <span class="eco-label">Shibarium SOU</span>
-                            <div class="eco-addr-box">
-                                <span>0x5e1a...d799</span>
-                                <span class="copy-icon" onclick="copyValue('0x5e1aee526d1aa049b4d95e5b68ae7bb556e2d799')">📋</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Trade & Buy -->
-                <div class="eco-card">
-                    <h3 data-i18n="ecoTrade">交易与购买</h3>
-                    <div class="eco-list">
-                        <div class="eco-item">
-                            <span class="eco-label">Pancakeswap (BSC)</span>
-                            <a href="https://pancakeswap.finance/swap?chain=bsc&outputCurrency=0xb65bD36fef84ebc5114Cfd803A4F25B2b57F7777" target="_blank" class="eco-link"><span data-i18n="goNow">立即前往</span> ↗</a>
-                        </div>
-                        <div class="eco-item">
-                            <span class="eco-label">Uniswap (ETH)</span>
-                            <a href="https://app.uniswap.org/swap?inputCurrency=ETH&outputCurrency=0xdea2a2a166e2fdc47b934bee68e6032f8f1ca09c" target="_blank" class="eco-link"><span data-i18n="goNow">立即前往</span> ↗</a>
-                        </div>
-                        <div class="eco-item">
-                            <span class="eco-label">Woofswap (Shibarium)</span>
-                            <a href="https://woofswap.finance/swap?inputCurrency=BONE&outputCurrency=0x5e1aee526d1aa049b4d95e5b68ae7bb556e2d799" target="_blank" class="eco-link"><span data-i18n="goNow">立即前往</span> ↗</a>
-                        </div>
-                        <div class="eco-item" style="margin-top: 8px; padding: 12px; background: rgba(99,102,241,0.1); border-radius: 12px; border: 1px dashed rgba(99,102,241,0.3);">
-                            <span class="eco-label" style="color: var(--primary-light);" data-i18n="directBuyTitle">直接转账购买 (BSC)</span>
-                            <p style="font-size: 11px; color: var(--text-secondary); margin: 4px 0;" data-i18n="directBuyTip">往下方地址转 BNB 即可获得 SOU</p>
-                            <div class="eco-addr-box">
-                                <span>0x1401...Df2C</span>
-                                <span class="copy-icon" onclick="copyValue('0x1401ADEf004F94aD27F13Ad7ad48de38b8F1Df2C')">📋</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bridge & Tools -->
-                <div class="eco-card">
-                    <h3 data-i18n="ecoBridge">跨链与工具</h3>
-                    <div class="eco-list">
-                        <div class="eco-item">
-                            <span class="eco-label">BSC ➡️ ETH Bridge</span>
-                            <a href="https://shibfun.github.io/ShibOwesYou/bridge/" target="_blank" class="eco-link" data-i18n="officialBridge">官方跨链桥 ↗</a>
-                        </div>
-                        <div class="eco-item">
-                            <span class="eco-label">ETH ➡️ Shibarium Bridge</span>
-                            <a href="https://shibfun.github.io/ShibOwesYou/bridgev1/" target="_blank" class="eco-link" data-i18n="officialBridge">官方跨链桥 ↗</a>
-                        </div>
-                        <div class="eco-item" style="margin-top: 8px;">
-                            <span class="eco-label" style="color: var(--success);" data-i18n="addHolderTitle">一键增加持有人 (BSC)</span>
-                            <p style="font-size: 11px; color: var(--text-secondary); margin: 4px 0;" data-i18n="addHolderTip">往该地址转 0 BNB 即可增加 200 个持有人</p>
-                            <div class="eco-addr-box" style="border: 1px solid rgba(16,185,129,0.3);">
-                                <span>0x4a7D...56cc</span>
-                                <span class="copy-icon" onclick="copyValue('0x4a7D7f1e44a7B3bEd43f2EdeB2c653f9C86756cc')">📋</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ShibOwesYouID -->
-                <div class="eco-card">
-                    <h3 data-i18n="ecoID">ShibOwesYouID</h3>
-                    <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6;" data-i18n="ecoIDDesc">
-                        您的 BSC 个人 .sou 域名。仅需销毁 1000 $SOU 即可拥有独一无二的 Web3 身份。
-                    </p>
-                    <a href="https://shibfun.github.io/ShibOwesYou/DSOU/" target="_blank" class="action-button" style="padding: 12px; font-size: 13px; margin-top: 0;" data-i18n="btnMintID">立即铸造 .sou 域名 ↗</a>
-                </div>
-
-                <!-- Buyback Progress -->
-                <div class="eco-card" style="grid-column: 1 / -1;">
-                    <h3 data-i18n="buybackTitle">Shib 生态系统资产回购进度</h3>
-                    <div style="display: grid; grid-template-columns: 1fr; gap: 16px;">
-                        <div class="buyback-item">
-                            <div class="buyback-header">
-                                <span class="buyback-token">BONE</span>
-                                <span class="buyback-amount">981,518</span>
-                            </div>
-                            <div class="buyback-usage" data-i18n="buybackUsage1">用途：在 Shibarium 上创建 BONE/SOU 流动性池</div>
-                        </div>
-                        <div class="buyback-item">
-                            <div class="buyback-header">
-                                <span class="buyback-token">BONE</span>
-                                <span class="buyback-amount">60,782</span>
-                            </div>
-                            <div class="buyback-usage" data-i18n="buybackUsage2">用途：预计与 SHIU 创建 BONE/SHIU 流动性池</div>
-                        </div>
-                        <div class="buyback-item">
-                            <div class="buyback-header">
-                                <span class="buyback-token">SHIBOSHIS</span>
-                                <span class="buyback-amount">15</span>
-                            </div>
-                            <div class="buyback-usage">
-                                <span data-i18n="buybackUsage3">捐赠给 SHIBOSHI 的贡献者</span>
-                                <a href="https://opensea.io/ShibOwesYou" target="_blank" class="eco-link" style="display: inline-flex; margin-left: 8px;">OpenSea ↗</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SHIU Logic -->
-                <div class="eco-card" style="grid-column: 1 / -1;">
-                    <h3 data-i18n="ecoSHIU">SHIU 工作原理</h3>
-                    <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
-                        <div>
-                            <div class="shiu-step">
-                                <div class="shiu-num">1</div>
-                                <div class="shiu-text"><span data-i18n="shiuStep1">在 Ethereum 上使用 USDT/USDC 兑换 $SHIU</span> <a href="https://shibfun.github.io/ShibOwesYou/shiu/" target="_blank" class="eco-link" style="display: inline;"><span data-i18n="goSwap">前往兑换</span> ↗</a></div>
-                            </div>
-                            <div class="shiu-step">
-                                <div class="shiu-num">2</div>
-                                <div class="shiu-text"><span data-i18n="shiuStep2">通过 Transporter 将 $SHIU 从 Ethereum 跨链至 Shibarium</span> <a href="https://app.transporter.io/?from=mainnet&tab=token&to=shibarium" target="_blank" class="eco-link" style="display: inline;"><span data-i18n="goBridge">前往跨链</span> ↗</a></div>
-                            </div>
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- Ecosystem Hub -->
+            <div class="eco-hub">
+                <h2 class="eco-title" data-i18n="ecoTitle">SOU 生态指南</h2>
+                
+                <div class="eco-grid">
+                    <!-- Contracts -->
+                    <div class="eco-card">
+                        <h3 data-i18n="ecoContracts">合约地址</h3>
+                        <div class="eco-list">
                             <div class="eco-item">
-                                <span class="eco-label">SHIU ETH 合约</span>
-                                <div class="eco-addr-box"><span>0x393a...765f</span><span class="copy-icon" onclick="copyValue('0x393a0ff130702c2dc6bfc500368394953450765f')">📋</span></div>
+                                <div class="eco-item-left">
+                                    <div class="eco-item-name">SOU Token (BSC)</div>
+                                </div>
+                                <div class="eco-addr-box"><span>0xb65b...7777</span><span class="copy-icon" onclick="copyValue('0xb65bd36fef84ebc5114cfd803a4f25b2b57f7777')">📋</span></div>
                             </div>
                             <div class="eco-item">
-                                <span class="eco-label">SHIU Shibarium 合约</span>
+                                <div class="eco-item-left">
+                                    <div class="eco-item-name">SOU Token (ETH)</div>
+                                </div>
+                                <div class="eco-addr-box"><span>0xb65b...7777</span><span class="copy-icon" onclick="copyValue('0xb65bd36fef84ebc5114cfd803a4f25b2b57f7777')">📋</span></div>
+                            </div>
+                            <div class="eco-item">
+                                <div class="eco-item-left">
+                                    <div class="eco-item-name">SHIU (Shibarium)</div>
+                                </div>
                                 <div class="eco-addr-box"><span>0x43bc...c8fd</span><span class="copy-icon" onclick="copyValue('0x43bcc765ea97f48f5ba5b0801cefecb703f6c8fd')">📋</span></div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Recovery -->
-                <div class="eco-card" style="grid-column: 1 / -1; border-color: var(--warning);">
-                    <h3 style="color: var(--warning);" data-i18n="ecoRecovery">Shibarium 被盗资金赔偿流程</h3>
-                    <div class="eco-list" style="gap: 16px;">
-                        <div class="shiu-step">
-                            <div class="shiu-num" style="background: var(--warning);">1</div>
-                            <div class="shiu-text"><span data-i18n="recoveryStep1">在 Shibarium 网络，将资产 1:1 兑换为 SOU 版本</span> <a href="https://shibfun.github.io/ShibOwesYou/GO/" target="_blank" class="eco-link" style="display: inline;"><span data-i18n="swapPage">兑换页面</span> ↗</a></div>
-                        </div>
-                        <div class="shiu-step">
-                            <div class="shiu-num" style="background: var(--warning);">2</div>
-                            <div class="shiu-text"><span data-i18n="recoveryStep2">使用 Transporter 将 SOU 版本从 Shibarium 跨链至 Ethereum</span> <a href="https://app.transporter.io/" target="_blank" class="eco-link" style="display: inline;"><span data-i18n="bridgePage">跨链页面</span> ↗</a></div>
-                        </div>
-                        <div class="shiu-step">
-                            <div class="shiu-num" style="background: var(--warning);">3</div>
-                            <div class="shiu-text"><span data-i18n="recoveryStep3">在 Ethereum 上拆包，获得原生代币资产</span> <a href="https://shibfun.github.io/ShibOwesYou/pegged/" target="_blank" class="eco-link" style="display: inline;"><span data-i18n="unwrapPage">拆包页面</span> ↗</a></div>
+                    <!-- Trade -->
+                    <div class="eco-card">
+                        <h3 data-i18n="ecoTrade">交易与购买</h3>
+                        <div class="eco-list">
+                            <div class="eco-item">
+                                <div class="eco-item-left">
+                                    <div class="eco-item-name">PancakeSwap (BSC)</div>
+                                </div>
+                                <a href="https://pancakeswap.finance/swap?outputCurrency=0xb65bd36fef84ebc5114cfd803a4f25b2b57f7777" target="_blank" class="eco-link" data-i18n="goNow">立即前往</a>
+                            </div>
+                            <div class="eco-item">
+                                <div class="eco-item-left">
+                                    <div class="eco-item-name">Uniswap (ETH)</div>
+                                </div>
+                                <a href="https://app.uniswap.org/#/swap?outputCurrency=0xb65bd36fef84ebc5114cfd803a4f25b2b57f7777" target="_blank" class="eco-link" data-i18n="goNow">立即前往</a>
+                            </div>
+                            <div class="eco-item">
+                                <div class="eco-item-left">
+                                    <div class="eco-item-name">WoofSwap (Shibarium)</div>
+                                </div>
+                                <a href="https://www.woofswap.finance/swap?outputCurrency=0x43bcc765ea97f48f5ba5b0801cefecb703f6c8fd" target="_blank" class="eco-link" data-i18n="goNow">立即前往</a>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Compensation Progress -->
-                <div class="eco-card" style="grid-column: 1 / -1;">
-                    <h3 data-i18n="compTitle">赔偿进度</h3>
-                    <div class="progress-list">
-                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">ETH</span></div>
-                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">SHIB</span></div>
-                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">TREAT</span></div>
-                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">LEASH</span></div>
-                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">USDC</span></div>
-                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">USDT</span></div>
-                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">DAI</span></div>
-                        <div class="progress-item completed"><span class="progress-status">☑️</span><span class="progress-name">WBTC</span></div>
-                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">BAD</span></div>
-                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">SHIFU</span></div>
-                        <div class="progress-item"><span class="progress-status">⌛️</span><span class="progress-name">ROAR</span></div>
-                        <div class="progress-item completed"><span class="progress-status">☑️</span><span class="progress-name">LTD</span></div>
-                        <div class="progress-item completed"><span class="progress-status">☑️</span><span class="progress-name">OSCAR</span></div>
-                        <div class="progress-item"><span class="progress-status">❓</span><span class="progress-name">xFUND</span></div>
-                        <div class="progress-item"><span class="progress-status">❓</span><span class="progress-name">FUND</span></div>
-                        <div class="progress-item"><span class="progress-status">❓</span><span class="progress-name">KNINE</span></div>
+                    <!-- Bridge -->
+                    <div class="eco-card">
+                        <h3 data-i18n="ecoBridge">跨链与工具</h3>
+                        <div class="eco-list">
+                            <div class="eco-item">
+                                <div class="eco-item-left">
+                                    <div class="eco-item-name" data-i18n="officialBridge">官方跨链桥</div>
+                                </div>
+                                <a href="https://shibarium.shib.io/bridge" target="_blank" class="eco-link" data-i18n="goNow">立即前往</a>
+                            </div>
+                            <div class="eco-item">
+                                <div class="eco-item-left">
+                                    <div class="eco-item-name">Transporter (CCIP)</div>
+                                </div>
+                                <a href="https://app.transporter.io/" target="_blank" class="eco-link" data-i18n="goNow">立即前往</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="progress-legend">
-                        <div class="legend-item"><span>⌛️</span><span data-i18n="statusQueue">排队中</span></div>
-                        <div class="legend-item"><span>☑️</span><span data-i18n="statusDone">赔偿已完成</span></div>
-                        <div class="legend-item"><span>❓</span><span data-i18n="statusUncertain">已离开或流动性不足</span></div>
+
+                    <!-- ID -->
+                    <div class="eco-card">
+                        <h3 data-i18n="ecoID">ShibOwesYouID</h3>
+                        <div class="eco-list">
+                            <p class="shiu-text" style="font-size: 12px; margin-bottom: 10px;" data-i18n="ecoIDDesc">您的 BSC 个人 .sou 域名。仅需销毁 1000 $SOU 即可拥有独一无二的 Web3 身份。</p>
+                            <a href="https://shibfun.github.io/ShibOwesYou/ID/" target="_blank" class="action-button" style="padding: 12px; font-size: 13px; margin-top: 0;" data-i18n="btnMintID">立即铸造 .sou 域名</a>
+                        </div>
+                    </div>
+
+                    <!-- SHIU Principles -->
+                    <div class="eco-card">
+                        <h3 data-i18n="ecoSHIU">SHIU 工作原理</h3>
+                        <div class="eco-list" style="gap: 12px;">
+                            <div class="shiu-step">
+                                <div class="shiu-num">1</div>
+                                <div class="shiu-text"><span data-i18n="shiuStep1">在 Ethereum 上使用 USDT/USDC 兑换 $SHIU</span> <a href="https://shibfun.github.io/ShibOwesYou/SHIU/" target="_blank" class="eco-link" style="display: inline;"><span data-i18n="goSwap">前往兑换</span> ↗</a></div>
+                            </div>
+                            <div class="shiu-step">
+                                <div class="shiu-num">2</div>
+                                <div class="shiu-text"><span data-i18n="shiuStep2">通过 Transporter 将 $SHIU 从 Ethereum 到 Shibarium</span> <a href="https://app.transporter.io/" target="_blank" class="eco-link" style="display: inline;"><span data-i18n="goBridge">前往跨链</span> ↗</a></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Buyback -->
+                    <div class="eco-card">
+                        <h3 data-i18n="buybackTitle">Shib 生态系统资产回购进度</h3>
+                        <div class="eco-list" style="gap: 10px;">
+                            <div class="shiu-text" style="font-size: 12px; background: rgba(99, 102, 241, 0.05); padding: 10px; border-radius: 12px; border: 1px solid var(--border);">
+                                • <span data-i18n="buybackUsage1">用途：在 Shibarium 上创建 BONE/SOU 流动性池</span><br>
+                                • <span data-i18n="buybackUsage2">用途：预计与 SHIU 创建 BONE/SHIU 流动性池</span><br>
+                                • <span data-i18n="buybackUsage3">捐赠给 SHIBOSHI 的贡献者</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Buyback SOU NFT -->
+                    <div class="eco-card" style="grid-column: 1 / -1; border-color: var(--primary-light);">
+                        <h3 style="color: var(--primary-light);" data-i18n="nftBuybackTitle">回购SOU NFT进度：即将到来</h3>
+                        <div class="eco-list">
+                            <div class="shiu-text">
+                                <span data-i18n="nftBuybackDesc">我们即将开始回购 SOU NFT，敬请期待。</span>
+                                <a href="https://opensea.io/collection/shibowesyou" target="_blank" class="eco-link" style="display: block; margin-top: 10px;">
+                                    <span data-i18n="viewOnOpensea">在 OpenSea 上查看 SOU NFT 集合</span> ↗
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -630,25 +527,21 @@
                 domainTip: "温馨提示：域名转账支持将 SOU 发送至任意解析后的地址",
                 ecoTitle: "SOU 生态指南", ecoContracts: "合约地址", ecoTrade: "交易与购买",
                 ecoBridge: "跨链与工具", ecoID: "ShibOwesYouID", ecoSHIU: "SHIU 工作原理",
-                ecoRecovery: "Shibarium 被盗资金赔偿流程",
                 notConnected: "未连接", goNow: "立即前往", directBuyTitle: "直接转账购买 (BSC)",
                 directBuyTip: "往下方地址转 BNB 即可获得 SOU", officialBridge: "官方跨链桥",
                 addHolderTitle: "一键增加持有人 (BSC)", addHolderTip: "往该地址转 0 BNB 即可增加 200 个持有人",
                 ecoIDDesc: "您的 BSC 个人 .sou 域名。仅需销毁 1000 $SOU 即可拥有独一无二的 Web3 身份。",
                 btnMintID: "立即铸造 .sou 域名", shiuStep1: "在 Ethereum 上使用 USDT/USDC 兑换 $SHIU",
-                shiuStep2: "通过 Transporter 将 $SHIU 从 Ethereum 跨链至 Shibarium",
+                shiuStep2: "通过 Transporter 将 $SHIU 从 Ethereum 到 Shibarium",
                 goSwap: "前往兑换", goBridge: "前往跨链",
-                recoveryStep1: "在 Shibarium 网络，将资产 1:1 兑换为 SOU 版本",
-                recoveryStep2: "使用 Transporter 将 SOU 版本从 Shibarium 跨链至 Ethereum",
-                recoveryStep3: "在 Ethereum 上拆包，获得原生代币资产",
-                swapPage: "兑换页面", bridgePage: "跨链页面", unwrapPage: "拆包页面",
                 pending: "处理中...", sending: "发送中...",
-                compTitle: "赔偿进度", statusQueue: "排队中", statusDone: "赔偿已完成",
-                statusUncertain: "已离开或流动性不足",
                 buybackTitle: "Shib 生态系统资产回购进度",
                 buybackUsage1: "用途：在 Shibarium 上创建 BONE/SOU 流动性池",
                 buybackUsage2: "用途：预计与 SHIU 创建 BONE/SHIU 流动性池",
-                buybackUsage3: "捐赠给 SHIBOSHI 的贡献者"
+                buybackUsage3: "捐赠给 SHIBOSHI 的贡献者",
+                nftBuybackTitle: "回购SOU NFT进度：即将到来",
+                nftBuybackDesc: "我们即将开始回购 SOU NFT，敬请期待。",
+                viewOnOpensea: "在 OpenSea 上查看 SOU NFT 集合"
             },
             en: {
                 connectWallet: "Connect Wallet", tabAssets: "Assets", tabSend: "Send", tabDomain: "Domain", tabQuery: "Query",
@@ -658,7 +551,7 @@
                 targetPlaceholder: "0x... or ID", domainPlaceholder: "Name",
                 targetAddrLabel: "Resolved Address", amountLabel: "Amount", btnSend: "Send Now",
                 searchLabel: "Search Assets & Info", searchPlaceholder: "Addr, ID or .sou", btnSearch: "Search",
-                msgCreateSuccess: "Success!", msgSendSuccess: "Sent!", msgIdNotFound: "Not Found",
+                msgCreateSuccess: "Created!", msgSendSuccess: "Sent!", msgIdNotFound: "ID Not Found",
                 msgInvalidTarget: "Invalid: Not SOU wallet or not whitelisted", msgQueryEmpty: "No info",
                 msgQueryWallet: "Wallet", msgQueryOwner: "Owner", msgQueryIsSOU: "Is SOU Wallet",
                 msgYes: "Yes", msgNo: "No", msgError: "Failed", msgConnectMetaMask: "Install MetaMask",
@@ -667,7 +560,6 @@
                 domainTip: "Tip: Domain Send supports any resolved address",
                 ecoTitle: "SOU Ecosystem Guide", ecoContracts: "Contracts", ecoTrade: "Trade & Buy",
                 ecoBridge: "Bridge & Tools", ecoID: "ShibOwesYouID", ecoSHIU: "SHIU Principles",
-                ecoRecovery: "Shibarium Recovery Process",
                 notConnected: "Not Connected", goNow: "Go Now", directBuyTitle: "Direct Buy (BSC)",
                 directBuyTip: "Send BNB to the address below to get SOU", officialBridge: "Official Bridge",
                 addHolderTitle: "Add Holders (BSC)", addHolderTip: "Send 0 BNB to add 200 holders",
@@ -675,17 +567,14 @@
                 btnMintID: "Mint .sou ID Now", shiuStep1: "Swap USDT/USDC for $SHIU on Ethereum",
                 shiuStep2: "Bridge $SHIU from Ethereum to Shibarium via Transporter",
                 goSwap: "Go to Swap", goBridge: "Go to Bridge",
-                recoveryStep1: "On Shibarium, swap assets 1:1 for SOU version",
-                recoveryStep2: "Bridge SOU version from Shibarium to Ethereum via Transporter",
-                recoveryStep3: "Unwrap on Ethereum for native assets",
-                swapPage: "Swap Page", bridgePage: "Bridge Page", unwrapPage: "Unwrap Page",
                 pending: "Pending...", sending: "Sending...",
-                compTitle: "Compensation Progress", statusQueue: "In the queue", statusDone: "Completed",
-                statusUncertain: "Left or insufficient liquidity",
                 buybackTitle: "Shib Ecosystem Asset Buyback Progress",
                 buybackUsage1: "Usage: Create BONE/SOU liquidity pool on Shibarium",
                 buybackUsage2: "Usage: Expected to create BONE/SHIU liquidity pool",
-                buybackUsage3: "Donated to SHIBOSHI contributors"
+                buybackUsage3: "Donated to SHIBOSHI contributors",
+                nftBuybackTitle: "SOU NFT Buyback Progress: Coming Soon",
+                nftBuybackDesc: "We will soon start buying back SOU NFTs, stay tuned.",
+                viewOnOpensea: "View SOU NFT Collection on OpenSea"
             }
         };
 
@@ -866,7 +755,7 @@
                 const isWhite = await factory.whitelist(userWallet);
                 if (!isSOU && !globalLifted && !isWhite) return showToast(i18n[currentLang].msgInvalidTarget, 'error');
                 const wallet = new ethers.Contract(userWallet, WALLET_ABI, signer);
-                const tx = await wallet.transfer(targetAddr, ethers.utils.parseUnits(amt.toString(), 18), SOU_ADDR);
+                const tx = await wallet.transfer(targetAddr, ethers.utils.parseUnits(amt, 18), SOU_ADDR);
                 showToast(i18n[currentLang].sending, 'info');
                 await tx.wait();
                 showToast(i18n[currentLang].msgSendSuccess, 'success');
@@ -885,7 +774,7 @@
                 const targetAddr = await idContract.resolve(searchName);
                 if (targetAddr === "0x0000000000000000000000000000000000000000") return showToast(i18n[currentLang].msgIdNotFound, 'error');
                 const sou = new ethers.Contract(SOU_ADDR, ERC20_ABI, signer);
-                const tx = await sou.transfer(targetAddr, ethers.utils.parseUnits(amt.toString(), 18));
+                const tx = await sou.transfer(targetAddr, ethers.utils.parseUnits(amt, 18));
                 showToast(i18n[currentLang].sending, 'info');
                 await tx.wait();
                 showToast(i18n[currentLang].msgSendSuccess, 'success');
@@ -895,53 +784,73 @@
 
         async function handleQuery() {
             const input = document.getElementById('queryInput').value.trim();
-            const resBox = document.getElementById('queryResult');
+            if (!input) return;
+            const container = document.getElementById('queryResult');
+            container.innerHTML = '<p style="text-align:center; color:var(--text-tertiary);">Querying...</p>';
+            container.style.display = 'block';
             const factory = new ethers.Contract(FACTORY_ADDR, FACTORY_ABI, provider);
+            const sou = new ethers.Contract(SOU_ADDR, ERC20_ABI, provider);
             const idContract = new ethers.Contract(ID_CONTRACT_ADDR, ID_ABI, provider);
+            let results = [];
             try {
-                let resHtml = "";
-                const lang = i18n[currentLang];
                 if (input.startsWith("0x") && input.length === 42) {
-                    const wallet = await factory.ownerToWallet(input);
-                    const owner = await factory.walletToOwner(input);
-                    if (wallet !== "0x0000000000000000000000000000000000000000") resHtml += `<div class="info-row"><span>${lang.msgQueryWallet}:</span><span>${wallet} <span class="copy-icon" onclick="copyValue('${wallet}')">📋</span></span></div>`;
-                    if (owner !== "0x0000000000000000000000000000000000000000") resHtml += `<div class="info-row"><span>${lang.msgQueryOwner}:</span><span>${owner} <span class="copy-icon" onclick="copyValue('${owner}')">📋</span></span></div>`;
-                    resHtml += `<div class="info-row"><span>${lang.msgQueryIsSOU}:</span><span>${await factory.isSOUWallet(input) ? lang.msgYes : lang.msgNo}</span></div>`;
-                } else if (input.toLowerCase().endsWith(".sou")) {
-                    let searchName = input.toLowerCase().substring(0, input.length - 4);
-                    const addr = await idContract.resolve(searchName);
-                    resHtml = addr !== "0x0000000000000000000000000000000000000000" ? `<div class="info-row"><span>${lang.msgQueryWallet}:</span><span>${addr} <span class="copy-icon" onclick="copyValue('${addr}')">📋</span></span></div>` : `<div>${lang.msgIdNotFound}</div>`;
-                } else if (!isNaN(input) && input.length > 0) {
+                    const isSOU = await factory.isSOUWallet(input);
+                    const bal = await sou.balanceOf(input);
+                    results.push({ label: i18n[currentLang].msgQueryIsSOU, val: isSOU ? i18n[currentLang].msgYes : i18n[currentLang].msgNo });
+                    results.push({ label: "SOU Balance", val: formatNumber(ethers.utils.formatUnits(bal, 18)) });
+                    if (isSOU) {
+                        const owner = await factory.walletToOwner(input);
+                        const id = await factory.walletToId(input);
+                        results.push({ label: i18n[currentLang].msgQueryOwner, val: owner });
+                        results.push({ label: "Wallet ID", val: id });
+                    } else {
+                        const wallet = await factory.ownerToWallet(input);
+                        if (wallet !== "0x0000000000000000000000000000000000000000") results.push({ label: i18n[currentLang].msgQueryWallet, val: wallet });
+                        const name = await idContract.primaryName(input);
+                        if (name) results.push({ label: "Primary Name", val: name + ".sou" });
+                    }
+                } else if (!isNaN(input)) {
                     const wallet = await factory.idToWallet(input);
-                    resHtml = wallet !== "0x0000000000000000000000000000000000000000" ? `<div class="info-row"><span>${lang.msgQueryWallet}:</span><span>${wallet} <span class="copy-icon" onclick="copyValue('${wallet}')">📋</span></span></div>` : `<div>${lang.msgIdNotFound}</div>`;
-                } else { resHtml = `<div>${lang.msgQueryEmpty}</div>`; }
-                resBox.innerHTML = resHtml; resBox.style.display = 'flex';
-            } catch (e) { showToast(i18n[currentLang].msgError, 'error'); }
-        }
-
-        function copyText(id) {
-            const txt = document.getElementById(id).innerText;
-            if (txt === i18n.zh.notConnected || txt === i18n.en.notConnected || txt === "0x..." || txt === i18n.zh.connectWallet || txt === i18n.en.connectWallet) return;
-            if (id === 'primaryNameText') {
-                navigator.clipboard.writeText(userPrimaryName).then(() => showToast(i18n[currentLang].msgCopySuccess, 'success'));
-                return;
+                    if (wallet !== "0x0000000000000000000000000000000000000000") {
+                        const owner = await factory.walletToOwner(wallet);
+                        const bal = await sou.balanceOf(wallet);
+                        results.push({ label: i18n[currentLang].msgQueryWallet, val: wallet });
+                        results.push({ label: i18n[currentLang].msgQueryOwner, val: owner });
+                        results.push({ label: "SOU Balance", val: formatNumber(ethers.utils.formatUnits(bal, 18)) });
+                    }
+                } else {
+                    let searchName = input.toLowerCase();
+                    if (searchName.endsWith(".sou")) searchName = searchName.substring(0, searchName.length - 4);
+                    const addr = await idContract.resolve(searchName);
+                    if (addr !== "0x0000000000000000000000000000000000000000") {
+                        const bal = await sou.balanceOf(addr);
+                        results.push({ label: "Resolved Address", val: addr });
+                        results.push({ label: "SOU Balance", val: formatNumber(ethers.utils.formatUnits(bal, 18)) });
+                    }
+                }
+            } catch (e) { console.error(e); }
+            if (results.length === 0) { container.innerHTML = `<p style="text-align:center; color:var(--error);">${i18n[currentLang].msgQueryEmpty}</p>`; }
+            else {
+                container.innerHTML = results.map(r => `
+                    <div class="eco-item" style="margin-bottom:8px; flex-direction:column; align-items:flex-start; gap:4px;">
+                        <span style="font-size:11px; color:var(--text-tertiary); font-weight:700; text-transform:uppercase;">${r.label}</span>
+                        <span style="font-size:13px; color:var(--text-primary); font-family:'Space Mono', monospace; word-break:break-all;">${r.val}</span>
+                    </div>
+                `).join('');
             }
-            const fullTxt = (id === 'eoaAddrFull') ? userAddr : (id === 'myWalletAddrFull' ? userWallet : txt);
-            navigator.clipboard.writeText(fullTxt).then(() => showToast(i18n[currentLang].msgCopySuccess, 'success'));
         }
-        function copyValue(val) { navigator.clipboard.writeText(val).then(() => showToast(i18n[currentLang].msgCopySuccess, 'success')); }
 
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.onclick = () => {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                btn.classList.add('active');
-                document.getElementById(btn.dataset.tab + 'Tab').classList.add('active');
-            };
-        });
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tab).style.display = 'block';
+            event.currentTarget.classList.add('active');
+        }
 
-        if (window.ethereum && window.ethereum.selectedAddress) connectWallet();
-        setLang('zh');
+        function copyValue(val) {
+            if (!val || val === i18n[currentLang].notConnected || val === "0x...") return;
+            navigator.clipboard.writeText(val).then(() => showToast(i18n[currentLang].msgCopySuccess, 'success'));
+        }
     </script>
 </body>
 </html>
