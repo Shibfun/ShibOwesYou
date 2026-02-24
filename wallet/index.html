@@ -184,71 +184,63 @@
         .eco-link i { font-size: 10px; opacity: 0.5; }
         
         .eco-addr-box {
-            background: rgba(0,0,0,0.2); border-radius: 12px; padding: 10px;
-            font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-secondary);
-            display: flex; justify-content: space-between; align-items: center; margin-top: 4px;
+            background: rgba(0,0,0,0.3); padding: 12px 16px; border-radius: 14px; border: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center; font-family: 'Space Mono', monospace; font-size: 12px;
         }
 
-        .shiu-step { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
-        .shiu-num { width: 20px; height: 20px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0; }
-        .shiu-text { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
-
-        /* Progress List Styles */
-        .progress-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-top: 12px; }
-        .progress-item { 
-            background: rgba(0,0,0,0.2); padding: 10px 14px; border-radius: 12px; 
-            display: flex; align-items: center; gap: 8px; font-size: 12px; 
-            border: 1px solid var(--border); transition: 0.2s;
-        }
-        .progress-item:hover { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); }
-        .progress-item.completed { 
-            background: rgba(16, 185, 129, 0.15); 
-            border-color: rgba(16, 185, 129, 0.3); 
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
-        }
-        .progress-item.completed .progress-name { color: var(--success); }
-        
-        .progress-status { font-size: 14px; }
-        .progress-name { font-weight: 600; color: var(--text-primary); }
-        
-        .progress-legend { 
-            display: flex; flex-wrap: wrap; gap: 16px; margin-top: 24px; 
-            padding-top: 16px; border-top: 1px solid var(--border);
-        }
-        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary); }
-
-        /* Buyback Styles */
-        .buyback-item {
-            background: rgba(255,255,255,0.03); border-radius: 16px; padding: 16px;
-            border: 1px solid var(--border); margin-bottom: 12px;
-        }
+        .buyback-item { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 16px; padding: 16px; }
         .buyback-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .buyback-token { font-weight: 800; color: var(--primary-light); font-size: 14px; }
-        .buyback-amount { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--text-primary); }
-        .buyback-usage { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
-
-        footer { text-align: center; padding: 60px 20px; font-size: 11px; color: var(--text-tertiary); opacity: 0.6; }
+        .buyback-token { font-weight: 800; color: var(--primary-light); }
+        .buyback-amount { font-family: 'Space Mono', monospace; font-weight: 700; }
+        .buyback-usage { font-size: 12px; color: var(--text-secondary); }
+        
+        .shiu-step { display: flex; gap: 16px; margin-bottom: 16px; }
+        .shiu-num { width: 28px; height: 28px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; flex-shrink: 0; }
+        .shiu-text { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
 
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: contentFade 0.5s ease-out; }
-        @keyframes contentFade { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .id-preview { margin-top: 16px; padding: 18px; background: rgba(0,0,0,0.4); border-radius: 20px; display: none; border: 1px solid var(--border); }
-        .info-row { display: flex; justify-content: space-between; align-items: center; width: 100%; font-size: 13px; margin-bottom: 10px; gap: 15px; }
-        .info-row span:first-child { color: var(--text-secondary); font-weight: 500; flex-shrink: 0; }
-        .info-row span:last-child { color: var(--text-primary); font-weight: 700; text-align: right; word-break: break-all; overflow-wrap: break-word; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .id-preview { margin-top: 16px; display: none; }
+        .id-preview-label { font-size: 11px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase; padding-left: 6px; }
+
+        footer { padding: 40px 20px; text-align: center; color: var(--text-tertiary); font-size: 13px; font-weight: 500; }
+
+        /* Exchange Specific Styles */
+        .whitelist-badge {
+            display: flex; flex-direction: column; gap: 10px; padding: 16px;
+            background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 20px; color: var(--success); margin-bottom: 24px;
+        }
+        .whitelist-header { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 14px; }
+        .whitelist-addr-box { 
+            background: rgba(0,0,0,0.2); padding: 10px 14px; border-radius: 12px; 
+            font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text-secondary);
+            display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(16, 185, 129, 0.1);
+        }
+        .reward-info {
+            margin-top: 16px; padding: 18px; background: rgba(99, 102, 241, 0.05);
+            border-radius: 20px; border: 1px dashed var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .reward-label { font-size: 13px; color: var(--text-secondary); font-weight: 600; }
+        .reward-value { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--primary-light); font-size: 16px; }
     </style>
 </head>
 <body>
     <div class="bg-glow"></div>
     <nav>
-        <a href="#" class="logo-nav"><img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU"><span>SOU Wallet</span></a>
+        <a href="#" class="logo-nav">
+            <img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU">
+            <span>SOU HUB</span>
+        </a>
         <div class="nav-right">
             <div class="lang-switch">
-                <button class="lang-btn active" id="btn-zh" onclick="setLang('zh')">中</button>
+                <button class="lang-btn active" id="btn-zh" onclick="setLang('zh')">ZH</button>
                 <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
             </div>
-            <div class="wallet-info" onclick="connectWallet()">
+            <div class="wallet-info" id="walletBtn" onclick="connectWallet()">
                 <div class="status-dot" id="walletDot"></div>
                 <span id="walletAddr" data-i18n="connectWallet">连接钱包</span>
             </div>
@@ -260,14 +252,16 @@
     <div class="wrapper">
         <div class="app-container">
             <div class="card">
-                <div class="tab-nav">
-                    <button class="tab-btn active" data-tab="assets" data-i18n="tabAssets">资产</button>
-                    <button class="tab-btn" data-tab="send" data-i18n="tabSend">发送</button>
-                    <button class="tab-btn" data-tab="domain" data-i18n="tabDomain">域名转账</button>
-                    <button class="tab-btn" data-tab="query" data-i18n="tabQuery">查询</button>
-                </div>
-
                 <div class="card-content">
+                    <div class="tab-nav">
+                        <button class="tab-btn active" data-tab="assets" data-i18n="tabAssets">资产</button>
+                        <button class="tab-btn" data-tab="send" data-i18n="tabSend">发送</button>
+                        <button class="tab-btn" data-tab="domain" data-i18n="tabDomain">域名转账</button>
+                        <button class="tab-btn" data-tab="query" data-i18n="tabQuery">查询</button>
+                        <button class="tab-btn" data-tab="exchange" data-i18n="tabExchange">兑换</button>
+                    </div>
+
+                    <!-- Assets Tab -->
                     <div class="tab-content active" id="assetsTab">
                         <div class="balance-grid">
                             <div class="balance-card direct">
@@ -277,44 +271,46 @@
                                 </div>
                                 <div class="balance-val" id="eoaBalanceDisplay">0.00</div>
                                 <div class="addr-pill">
-                                    <span id="eoaAddrFull" class="addr-text" data-i18n="notConnected">未连接</span>
+                                    <span class="addr-text" id="eoaAddrFull">未连接</span>
                                     <span class="copy-icon" onclick="copyText('eoaAddrFull')">📋</span>
                                 </div>
                             </div>
 
-                            <div id="noWalletUI">
-                                <div class="balance-card" style="border: 2px dashed var(--border); background: transparent; min-height: 180px; justify-content: center;">
-                                    <p data-i18n="noWalletTip" style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; font-weight: 600;">未拥有 SOU 智能钱包</p>
-                                    <div class="input-box" style="padding: 14px 18px; border-radius: 18px; margin-bottom: 14px; background: rgba(0,0,0,0.2); width: 80%;">
-                                        <input type="text" id="regID" data-i18n-placeholder="idPlaceholder" placeholder="输入数字 ID">
-                                    </div>
-                                    <button class="action-button" onclick="createWallet()" data-i18n="btnCreate" style="padding: 14px; font-size: 14px; margin-top: 0; border-radius: 18px; box-shadow: none; width: 80%;">创建钱包</button>
-                                </div>
-                            </div>
-
-                            <div id="hasWalletUI" class="balance-card smart" style="display: none;">
+                            <div class="balance-card smart">
                                 <div class="balance-header">
                                     <img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU">
                                     <span class="balance-label" data-i18n="smartBalanceLabel">智能钱包余额</span>
                                 </div>
                                 <div class="balance-val" id="souBalance">0.00</div>
                                 
-                                <div class="primary-name-box" id="primaryNameContainer" style="display: none;">
-                                    <span id="primaryNameText">-.sou</span>
-                                    <span class="copy-icon" onclick="copyText('primaryNameText')" style="font-size: 12px;">📋</span>
+                                <div id="noWalletUI" style="display: none; width: 100%;">
+                                    <p class="tip-text" data-i18n="noWalletTip">您尚未拥有 SOU 智能钱包</p>
+                                    <div class="input-section" style="margin-top: 16px;">
+                                        <div class="input-box">
+                                            <input type="number" id="regID" data-i18n-placeholder="idPlaceholder" placeholder="输入数字 ID">
+                                        </div>
+                                        <button class="action-button" onclick="createWallet()" data-i18n="btnCreate">创建钱包</button>
+                                    </div>
                                 </div>
 
-                                <div class="info-row" style="justify-content: center; gap: 8px; margin-bottom: 6px; margin-top: 10px;">
-                                    <span style="font-size: 11px; opacity: 0.5;">ID:</span> <b id="myID" style="color: var(--primary-light); font-size: 14px;">-</b>
-                                </div>
-                                <div class="addr-pill">
-                                    <span id="myWalletAddrFull" class="addr-text">0x...</span>
-                                    <span class="copy-icon" onclick="copyText('myWalletAddrFull')">📋</span>
+                                <div id="hasWalletUI" style="display: none; width: 100%;">
+                                    <div class="primary-name-box" id="primaryNameContainer" style="display: none;">
+                                        <span id="primaryNameText">-.sou</span>
+                                        <span class="copy-icon" onclick="copyText('primaryNameText')" style="font-size: 12px;">📋</span>
+                                    </div>
+                                    <div class="info-row" style="justify-content: center; gap: 8px; margin-bottom: 6px; margin-top: 10px;">
+                                        <span style="font-size: 11px; opacity: 0.5;">ID:</span> <b id="myID" style="color: var(--primary-light); font-size: 14px;">-</b>
+                                    </div>
+                                    <div class="addr-pill">
+                                        <span id="myWalletAddrFull" class="addr-text">0x...</span>
+                                        <span class="copy-icon" onclick="copyText('myWalletAddrFull')">📋</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Send Tab -->
                     <div class="tab-content" id="sendTab">
                         <div class="input-section">
                             <div class="input-label" data-i18n="receiverLabel">接收者 (地址或数字 ID)</div>
@@ -352,6 +348,7 @@
                         <div class="tip-text" data-i18n="smartTip">温馨提示：SOU 智能钱包仅支持在 SOU 钱包地址之间进行转账</div>
                     </div>
 
+                    <!-- Domain Tab -->
                     <div class="tab-content" id="domainTab">
                         <div class="input-section">
                             <div class="input-label" data-i18n="domainLabel">接收者域名</div>
@@ -390,6 +387,7 @@
                         <div class="tip-text" data-i18n="domainTip">温馨提示：域名转账支持将 SOU 发送至任意解析后的地址</div>
                     </div>
 
+                    <!-- Query Tab -->
                     <div class="tab-content" id="queryTab">
                         <div class="input-section">
                             <div class="input-label" data-i18n="searchLabel">搜索地址、ID 或域名</div>
@@ -400,6 +398,48 @@
                         <button class="action-button" style="background: var(--dark-3); box-shadow: none; border: 1px solid var(--border);" onclick="handleQuery()" data-i18n="btnSearch">搜索</button>
                         <div id="queryResult" style="flex-direction: column; gap: 10px; margin-top: 24px; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 24px; display: none; border: 1px solid var(--border);">
                         </div>
+                    </div>
+
+                    <!-- Exchange Tab -->
+                    <div class="tab-content" id="exchangeTab">
+                        <div class="whitelist-badge">
+                            <div class="whitelist-header">
+                                <span>✨</span>
+                                <span data-i18n="whitelistTitle">白名单公布: Shiba Inu: Deployer 2</span>
+                            </div>
+                            <div class="whitelist-addr-box">
+                                <span>0xc7D0...2Bf3</span>
+                                <span class="copy-icon" onclick="copyValue('0xc7D0445ac2947760b3dD388B8586Adf079972Bf3')">📋</span>
+                            </div>
+                        </div>
+                        
+                        <div class="input-section">
+                            <div class="input-label">
+                                <span data-i18n="exchangeAmount">兑换数量 (SOU)</span>
+                                <span style="font-size: 11px; color: var(--text-tertiary); font-family: 'Space Mono';">Bal: <span class="directBalText">0.00</span> SOU</span>
+                            </div>
+                            <div class="input-box">
+                                <input type="number" id="exchangeAmt" placeholder="0.0" oninput="updateRewardPreview()">
+                                <div class="token-badge">
+                                    <img src="https://www.woofswap.finance/image/tokens/sou.png" class="token-logo-small">
+                                    <span style="font-size: 13px; font-weight: 800;">SOU</span>
+                                </div>
+                            </div>
+                            <div class="percent-row">
+                                <button class="percent-btn" onclick="setExchangePercent(0.25)">25%</button>
+                                <button class="percent-btn" onclick="setExchangePercent(0.5)">50%</button>
+                                <button class="percent-btn" onclick="setExchangePercent(0.75)">75%</button>
+                                <button class="percent-btn" onclick="setExchangePercent(1.0)">MAX</button>
+                            </div>
+                        </div>
+
+                        <div class="reward-info">
+                            <span class="reward-label" data-i18n="estimatedReward">预计获得奖励</span>
+                            <span class="reward-value" id="rewardPreview">0.00 BNB</span>
+                        </div>
+
+                        <button class="action-button" id="btnExchange" onclick="handleExchange()" data-i18n="btnExchange">立即兑换</button>
+                        <p class="tip-text" data-i18n="exchangeTip">温馨提示：兑换数量必须是 100,000 SOU 的整数倍。白名单用户兑换将直接销毁合约内的 SOU。</p>
                     </div>
                 </div>
             </div>
@@ -479,9 +519,9 @@
                         <div class="eco-item" style="margin-top: 8px;">
                             <span class="eco-label" style="color: var(--success);" data-i18n="addHolderTitle">一键增加持有人 (BSC)</span>
                             <p style="font-size: 11px; color: var(--text-secondary); margin: 4px 0;" data-i18n="addHolderTip">往该地址转 0 BNB 即可增加 200 个持有人</p>
-                            <div class="eco-addr-box" style="border: 1px solid rgba(16,185,129,0.3);">
-                                <span>0x4a7D...56cc</span>
-                                <span class="copy-icon" onclick="copyValue('0x4a7D7f1e44a7B3bEd43f2EdeB2c653f9C86756cc')">📋</span>
+                            <div class="eco-addr-box">
+                                <span>0x7082...6666</span>
+                                <span class="copy-icon" onclick="copyValue('0x7082666666666666666666666666666666666666')">📋</span>
                             </div>
                         </div>
                     </div>
@@ -490,10 +530,10 @@
                 <!-- ShibOwesYouID -->
                 <div class="eco-card">
                     <h3 data-i18n="ecoID">ShibOwesYouID</h3>
-                    <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6;" data-i18n="ecoIDDesc">
-                        您的 BSC 个人 .sou 域名。仅需销毁 1000 $SOU 即可拥有独一无二的 Web3 身份。
-                    </p>
-                    <a href="https://shibfun.github.io/ShibOwesYou/DSOU/" target="_blank" class="action-button" style="padding: 12px; font-size: 13px; margin-top: 0;" data-i18n="btnMintID">立即铸造 .sou 域名 ↗</a>
+                    <div class="eco-list">
+                        <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;" data-i18n="ecoIDDesc">您的 BSC 个人 .sou 域名。仅需销毁 1000 $SOU 即可拥有独一无二的 Web3 身份。</p>
+                        <a href="https://shibfun.github.io/ShibOwesYou/id/" target="_blank" class="action-button" style="padding: 12px; font-size: 14px; margin-top: 10px;" data-i18n="btnMintID">立即铸造 .sou 域名</a>
+                    </div>
                 </div>
 
                 <!-- Buyback Progress -->
@@ -574,17 +614,20 @@
         const FACTORY_ADDR = "0x02E54e08Be9fE047C6E6aEd89A430AcBe4708E9e";
         const ID_CONTRACT_ADDR = "0x31CCB08535398AFEe394E8cd8d34e72973C08cc9";
         const SOU_ADDR = "0xb65bd36fef84ebc5114cfd803a4f25b2b57f7777";
+        const FOUNDATION_ADDR = "0xa819Eaf3f1d79E03a6D1001818889655532A9150";
+        const WHITELIST_ADDR = "0xc7D0445ac2947760b3dD388B8586Adf079972Bf3";
         const BSC_CHAIN_ID = 56;
-        
+        const UNIT = ethers.utils.parseUnits("100000", 18);
+
         const i18n = {
             zh: {
-                connectWallet: "连接钱包", tabAssets: "资产", tabSend: "发送", tabDomain: "域名转账", tabQuery: "查询",
+                connectWallet: "连接钱包", tabAssets: "资产", tabSend: "发送", tabDomain: "域名转账", tabQuery: "查询", tabExchange: "兑换",
                 eoaBalanceLabel: "直接持有余额 (EOA)", smartBalanceLabel: "智能钱包余额",
                 noWalletTip: "您尚未拥有 SOU 智能钱包", idPlaceholder: "输入数字 ID", btnCreate: "创建钱包",
-                receiverLabel: "接收者 (地址或 ID)", domainLabel: "接收者域名",
+                receiverLabel: "接收者 (地址或数字 ID)", domainLabel: "接收者域名",
                 targetPlaceholder: "0x... 或 数字 ID", domainPlaceholder: "输入名称",
-                targetAddrLabel: "解析地址", amountLabel: "转账数量", btnSend: "立即发送",
-                searchLabel: "搜索资产与关联信息", searchPlaceholder: "地址、ID 或 .sou 域名", btnSearch: "开始搜索",
+                targetAddrLabel: "解析地址", amountLabel: "数量", btnSend: "立即发送",
+                searchLabel: "搜索地址、ID 或域名", searchPlaceholder: "地址、ID 或 .sou 域名", btnSearch: "搜索",
                 msgCreateSuccess: "创建成功！", msgSendSuccess: "转账成功！", msgIdNotFound: "未找到信息",
                 msgInvalidTarget: "目标非法：非 SOU 钱包或未在白名单", msgQueryEmpty: "未查询到信息",
                 msgQueryWallet: "关联钱包", msgQueryOwner: "所有者", msgQueryIsSOU: "是否为 SOU 钱包",
@@ -608,10 +651,14 @@
                 buybackUsage3: "捐赠给 SHIBOSHI 的贡献者",
                 nftBuybackTitle: "回购SOU NFT进度：即将到来",
                 nftBuybackDesc: "我们即将开始回购 SOU NFT，敬请期待。",
-                viewOnOpensea: "在 OpenSea 上查看 SOU NFT 集合"
+                viewOnOpensea: "在 OpenSea 上查看 SOU NFT 集合",
+                exchangeAmount: "兑换数量 (SOU)", btnExchange: "立即兑换", estimatedReward: "预计获得奖励",
+                exchangeTip: "温馨提示：兑换数量必须是 100,000 SOU 的整数倍。白名单用户兑换将直接销毁合约内的 SOU。",
+                whitelistTitle: "白名单公布: Shiba Inu: Deployer 2", msgApproveSuccess: "授权成功！", msgExchangeSuccess: "兑换成功！",
+                msgBelowMin: "低于最小兑换单位 (100,000 SOU)", msgNotMultiple: "数量必须是 100,000 的整数倍"
             },
             en: {
-                connectWallet: "Connect Wallet", tabAssets: "Assets", tabSend: "Send", tabDomain: "Domain", tabQuery: "Query",
+                connectWallet: "Connect Wallet", tabAssets: "Assets", tabSend: "Send", tabDomain: "Domain", tabQuery: "Query", tabExchange: "Exchange",
                 eoaBalanceLabel: "Direct Balance (EOA)", smartBalanceLabel: "Smart Balance",
                 noWalletTip: "No SOU Smart Wallet yet", idPlaceholder: "Numeric ID", btnCreate: "Create Wallet",
                 receiverLabel: "Receiver (Addr/ID)", domainLabel: "Receiver Domain",
@@ -641,7 +688,11 @@
                 buybackUsage3: "Donated to SHIBOSHI contributors",
                 nftBuybackTitle: "SOU NFT Buyback Progress: Coming Soon",
                 nftBuybackDesc: "We will soon start buying back SOU NFTs, stay tuned.",
-                viewOnOpensea: "View SOU NFT Collection on OpenSea"
+                viewOnOpensea: "View SOU NFT Collection on OpenSea",
+                exchangeAmount: "Exchange Amount (SOU)", btnExchange: "Exchange Now", estimatedReward: "Estimated Reward",
+                exchangeTip: "Tip: Amount must be a multiple of 100,000 SOU. Whitelist users burn SOU from contract.",
+                whitelistTitle: "Whitelist: Shiba Inu: Deployer 2", msgApproveSuccess: "Approve Success!", msgExchangeSuccess: "Exchange Success!",
+                msgBelowMin: "Below minimum (100,000 SOU)", msgNotMultiple: "Must be multiple of 100,000"
             }
         };
 
@@ -649,6 +700,7 @@
         let userSmartSouBal = "0";
         let userDirectSouBal = "0";
         let userPrimaryName = "";
+        let isUserWhitelisted = false;
 
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
@@ -699,7 +751,12 @@
             "function primaryName(address) view returns (string)"
         ];
         const WALLET_ABI = ["function transfer(address to, uint256 amount, address token) external"];
-        const ERC20_ABI = ["function balanceOf(address) view returns (uint256)", "function transfer(address to, uint256 amount) external returns (bool)"];
+        const ERC20_ABI = ["function balanceOf(address) view returns (uint256)", "function transfer(address to, uint256 amount) external returns (bool)", "function allowance(address,address) view returns (uint256)", "function approve(address,uint256) returns (bool)"];
+        const FOUNDATION_ABI = [
+            "function exchange(uint256) external",
+            "function exchangeWhitelist(uint256) external",
+            "function calculateReward(uint256) view returns (uint256)"
+        ];
 
         let provider, signer, userAddr, userWallet;
 
@@ -714,6 +771,8 @@
             document.getElementById('walletAddr').innerText = userAddr.substring(0,6) + "..." + userAddr.substring(38);
             document.getElementById('eoaAddrFull').innerText = userAddr;
             document.getElementById('walletDot').classList.add('connected');
+            
+            isUserWhitelisted = (userAddr.toLowerCase() === WHITELIST_ADDR.toLowerCase());
             await refreshUI();
         }
 
@@ -768,6 +827,65 @@
                 showToast(i18n[currentLang].pending, 'info');
                 await tx.wait();
                 showToast(i18n[currentLang].msgCreateSuccess, 'success');
+                await refreshUI();
+            } catch (e) { showToast(i18n[currentLang].msgError, 'error'); }
+        }
+
+        async function updateRewardPreview() {
+            const amt = document.getElementById('exchangeAmt').value;
+            if (!amt || isNaN(amt) || parseFloat(amt) <= 0) {
+                document.getElementById('rewardPreview').innerText = "0.00 BNB";
+                return;
+            }
+            try {
+                const foundation = new ethers.Contract(FOUNDATION_ADDR, FOUNDATION_ABI, provider);
+                const souAmount = ethers.utils.parseUnits(amt.toString(), 18);
+                if (souAmount.lt(UNIT)) {
+                    document.getElementById('rewardPreview').innerText = i18n[currentLang].msgBelowMin;
+                    return;
+                }
+                if (!souAmount.mod(UNIT).isZero()) {
+                    document.getElementById('rewardPreview').innerText = i18n[currentLang].msgNotMultiple;
+                    return;
+                }
+                const reward = await foundation.calculateReward(souAmount);
+                document.getElementById('rewardPreview').innerText = ethers.utils.formatEther(reward) + " BNB";
+            } catch (e) { document.getElementById('rewardPreview').innerText = "---"; }
+        }
+
+        function setExchangePercent(p) {
+            let val = parseFloat(userDirectSouBal) * p;
+            val = Math.floor(val / 100000) * 100000;
+            document.getElementById('exchangeAmt').value = val;
+            updateRewardPreview();
+        }
+
+        async function handleExchange() {
+            const amt = document.getElementById('exchangeAmt').value;
+            if (!amt || isNaN(amt)) return;
+            const souAmount = ethers.utils.parseUnits(amt.toString(), 18);
+            if (souAmount.lt(UNIT)) return showToast(i18n[currentLang].msgBelowMin, 'error');
+            if (!souAmount.mod(UNIT).isZero()) return showToast(i18n[currentLang].msgNotMultiple, 'error');
+            try {
+                const foundation = new ethers.Contract(FOUNDATION_ADDR, FOUNDATION_ABI, signer);
+                const sou = new ethers.Contract(SOU_ADDR, ERC20_ABI, signer);
+                if (!isUserWhitelisted) {
+                    const allowance = await sou.allowance(userAddr, FOUNDATION_ADDR);
+                    if (allowance.lt(souAmount)) {
+                        showToast(i18n[currentLang].pending, 'info');
+                        const txApprove = await sou.approve(FOUNDATION_ADDR, ethers.constants.MaxUint256);
+                        await txApprove.wait();
+                        showToast(i18n[currentLang].msgApproveSuccess, 'success');
+                    }
+                    const tx = await foundation.exchange(souAmount);
+                    showToast(i18n[currentLang].pending, 'info');
+                    await tx.wait();
+                } else {
+                    const tx = await foundation.exchangeWhitelist(souAmount);
+                    showToast(i18n[currentLang].pending, 'info');
+                    await tx.wait();
+                }
+                showToast(i18n[currentLang].msgExchangeSuccess, 'success');
                 await refreshUI();
             } catch (e) { showToast(i18n[currentLang].msgError, 'error'); }
         }
@@ -860,16 +978,16 @@
                 if (input.startsWith("0x") && input.length === 42) {
                     const wallet = await factory.ownerToWallet(input);
                     const owner = await factory.walletToOwner(input);
-                    if (wallet !== "0x0000000000000000000000000000000000000000") resHtml += `<div class="info-row"><span>${lang.msgQueryWallet}:</span><span>${wallet} <span class="copy-icon" onclick="copyValue('${wallet}')">📋</span></span></div>`;
-                    if (owner !== "0x0000000000000000000000000000000000000000") resHtml += `<div class="info-row"><span>${lang.msgQueryOwner}:</span><span>${owner} <span class="copy-icon" onclick="copyValue('${owner}')">📋</span></span></div>`;
-                    resHtml += `<div class="info-row"><span>${lang.msgQueryIsSOU}:</span><span>${await factory.isSOUWallet(input) ? lang.msgYes : lang.msgNo}</span></div>`;
+                    if (wallet !== "0x0000000000000000000000000000000000000000") resHtml += `<div style="display:flex;justify-content:space-between;font-size:13px;"><span>${lang.msgQueryWallet}:</span><span>${wallet} <span class="copy-icon" onclick="copyValue('${wallet}')">📋</span></span></div>`;
+                    if (owner !== "0x0000000000000000000000000000000000000000") resHtml += `<div style="display:flex;justify-content:space-between;font-size:13px;"><span>${lang.msgQueryOwner}:</span><span>${owner} <span class="copy-icon" onclick="copyValue('${owner}')">📋</span></span></div>`;
+                    resHtml += `<div style="display:flex;justify-content:space-between;font-size:13px;"><span>${lang.msgQueryIsSOU}:</span><span>${await factory.isSOUWallet(input) ? lang.msgYes : lang.msgNo}</span></div>`;
                 } else if (input.toLowerCase().endsWith(".sou")) {
                     let searchName = input.toLowerCase().substring(0, input.length - 4);
                     const addr = await idContract.resolve(searchName);
-                    resHtml = addr !== "0x0000000000000000000000000000000000000000" ? `<div class="info-row"><span>${lang.msgQueryWallet}:</span><span>${addr} <span class="copy-icon" onclick="copyValue('${addr}')">📋</span></span></div>` : `<div>${lang.msgIdNotFound}</div>`;
+                    resHtml = addr !== "0x0000000000000000000000000000000000000000" ? `<div style="display:flex;justify-content:space-between;font-size:13px;"><span>${lang.msgQueryWallet}:</span><span>${addr} <span class="copy-icon" onclick="copyValue('${addr}')">📋</span></span></div>` : `<div>${lang.msgIdNotFound}</div>`;
                 } else if (!isNaN(input) && input.length > 0) {
                     const wallet = await factory.idToWallet(input);
-                    resHtml = wallet !== "0x0000000000000000000000000000000000000000" ? `<div class="info-row"><span>${lang.msgQueryWallet}:</span><span>${wallet} <span class="copy-icon" onclick="copyValue('${wallet}')">📋</span></span></div>` : `<div>${lang.msgIdNotFound}</div>`;
+                    resHtml = wallet !== "0x0000000000000000000000000000000000000000" ? `<div style="display:flex;justify-content:space-between;font-size:13px;"><span>${lang.msgQueryWallet}:</span><span>${wallet} <span class="copy-icon" onclick="copyValue('${wallet}')">📋</span></span></div>` : `<div>${lang.msgIdNotFound}</div>`;
                 } else { resHtml = `<div>${lang.msgQueryEmpty}</div>`; }
                 resBox.innerHTML = resHtml; resBox.style.display = 'flex';
             } catch (e) { showToast(i18n[currentLang].msgError, 'error'); }
@@ -877,13 +995,8 @@
 
         function copyText(id) {
             const txt = document.getElementById(id).innerText;
-            if (txt === i18n.zh.notConnected || txt === i18n.en.notConnected || txt === "0x..." || txt === i18n.zh.connectWallet || txt === i18n.en.connectWallet) return;
-            if (id === 'primaryNameText') {
-                navigator.clipboard.writeText(userPrimaryName).then(() => showToast(i18n[currentLang].msgCopySuccess, 'success'));
-                return;
-            }
-            const fullTxt = (id === 'eoaAddrFull') ? userAddr : (id === 'myWalletAddrFull' ? userWallet : txt);
-            navigator.clipboard.writeText(fullTxt).then(() => showToast(i18n[currentLang].msgCopySuccess, 'success'));
+            if (txt === "未连接" || txt === "Not Connected" || txt === "0x...") return;
+            navigator.clipboard.writeText(txt).then(() => showToast(i18n[currentLang].msgCopySuccess, 'success'));
         }
         function copyValue(val) { navigator.clipboard.writeText(val).then(() => showToast(i18n[currentLang].msgCopySuccess, 'success')); }
 
