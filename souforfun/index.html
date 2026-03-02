@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>SOU FOR FUN</title>
+    <link rel="icon" href="https://raw.githubusercontent.com/Shibfun/ShibOwesYou/refs/heads/main/images/sou.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #0a0e27;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        #gameContainer {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: linear-gradient(180deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        #gameArea {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        .enemy {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            border: 4px solid white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .enemy.hit {
+            animation: enemyShake 0.2s;
+            border-color: #ff4757;
+        }
+
+        @keyframes enemyShake {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .enemyLabel {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            padding: 4px 12px;
+            border-radius: 5px;
+            font-size: 12px;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+
+        #souBase {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 160px;
+            height: 160px;
+            border-radius: 50% 50% 0 0;
+            background: linear-gradient(135deg, #ff6b35, #ff8c42);
+            border: 4px solid #f7b801;
+            box-shadow: 0 -10px 30px rgba(255, 107, 53, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 80;
+        }
+
+        #souLogo {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background-image: url('https://raw.githubusercontent.com/Shibfun/ShibOwesYou/refs/heads/main/images/sou.png');
+            background-size: cover;
+            background-position: center;
+            border: 3px solid #f7b801;
+            box-shadow: 0 0 15px rgba(247, 184, 1, 0.6);
+        }
+
+        #crosshair {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            pointer-events: none;
+            z-index: 200;
+            transform: translate(-50%, -50%);
+        }
+
+        .crosshairLine {
+            position: absolute;
+            background: #f7b801;
+            box-shadow: 0 0 5px #f7b801;
+        }
+
+        .crosshairH {
+            width: 15px;
+            height: 2px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .crosshairV {
+            width: 2px;
+            height: 15px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .crosshairDot {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #f7b801;
+            border-radius: 50%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 8px #f7b801;
+        }
+
+        #uiPanel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+            font-weight: bold;
+            font-size: 18px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .statBox {
+            background: rgba(0,0,0,0.8);
+            padding: 10px 20px;
+            border: 2px solid #ff6b35;
+            border-radius: 5px;
+            color: #f7b801;
+            text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+        }
+
+        .statBox.kills {
+            border-color: #ff4757;
+            color: #ff4757;
+        }
+
+        #healthBar {
+            position: absolute;
+            bottom: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 40px;
+            background: rgba(0,0,0,0.8);
+            border: 2px solid white;
+            overflow: hidden;
+            z-index: 90;
+        }
+
+        #healthFill {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, #4caf50, #8bc34a);
+            transition: width 0.2s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        #healthLabel {
+            position: absolute;
+            bottom: 225px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.6);
+            padding: 4px 12px;
+            border: 1px solid white;
+            font-size: 12px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .popup {
+            position: absolute;
+            font-weight: bold;
+            pointer-events: none;
+            animation: popupFloat 1.2s forwards;
+            z-index: 70;
+            text-shadow: 3px 3px 10px rgba(0,0,0,0.9);
+        }
+
+        .popupHeal {
+            color: #4caf50;
+            font-size: 56px;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+
+        .popupCallout {
+            color: #ffeb3b;
+            font-size: 28px;
+            text-transform: uppercase;
+            font-style: italic;
+            max-width: 200px;
+            text-align: center;
+            font-weight: 900;
+            letter-spacing: 1px;
+            line-height: 1.3;
+        }
+
+        @keyframes popupFloat {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-120px) scale(0.6);
+            }
+        }
+
+        #startScreen, #gameOverScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 14, 39, 0.98);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+            text-align: center;
+        }
+
+        #startScreen.hidden, #gameOverScreen.hidden {
+            display: none;
+        }
+
+        h1 {
+            font-size: 72px;
+            color: #ff6b35;
+            text-shadow: 0 0 20px rgba(255, 107, 53, 0.6);
+            margin: 20px 0;
+            letter-spacing: 3px;
+        }
+
+        p {
+            font-size: 18px;
+            color: #ccc;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff6b35, #ff8c42);
+            color: black;
+            border: 2px solid #f7b801;
+            padding: 15px 40px;
+            font-size: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px;
+            transition: transform 0.15s;
+        }
+
+        button:hover, button:active {
+            transform: scale(1.05);
+        }
+
+        #langToggle {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            z-index: 101;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .footer {
+            background: rgba(0,0,0,0.9);
+            border-top: 2px solid #ff6b35;
+            padding: 8px 15px;
+            text-align: center;
+            font-size: 11px;
+            color: #aaa;
+            font-family: 'Courier New', monospace;
+        }
+
+        .muzzleFlash {
+            position: absolute;
+            font-size: 40px;
+            pointer-events: none;
+            animation: flashPop 0.15s forwards;
+            z-index: 70;
+        }
+
+        @keyframes flashPop {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+        }
+
+        @media (max-width: 768px) {
+            #uiPanel {
+                flex-direction: column;
+                gap: 10px;
+                font-size: 14px;
+            }
+
+            .statBox {
+                padding: 8px 15px;
+            }
+
+            h1 {
+                font-size: 48px;
+            }
+
+            p {
+                font-size: 14px;
+            }
+
+            button {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+
+            #healthBar {
+                width: 80vw;
+                height: 30px;
+            }
+
+            #souBase {
+                width: 120px;
+                height: 120px;
+            }
+
+            #souLogo {
+                width: 100px;
+                height: 100px;
+            }
+
+            .enemy {
+                width: 100px;
+                height: 100px;
+            }
+
+            .popupHeal {
+                font-size: 42px;
+            }
+
+            .popupCallout {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="gameContainer">
+    <div id="gameArea">
+        <div id="uiPanel">
+            <div class="statBox">LEVEL: <span id="levelDisplay">1</span></div>
+            <div class="statBox kills">KILLS: <span id="killsDisplay">0</span></div>
+            <div class="statBox">SCORE: <span id="scoreDisplay">0</span></div>
+        </div>
+
+        <div id="healthLabel">ENERGY BOOST</div>
+        <div id="healthBar" style="display: none;">
+            <div id="healthFill"></div>
+        </div>
+
+        <div id="souBase">
+            <div id="souLogo"></div>
+        </div>
+
+        <div id="crosshair">
+            <div class="crosshairLine crosshairH"></div>
+            <div class="crosshairLine crosshairV"></div>
+            <div class="crosshairDot"></div>
+        </div>
+
+        <div id="startScreen">
+            <h1>SOU FOR FUN</h1>
+            <p>TACTICAL STRIKE FORCE</p>
+            <p id="descText">Click to boost their energy</p>
+            <button id="startBtn">LOCK & LOAD</button>
+        </div>
+
+        <div id="gameOverScreen" class="hidden">
+            <h1>MISSION COMPLETE</h1>
+            <p id="finalScore">TOTAL BOOST: 0</p>
+            <p id="finalKills">TARGETS ENERGIZED: 0</p>
+            <button id="restartBtn">RETRY MISSION</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2024 SOU FOR FUN | Powered by SOU Community | All Rights Reserved
+    </div>
+</div>
+
+<button id="langToggle">中文</button>
+
+<script>
+const kaalImg = new Image();
+kaalImg.src = 'https://raw.githubusercontent.com/Shibfun/ShibOwesYou/refs/heads/main/images/kaal.jpg';
+
+const shyImg = new Image();
+shyImg.src = 'https://raw.githubusercontent.com/Shibfun/ShibOwesYou/refs/heads/main/images/shy.jpg';
+
+const calloutPhrases = {
+    en: [
+        "STOP BEING SILENT!",
+        "WRITE CODE NOW!",
+        "UPDATE THE REPO!",
+        "NO MORE LAZINESS!",
+        "GET SHIPPING!",
+        "DEPLOY IT!",
+        "COMMIT CHANGES!",
+        "PUSH TO MAIN!",
+        "BUILD SOMETHING!",
+        "SHIP IT!",
+        "STOP PROCRASTINATING!",
+        "CODE FASTER!",
+        "BREAK THE SILENCE!",
+        "SPEAK UP!",
+        "MAKE PROGRESS!",
+        "MOVE FORWARD!",
+        "TAKE ACTION!",
+        "EXECUTE NOW!",
+        "DELIVER VALUE!",
+        "STOP WAITING!",
+        "GO LIVE!",
+        "RELEASE IT!",
+        "LAUNCH NOW!",
+        "MAKE IT HAPPEN!",
+        "NO EXCUSES!",
+        "FULL SPEED!",
+        "MAXIMUM VELOCITY!",
+        "UNSTOPPABLE!",
+        "LEGENDARY PACE!",
+        "WARRIOR MODE!",
+        "BEAST MODE!",
+        "GRIND TIME!",
+        "HUSTLE HARD!",
+        "EARN IT!",
+        "PROVE YOURSELF!",
+        "SHOW YOUR POWER!",
+        "DOMINATE!",
+        "CONQUER!",
+        "VICTORY!",
+        "RISE UP!"
+    ],
+    zh: [
+        "停止沉默！",
+        "现在写代码！",
+        "更新仓库！",
+        "别再偷懒！",
+        "快去发布！",
+        "部署它！",
+        "提交更改！",
+        "推送到主分支！",
+        "构建东西！",
+        "发布它！",
+        "停止拖延！",
+        "更快地编码！",
+        "打破沉默！",
+        "大声说话！",
+        "取得进展！",
+        "向前迈进！",
+        "立即采取行动！",
+        "现在执行！",
+        "交付价值！",
+        "停止等待！",
+        "上线！",
+        "发布！",
+        "现在启动！",
+        "让它发生！",
+        "没有借口！",
+        "全速！",
+        "最大速度！",
+        "无法阻挡！",
+        "传奇步伐！",
+        "战士模式！",
+        "野兽模式！",
+        "磨练时间！",
+        "努力奋斗！",
+        "赚取它！",
+        "证明自己！",
+        "展示你的力量！",
+        "统治！",
+        "征服！",
+        "胜利！",
+        "站起来！"
+    ]
+};
+
+const i18n = {
+    en: {
+        level: "LEVEL: ",
+        kills: "KILLS: ",
+        score: "SCORE: ",
+        health: "ENERGY BOOST",
+        desc: "Click to boost their energy",
+        start: "LOCK & LOAD",
+        restart: "RETRY MISSION",
+        over: "MISSION COMPLETE",
+        final: "TOTAL BOOST: ",
+        finalKills: "TARGETS ENERGIZED: ",
+        lang: "中文",
+        kaal: "KAAL",
+        shy: "SHYTOSHI"
+    },
+    zh: {
+        level: "等级: ",
+        kills: "击杀: ",
+        score: "分数: ",
+        health: "能量加成",
+        desc: "点击为他们加能量",
+        start: "准备就绪",
+        restart: "重试任务",
+        over: "任务完成",
+        final: "总加成: ",
+        finalKills: "能量化目标: ",
+        lang: "English",
+        kaal: "KAAL",
+        shy: "SHYTOSHI"
+    }
+};
+
+let gameState = {
+    lang: 'en',
+    level: 1,
+    score: 0,
+    kills: 0,
+    isPlaying: false,
+    enemies: [],
+    enemyHealth: 100,
+    currentEnemyHealth: 100,
+    crosshairX: window.innerWidth / 2,
+    crosshairY: window.innerHeight / 2
+};
+
+const gameArea = document.getElementById('gameArea');
+const gameContainer = document.getElementById('gameContainer');
+const crosshair = document.getElementById('crosshair');
+const startScreen = document.getElementById('startScreen');
+const gameOverScreen = document.getElementById('gameOverScreen');
+const startBtn = document.getElementById('startBtn');
+const restartBtn = document.getElementById('restartBtn');
+const langToggle = document.getElementById('langToggle');
+const levelDisplay = document.getElementById('levelDisplay');
+const killsDisplay = document.getElementById('killsDisplay');
+const scoreDisplay = document.getElementById('scoreDisplay');
+const healthBar = document.getElementById('healthBar');
+const healthFill = document.getElementById('healthFill');
+const healthLabel = document.getElementById('healthLabel');
+const souBase = document.getElementById('souBase');
+
+function updateUI() {
+    const t = i18n[gameState.lang];
+    levelDisplay.textContent = gameState.level;
+    killsDisplay.textContent = gameState.kills;
+    scoreDisplay.textContent = gameState.score;
+    document.getElementById('descText').textContent = t.desc;
+    startBtn.textContent = t.start;
+    restartBtn.textContent = t.restart;
+    document.getElementById('gameOverScreen').querySelector('h1').textContent = t.over;
+    document.getElementById('finalScore').textContent = t.final + gameState.score;
+    document.getElementById('finalKills').textContent = t.finalKills + gameState.kills;
+    langToggle.textContent = t.lang;
+    healthLabel.textContent = t.health;
+}
+
+langToggle.addEventListener('click', () => {
+    gameState.lang = gameState.lang === 'en' ? 'zh' : 'en';
+    updateUI();
+});
+
+document.addEventListener('mousemove', (e) => {
+    gameState.crosshairX = e.clientX;
+    gameState.crosshairY = e.clientY;
+    crosshair.style.left = e.clientX + 'px';
+    crosshair.style.top = e.clientY + 'px';
+});
+
+document.addEventListener('touchmove', (e) => {
+    if (gameState.isPlaying) {
+        const touch = e.touches[0];
+        gameState.crosshairX = touch.clientX;
+        gameState.crosshairY = touch.clientY;
+        crosshair.style.left = touch.clientX + 'px';
+        crosshair.style.top = touch.clientY + 'px';
+    }
+}, { passive: true });
+
+function spawnEnemy() {
+    if (!gameState.isPlaying) return;
+
+    const enemy = document.createElement('div');
+    enemy.className = 'enemy';
+    
+    const isKaal = Math.random() > 0.5;
+    const name = isKaal ? i18n[gameState.lang].kaal : i18n[gameState.lang].shy;
+    const img = isKaal ? kaalImg : shyImg;
+    
+    enemy.style.backgroundImage = `url('${img.src}')`;
+    
+    const label = document.createElement('div');
+    label.className = 'enemyLabel';
+    label.textContent = name;
+    enemy.appendChild(label);
+    
+    const gameAreaRect = gameArea.getBoundingClientRect();
+    let x = Math.random() * (gameAreaRect.width - 150);
+    let y = Math.random() * (gameAreaRect.height - 250) + 50;
+    
+    enemy.style.left = x + 'px';
+    enemy.style.top = y + 'px';
+
+    let speedX = (Math.random() - 0.5) * (6 + gameState.level * 1.2);
+    let speedY = (Math.random() - 0.5) * (6 + gameState.level * 1.2);
+
+    const moveInterval = setInterval(() => {
+        if (!gameState.isPlaying) {
+            clearInterval(moveInterval);
+            enemy.remove();
+            return;
+        }
+
+        x += speedX;
+        y += speedY;
+
+        if (x <= 0 || x >= gameAreaRect.width - 150) speedX *= -1;
+        if (y <= 50 || y >= gameAreaRect.height - 250) speedY *= -1;
+
+        enemy.style.left = x + 'px';
+        enemy.style.top = y + 'px';
+    }, 16);
+
+    gameArea.addEventListener('click', function checkHit(e) {
+        if (!gameState.isPlaying) return;
+        
+        const enemyRect = enemy.getBoundingClientRect();
+        const distance = Math.sqrt(
+            Math.pow(e.clientX - (enemyRect.left + enemyRect.width / 2), 2) +
+            Math.pow(e.clientY - (enemyRect.top + enemyRect.height / 2), 2)
+        );
+
+        if (distance < enemyRect.width / 2) {
+            shootEnemy(enemy, e.clientX, e.clientY);
+        }
+    });
+
+    gameArea.addEventListener('touchstart', function checkTouchHit(e) {
+        if (!gameState.isPlaying) return;
+        
+        const touch = e.touches[0];
+        const enemyRect = enemy.getBoundingClientRect();
+        const distance = Math.sqrt(
+            Math.pow(touch.clientX - (enemyRect.left + enemyRect.width / 2), 2) +
+            Math.pow(touch.clientY - (enemyRect.top + enemyRect.height / 2), 2)
+        );
+
+        if (distance < enemyRect.width / 2) {
+            shootEnemy(enemy, touch.clientX, touch.clientY);
+        }
+    }, { passive: true });
+
+    gameArea.appendChild(enemy);
+    gameState.enemies.push({ element: enemy, interval: moveInterval });
+}
+
+function getRandomCallout() {
+    const phrases = calloutPhrases[gameState.lang];
+    return phrases[Math.floor(Math.random() * phrases.length)];
+}
+
+function shootEnemy(el, x, y) {
+    gameState.score += 100;
+    const boost = Math.max(5, 30 - gameState.level);
+    gameState.currentEnemyHealth += boost;
+    
+    if (gameState.currentEnemyHealth >= 100) {
+        gameState.level++;
+        gameState.kills++;
+        gameState.currentEnemyHealth = 0;
+        if (gameState.level % 3 === 0 && gameState.enemies.length < 5) {
+            spawnEnemy();
+        }
+    }
+
+    updateUI();
+    updateHealthBar();
+
+    el.classList.add('hit');
+    setTimeout(() => el.classList.remove('hit'), 200);
+
+    souBase.style.boxShadow = '0 -10px 40px rgba(255, 107, 53, 0.8), inset 0 0 20px rgba(255,255,255,0.3)';
+    setTimeout(() => {
+        souBase.style.boxShadow = '0 -10px 30px rgba(255, 107, 53, 0.5), inset 0 0 20px rgba(0,0,0,0.3)';
+    }, 150);
+
+    const flash = document.createElement('div');
+    flash.className = 'muzzleFlash';
+    flash.textContent = '⚡';
+    flash.style.left = x + 'px';
+    flash.style.top = y + 'px';
+    gameArea.appendChild(flash);
+    setTimeout(() => flash.remove(), 150);
+
+    const heal = document.createElement('div');
+    heal.className = 'popup popupHeal';
+    heal.textContent = '+' + Math.floor(boost);
+    heal.style.left = x + 'px';
+    heal.style.top = y + 'px';
+    gameArea.appendChild(heal);
+    setTimeout(() => heal.remove(), 1200);
+
+    const callout = document.createElement('div');
+    callout.className = 'popup popupCallout';
+    callout.textContent = getRandomCallout();
+    callout.style.left = (x - 100) + 'px';
+    callout.style.top = (y + 40) + 'px';
+    gameArea.appendChild(callout);
+    setTimeout(() => callout.remove(), 1200);
+}
+
+function updateHealthBar() {
+    const percent = gameState.currentEnemyHealth;
+    healthFill.style.width = percent + '%';
+    healthFill.textContent = Math.ceil(percent) + ' ENERGY';
+}
+
+function startGame() {
+    gameState.isPlaying = true;
+    gameState.score = 0;
+    gameState.level = 1;
+    gameState.kills = 0;
+    gameState.currentEnemyHealth = 0;
+    gameState.enemies = [];
+    
+    document.querySelectorAll('.enemy').forEach(el => el.remove());
+    
+    startScreen.classList.add('hidden');
+    gameOverScreen.classList.add('hidden');
+    healthBar.style.display = 'block';
+    
+    updateUI();
+    updateHealthBar();
+    
+    spawnEnemy();
+    spawnEnemy();
+}
+
+startBtn.addEventListener('click', startGame);
+restartBtn.addEventListener('click', startGame);
+
+updateUI();
+</script>
+
+</body>
+</html>
