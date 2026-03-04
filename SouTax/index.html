@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>SOU Token Deployer - Ecosystem Hub</title>
+    <link rel="icon" type="image/png" href="https://www.woofswap.finance/image/tokens/sou.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1; --primary-light: #818cf8; --primary-dark: #4f46e5;
+            --accent: #a855f7; --accent-light: #c084fc; --success: #10b981;
+            --warning: #f59e0b; --error: #ef4444; --dark-1: #030712;
+            --dark-2: #0f172a; --dark-3: #1e293b; --dark-4: #334155;
+            --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-tertiary: #64748b;
+            --border: rgba(255, 255, 255, 0.06); --border-focus: rgba(99, 102, 241, 0.4);
+            --glass: rgba(15, 23, 42, 0.65); --glass-heavy: rgba(15, 23, 42, 0.85);
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; outline: none; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--dark-1);
+            color: var(--text-primary); min-height: 100vh; position: relative;
+            overflow-x: hidden; display: flex; flex-direction: column;
+            line-height: 1.5;
+        }
+        .bg-glow {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 90%, rgba(168, 85, 247, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 1) 0%, rgba(3, 7, 18, 1) 100%);
+        }
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; background: var(--glass);
+            backdrop-filter: blur(20px); border-bottom: 1px solid var(--border);
+            padding: calc(12px + var(--safe-top)) 20px 12px; display: flex; justify-content: space-between; align-items: center; z-index: 1000;
+        }
+        @media (min-width: 1024px) { nav { padding: 16px 60px; } }
+        .logo-nav { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 800; color: var(--text-primary); text-decoration: none; }
+        .logo-nav img { width: 32px; height: 32px; border-radius: 10px; }
+        .nav-right { display: flex; align-items: center; gap: 12px; }
+        .wrapper { position: relative; z-index: 1; padding-top: calc(80px + var(--safe-top)); flex: 1; padding-bottom: calc(40px + var(--safe-bottom)); }
+        .app-container { width: 100%; max-width: 600px; margin: 0 auto; padding: 0 16px; display: flex; flex-direction: column; gap: 24px; }
+        .card { background: var(--glass-heavy); backdrop-filter: blur(40px); border-radius: 32px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6); }
+        .card-content { padding: 20px; }
+        @media (min-width: 768px) { .card-content { padding: 32px; } }
+        .tab-nav { display: flex; background: rgba(0, 0, 0, 0.3); padding: 6px; margin-bottom: 24px; border-radius: 20px; border: 1px solid var(--border); gap: 4px; }
+        .tab-btn { flex: 1; padding: 12px 10px; border: none; background: transparent; color: var(--text-secondary); font-weight: 700; font-size: 13px; cursor: pointer; border-radius: 16px; transition: var(--transition); }
+        .tab-btn.active { background: var(--primary); color: white; }
+        .input-section { margin-bottom: 16px; }
+        .input-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; color: var(--text-secondary); font-weight: 700; padding-left: 6px; }
+        .input-box { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border); border-radius: 18px; padding: 14px 18px; display: flex; align-items: center; gap: 12px; transition: var(--transition); }
+        .input-box:focus-within { border-color: var(--primary); background: rgba(0, 0, 0, 0.4); }
+        input { flex: 1; background: transparent; border: none; color: var(--text-primary); font-size: 15px; font-weight: 600; outline: none; width: 100%; }
+        input::placeholder { color: var(--text-tertiary); }
+        .action-button { width: 100%; padding: 18px; background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); border: none; border-radius: 20px; color: white; font-size: 16px; font-weight: 800; cursor: pointer; transition: var(--transition); margin-top: 12px; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2); display: flex; align-items: center; justify-content: center; }
+        .action-button:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(99, 102, 241, 0.3); }
+        .action-button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .secondary-button { width: 100%; padding: 14px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 18px; color: var(--text-secondary); font-size: 14px; font-weight: 700; cursor: pointer; transition: var(--transition); margin-top: 8px; }
+        .secondary-button:hover { background: rgba(255,255,255,0.1); color: white; }
+        .wallet-info { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 16px; font-size: 13px; font-weight: 700; cursor: pointer; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--error); }
+        .status-dot.connected { background: var(--success); box-shadow: 0 0 10px var(--success); }
+        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; }
+        .toast { padding: 14px 20px; border-radius: 16px; background: var(--glass-heavy); backdrop-filter: blur(20px); border: 1px solid var(--border); color: white; font-size: 14px; font-weight: 600; box-shadow: 0 20px 40px rgba(0,0,0,0.4); animation: toastIn 0.3s ease-out forwards; }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .result-box { margin-top: 20px; padding: 16px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 18px; display: none; }
+        .result-title { font-size: 12px; color: var(--success); font-weight: 800; text-transform: uppercase; margin-bottom: 8px; }
+        .result-text { font-family: 'Space Mono', monospace; font-size: 13px; color: white; word-break: break-all; }
+    </style>
+</head>
+<body>
+    <div class="bg-glow"></div>
+    <nav>
+        <a href="#" class="logo-nav">
+            <img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU">
+            <span>SOU Deployer</span>
+        </a>
+        <div class="nav-right">
+            <div class="wallet-info" id="connect-wallet">
+                <div class="status-dot" id="status-dot"></div>
+                <span id="wallet-address">Connect Wallet</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="wrapper">
+        <div class="app-container">
+            <div class="card">
+                <div class="card-content">
+                    <div class="tab-nav">
+                        <button class="tab-btn active" onclick="switchTab('deploy')">Deploy Token</button>
+                        <button class="tab-btn" onclick="switchTab('query')">Query CA</button>
+                    </div>
+
+                    <!-- Deploy Section -->
+                    <div id="deploy-section">
+                        <div class="input-section">
+                            <div class="input-label">Token Name</div>
+                            <div class="input-box"><input type="text" id="token-name" placeholder="e.g. Sou Magic Token"></div>
+                        </div>
+                        <div class="input-section">
+                            <div class="input-label">Token Symbol</div>
+                            <div class="input-box"><input type="text" id="token-symbol" placeholder="e.g. SMT"></div>
+                        </div>
+                        <div class="input-section">
+                            <div class="input-label">Metadata CID (IPFS)</div>
+                            <div class="input-box"><input type="text" id="token-meta" placeholder="Qm..."></div>
+                        </div>
+                        <div class="input-section">
+                            <div class="input-label">Tax Rate (100 = 1%)</div>
+                            <div class="input-box"><input type="number" id="tax-rate" value="300"></div>
+                        </div>
+                        <div class="input-section">
+                            <div class="input-label">Salt (Vanity Suffix)</div>
+                            <div class="input-box"><input type="text" id="token-salt" placeholder="0x..."></div>
+                        </div>
+                        
+                        <button class="secondary-button" onclick="fillRandom()">🎲 Random Fill (Valid Params)</button>
+                        <button class="action-button" id="deploy-btn" onclick="handleDeploy()">Deploy (Cost 10,000 SOU)</button>
+                        <p class="tip-text">Make sure you have approved 10,000 SOU to the contract before deploying.</p>
+                    </div>
+
+                    <!-- Query Section -->
+                    <div id="query-section" style="display: none;">
+                        <div class="input-section">
+                            <div class="input-label">Token ID</div>
+                            <div class="input-box"><input type="number" id="query-id" placeholder="Enter ID (e.g. 1)"></div>
+                        </div>
+                        <button class="action-button" onclick="handleQuery()">Query Address</button>
+                        
+                        <div class="result-box" id="query-result">
+                            <div class="result-title">Contract Address (CA)</div>
+                            <div class="result-text" id="ca-display"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script>
+        const CONTRACT_ADDRESS = "0x880Fd8963d824cdf61e7fd3315f3285eEf5F51B2";
+        const SOU_TOKEN_ADDRESS = "0xb65bD36fef84ebc5114Cfd803A4F25B2b57F7777";
+        const BSC_CHAIN_ID = "0x38"; // 56 in decimal
+
+        const ABI = [
+            "function deployNewToken(tuple(string name, string symbol, string meta, uint8 dexThresh, bytes32 salt, uint16 taxRate, uint8 migratorType, address quoteToken, uint256 quoteAmt, address beneficiary, bytes permitData, bytes32 extensionID, bytes extensionData, uint8 dexId, tuple(uint24 fee, int24 tickLower, int24 tickUpper) lpFeeProfile, uint64 taxDuration, uint64 antiFarmerDuration, uint16 mktBps, uint16 deflationBps, uint16 dividendBps, uint16 lpBps, uint256 minimumShareBalance) params) external",
+            "function deployedTokens(uint256) view returns (address)",
+            "function nextTokenId() view returns (uint256)"
+        ];
+
+        const ERC20_ABI = [
+            "function approve(address spender, uint256 amount) public returns (bool)",
+            "function allowance(address owner, address spender) view returns (uint256)"
+        ];
+
+        let provider, signer, contract;
+
+        async function connectWallet() {
+            if (!window.ethereum) return showToast("Please install MetaMask");
+            try {
+                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                if (chainId !== BSC_CHAIN_ID) {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: BSC_CHAIN_ID }],
+                    });
+                }
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                updateWalletUI(accounts[0]);
+                initContract();
+            } catch (err) {
+                showToast("Connection failed: " + err.message);
+            }
+        }
+
+        function updateWalletUI(addr) {
+            document.getElementById('wallet-address').innerText = addr.slice(0, 6) + "..." + addr.slice(-4);
+            document.getElementById('status-dot').classList.add('connected');
+        }
+
+        function initContract() {
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+            signer = provider.getSigner();
+            contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('deploy-section').style.display = tab === 'deploy' ? 'block' : 'none';
+            document.getElementById('query-section').style.display = tab === 'query' ? 'block' : 'none';
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.innerText = msg;
+            document.getElementById('toast-container').appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        function fillRandom() {
+            const names = ["Sou Moon", "Flap King", "Bsc Gem", "Alpha Sou", "Turbo Token"];
+            const symbols = ["MOON", "KING", "GEM", "ALPHA", "TURBO"];
+            const idx = Math.floor(Math.random() * names.length);
+            
+            document.getElementById('token-name').value = names[idx] + " " + Math.floor(Math.random() * 1000);
+            document.getElementById('token-symbol').value = symbols[idx];
+            document.getElementById('token-meta').value = "QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco"; // Example CID
+            document.getElementById('token-salt').value = ethers.utils.hexlify(ethers.utils.randomBytes(32));
+            document.getElementById('tax-rate').value = 300;
+            showToast("Random parameters filled!");
+        }
+
+        async function handleDeploy() {
+            if (!contract) return connectWallet();
+            const btn = document.getElementById('deploy-btn');
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+
+            try {
+                const userAddr = await signer.getAddress();
+                const souContract = new ethers.Contract(SOU_TOKEN_ADDRESS, ERC20_ABI, signer);
+                const allowance = await souContract.allowance(userAddr, CONTRACT_ADDRESS);
+                const needed = ethers.utils.parseEther("10000");
+
+                if (allowance.lt(needed)) {
+                    showToast("Approving SOU...");
+                    const txApprove = await souContract.approve(CONTRACT_ADDRESS, needed);
+                    await txApprove.wait();
+                    showToast("SOU Approved!");
+                }
+
+                const params = {
+                    name: document.getElementById('token-name').value,
+                    symbol: document.getElementById('token-symbol').value,
+                    meta: document.getElementById('token-meta').value,
+                    dexThresh: 1, // V2
+                    salt: document.getElementById('token-salt').value,
+                    taxRate: parseInt(document.getElementById('tax-rate').value),
+                    migratorType: 2, // V2_MIGRATOR
+                    quoteToken: "0x0000000000000000000000000000000000000000",
+                    quoteAmt: ethers.utils.parseEther("0.01"),
+                    beneficiary: userAddr,
+                    permitData: "0x",
+                    extensionID: ethers.utils.formatBytes32String(""),
+                    extensionData: "0x",
+                    dexId: 1, // UNISWAP_V2
+                    lpFeeProfile: { fee: 0, tickLower: 0, tickUpper: 0 },
+                    taxDuration: 0,
+                    antiFarmerDuration: 0,
+                    mktBps: 5000,
+                    deflationBps: 0,
+                    dividendBps: 5000,
+                    lpBps: 0,
+                    minimumShareBalance: ethers.utils.parseEther("1000000")
+                };
+
+                showToast("Deploying to Flap...");
+                const tx = await contract.deployNewToken(params);
+                await tx.wait();
+                showToast("Token Deployed Successfully!");
+            } catch (err) {
+                console.error(err);
+                showToast("Error: " + (err.data?.message || err.message));
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Deploy (Cost 10,000 SOU)";
+            }
+        }
+
+        async function handleQuery() {
+            if (!contract) return connectWallet();
+            const id = document.getElementById('query-id').value;
+            if (!id) return showToast("Please enter an ID");
+
+            try {
+                const addr = await contract.deployedTokens(id);
+                if (addr === "0x0000000000000000000000000000000000000000") {
+                    showToast("ID not found");
+                } else {
+                    document.getElementById('query-result').style.display = 'block';
+                    document.getElementById('ca-display').innerText = addr;
+                }
+            } catch (err) {
+                showToast("Query failed");
+            }
+        }
+
+        document.getElementById('connect-wallet').onclick = connectWallet;
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', (acc) => acc.length > 0 ? updateWalletUI(acc[0]) : location.reload());
+            window.ethereum.on('chainChanged', () => location.reload());
+        }
+    </script>
+</body>
+</html>
