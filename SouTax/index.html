@@ -117,10 +117,10 @@
                         </div>
                         <div class="input-section">
                             <div class="input-label">Salt (Vanity Suffix)</div>
-                            <div class="input-box"><input type="text" id="token-salt" placeholder="0x..."></div>
+                            <div class="input-box"><input type="text" id="token-salt" placeholder="Calculating..." readonly></div>
                         </div>
                         
-                        <button class="secondary-button" onclick="fillRandom()">🎲 Random Fill (Valid Params)</button>
+                        <button class="secondary-button" id="random-btn" onclick="fillRandom()">🎲 Random Fill (Auto Salt)</button>
                         <button class="action-button" id="deploy-btn" onclick="handleDeploy()">Deploy (Cost 10,000 SOU)</button>
                         <p class="tip-text">Make sure you have approved 10,000 SOU to the contract before deploying.</p>
                     </div>
@@ -148,7 +148,9 @@
     <script>
         const CONTRACT_ADDRESS = "0x880Fd8963d824cdf61e7fd3315f3285eEf5F51B2";
         const SOU_TOKEN_ADDRESS = "0xb65bD36fef84ebc5114Cfd803A4F25B2b57F7777";
-        const BSC_CHAIN_ID = "0x38"; // 56 in decimal
+        const FLAP_PORTAL_ADDRESS = "0xe2cE6ab80874Fa9Fa2aAE65D277Dd6B8e65C9De0";
+        const TAX_TOKEN_V2_IMPL = "0xae562c6A05b798499507c6276C6Ed796027807BA"; // BSC Tax Token V2 Impl
+        const BSC_CHAIN_ID = "0x38";
 
         const ABI = [
             "function deployNewToken(tuple(string name, string symbol, string meta, uint8 dexThresh, bytes32 salt, uint16 taxRate, uint8 migratorType, address quoteToken, uint256 quoteAmt, address beneficiary, bytes permitData, bytes32 extensionID, bytes extensionData, uint8 dexId, tuple(uint24 fee, int24 tickLower, int24 tickUpper) lpFeeProfile, uint64 taxDuration, uint64 antiFarmerDuration, uint16 mktBps, uint16 deflationBps, uint16 dividendBps, uint16 lpBps, uint256 minimumShareBalance) params) external",
@@ -158,7 +160,8 @@
 
         const ERC20_ABI = [
             "function approve(address spender, uint256 amount) public returns (bool)",
-            "function allowance(address owner, address spender) view returns (uint256)"
+            "function allowance(address owner, address spender) view returns (uint256)",
+            "function balanceOf(address account) view returns (uint256)"
         ];
 
         let provider, signer, contract;
@@ -204,37 +207,85 @@
             t.className = 'toast';
             t.innerText = msg;
             document.getElementById('toast-container').appendChild(t);
-            setTimeout(() => t.remove(), 3000);
+            setTimeout(() => t.remove(), 4000);
         }
 
-        function fillRandom() {
+        function predictAddress(salt, tokenImpl, portal) {
+            const bytecode = "0x3d602d80600a3d3981f3363d3d373d3d3d363d73"
+                + tokenImpl.slice(2).toLowerCase()
+                + "5af43d82803e903d91602b57fd5bf3";
+            
+            const saltBytes = ethers.utils.arrayify(salt);
+            const bytecodeHash = ethers.utils.keccak256(bytecode);
+            
+            const address = ethers.utils.getCreate2Address(portal, saltBytes, bytecodeHash);
+            return address;
+        }
+
+        async function findValidSalt(suffix) {
+            let salt = ethers.utils.hexlify(ethers.utils.randomBytes(32));
+            let iterations = 0;
+            while (!predictAddress(salt, TAX_TOKEN_V2_IMPL, FLAP_PORTAL_ADDRESS).endsWith(suffix)) {
+                salt = ethers.utils.keccak256(salt);
+                iterations++;
+                if (iterations > 5000) { // Safety break
+                    return findValidSalt(suffix);
+                }
+            }
+            return salt;
+        }
+
+        async function fillRandom() {
+            const btn = document.getElementById('random-btn');
+            btn.disabled = true;
+            btn.innerText = "Calculating Salt...";
+            
             const names = ["Sou Moon", "Flap King", "Bsc Gem", "Alpha Sou", "Turbo Token"];
             const symbols = ["MOON", "KING", "GEM", "ALPHA", "TURBO"];
             const idx = Math.floor(Math.random() * names.length);
             
             document.getElementById('token-name').value = names[idx] + " " + Math.floor(Math.random() * 1000);
             document.getElementById('token-symbol').value = symbols[idx];
-            document.getElementById('token-meta').value = "QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco"; // Example CID
-            document.getElementById('token-salt').value = ethers.utils.hexlify(ethers.utils.randomBytes(32));
+            document.getElementById('token-meta').value = "QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco";
             document.getElementById('tax-rate').value = 300;
-            showToast("Random parameters filled!");
+
+            try {
+                const salt = await findValidSalt("7777");
+                document.getElementById('token-salt').value = salt;
+                showToast("Random parameters & Valid Salt (7777) generated!");
+            } catch (e) {
+                showToast("Salt calculation failed, try again.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "🎲 Random Fill (Auto Salt)";
+            }
         }
 
         async function handleDeploy() {
             if (!contract) return connectWallet();
             const btn = document.getElementById('deploy-btn');
+            const salt = document.getElementById('token-salt').value;
+            
+            if (!salt || salt === "Calculating...") return showToast("Please click Random Fill first to get a valid Salt");
+
             btn.disabled = true;
             btn.innerText = "Processing...";
 
             try {
                 const userAddr = await signer.getAddress();
                 const souContract = new ethers.Contract(SOU_TOKEN_ADDRESS, ERC20_ABI, signer);
-                const allowance = await souContract.allowance(userAddr, CONTRACT_ADDRESS);
+                
+                const balance = await souContract.balanceOf(userAddr);
                 const needed = ethers.utils.parseEther("10000");
+                
+                if (balance.lt(needed)) {
+                    throw new Error("Insufficient SOU balance (Need 10,000 SOU)");
+                }
 
+                const allowance = await souContract.allowance(userAddr, CONTRACT_ADDRESS);
                 if (allowance.lt(needed)) {
-                    showToast("Approving SOU...");
-                    const txApprove = await souContract.approve(CONTRACT_ADDRESS, needed);
+                    showToast("Approving 10,000 SOU...");
+                    const txApprove = await souContract.approve(CONTRACT_ADDRESS, ethers.constants.MaxUint256);
                     await txApprove.wait();
                     showToast("SOU Approved!");
                 }
@@ -244,7 +295,7 @@
                     symbol: document.getElementById('token-symbol').value,
                     meta: document.getElementById('token-meta').value,
                     dexThresh: 1, // V2
-                    salt: document.getElementById('token-salt').value,
+                    salt: salt,
                     taxRate: parseInt(document.getElementById('tax-rate').value),
                     migratorType: 2, // V2_MIGRATOR
                     quoteToken: "0x0000000000000000000000000000000000000000",
@@ -264,13 +315,16 @@
                     minimumShareBalance: ethers.utils.parseEther("1000000")
                 };
 
-                showToast("Deploying to Flap...");
-                const tx = await contract.deployNewToken(params);
+                showToast("Deploying to Flap... Please wait.");
+                const tx = await contract.deployNewToken(params, { gasLimit: 1500000 });
                 await tx.wait();
                 showToast("Token Deployed Successfully!");
             } catch (err) {
                 console.error(err);
-                showToast("Error: " + (err.data?.message || err.message));
+                let msg = err.message;
+                if (err.data?.message) msg = err.data.message;
+                if (msg.includes("transfer amount exceeds balance")) msg = "SOU balance insufficient for fee";
+                showToast("Error: " + msg);
             } finally {
                 btn.disabled = false;
                 btn.innerText = "Deploy (Cost 10,000 SOU)";
