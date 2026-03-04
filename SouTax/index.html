@@ -112,8 +112,8 @@
                             <div class="input-box"><input type="text" id="token-meta" placeholder="Qm..."></div>
                         </div>
                         <div class="input-section">
-                            <div class="input-label">Tax Rate (100 = 1%)</div>
-                            <div class="input-box"><input type="number" id="tax-rate" value="300"></div>
+                            <div class="input-label">Tax Rate (Fixed 3%)</div>
+                            <div class="input-box"><input type="text" value="300 (3%)" readonly style="color: var(--text-tertiary);"></div>
                         </div>
                         <div class="input-section">
                             <div class="input-label">Salt (Vanity Suffix)</div>
@@ -122,7 +122,7 @@
                         
                         <button class="secondary-button" id="random-btn" onclick="fillRandom()">🎲 Random Fill (Auto Salt)</button>
                         <button class="action-button" id="deploy-btn" onclick="handleDeploy()">Deploy (Cost 10,000 SOU)</button>
-                        <p class="tip-text">Make sure you have approved 10,000 SOU to the contract before deploying.</p>
+                        <p class="tip-text">Marketing Wallet: 0xa819Eaf3f1d79E03a6D1001818889655532A9150</p>
                     </div>
 
                     <!-- Query Section -->
@@ -149,7 +149,8 @@
         const CONTRACT_ADDRESS = "0x880Fd8963d824cdf61e7fd3315f3285eEf5F51B2";
         const SOU_TOKEN_ADDRESS = "0xb65bD36fef84ebc5114Cfd803A4F25B2b57F7777";
         const FLAP_PORTAL_ADDRESS = "0xe2cE6ab80874Fa9Fa2aAE65D277Dd6B8e65C9De0";
-        const TAX_TOKEN_V2_IMPL = "0xae562c6A05b798499507c6276C6Ed796027807BA"; // BSC Tax Token V2 Impl
+        const TAX_TOKEN_V2_IMPL = "0xae562c6A05b798499507c6276C6Ed796027807BA";
+        const MARKETING_WALLET = "0xa819Eaf3f1d79E03a6D1001818889655532A9150";
         const BSC_CHAIN_ID = "0x38";
 
         const ABI = [
@@ -214,12 +215,9 @@
             const bytecode = "0x3d602d80600a3d3981f3363d3d373d3d3d363d73"
                 + tokenImpl.slice(2).toLowerCase()
                 + "5af43d82803e903d91602b57fd5bf3";
-            
             const saltBytes = ethers.utils.arrayify(salt);
             const bytecodeHash = ethers.utils.keccak256(bytecode);
-            
-            const address = ethers.utils.getCreate2Address(portal, saltBytes, bytecodeHash);
-            return address;
+            return ethers.utils.getCreate2Address(portal, saltBytes, bytecodeHash);
         }
 
         async function findValidSalt(suffix) {
@@ -228,9 +226,7 @@
             while (!predictAddress(salt, TAX_TOKEN_V2_IMPL, FLAP_PORTAL_ADDRESS).endsWith(suffix)) {
                 salt = ethers.utils.keccak256(salt);
                 iterations++;
-                if (iterations > 5000) { // Safety break
-                    return findValidSalt(suffix);
-                }
+                if (iterations > 10000) return findValidSalt(suffix);
             }
             return salt;
         }
@@ -247,14 +243,13 @@
             document.getElementById('token-name').value = names[idx] + " " + Math.floor(Math.random() * 1000);
             document.getElementById('token-symbol').value = symbols[idx];
             document.getElementById('token-meta').value = "QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco";
-            document.getElementById('tax-rate').value = 300;
 
             try {
                 const salt = await findValidSalt("7777");
                 document.getElementById('token-salt').value = salt;
-                showToast("Random parameters & Valid Salt (7777) generated!");
+                showToast("Valid Salt (7777) found!");
             } catch (e) {
-                showToast("Salt calculation failed, try again.");
+                showToast("Salt calculation failed.");
             } finally {
                 btn.disabled = false;
                 btn.innerText = "🎲 Random Fill (Auto Salt)";
@@ -266,7 +261,7 @@
             const btn = document.getElementById('deploy-btn');
             const salt = document.getElementById('token-salt').value;
             
-            if (!salt || salt === "Calculating...") return showToast("Please click Random Fill first to get a valid Salt");
+            if (!salt || salt === "Calculating...") return showToast("Please click Random Fill first");
 
             btn.disabled = true;
             btn.innerText = "Processing...";
@@ -277,17 +272,13 @@
                 
                 const balance = await souContract.balanceOf(userAddr);
                 const needed = ethers.utils.parseEther("10000");
-                
-                if (balance.lt(needed)) {
-                    throw new Error("Insufficient SOU balance (Need 10,000 SOU)");
-                }
+                if (balance.lt(needed)) throw new Error("Insufficient SOU balance");
 
                 const allowance = await souContract.allowance(userAddr, CONTRACT_ADDRESS);
                 if (allowance.lt(needed)) {
-                    showToast("Approving 10,000 SOU...");
+                    showToast("Approving SOU...");
                     const txApprove = await souContract.approve(CONTRACT_ADDRESS, ethers.constants.MaxUint256);
                     await txApprove.wait();
-                    showToast("SOU Approved!");
                 }
 
                 const params = {
@@ -296,35 +287,32 @@
                     meta: document.getElementById('token-meta').value,
                     dexThresh: 1, // V2
                     salt: salt,
-                    taxRate: parseInt(document.getElementById('tax-rate').value),
+                    taxRate: 300, // Fixed 3%
                     migratorType: 2, // V2_MIGRATOR
                     quoteToken: "0x0000000000000000000000000000000000000000",
                     quoteAmt: ethers.utils.parseEther("0.01"),
-                    beneficiary: userAddr,
+                    beneficiary: MARKETING_WALLET, // Fixed Marketing Wallet
                     permitData: "0x",
-                    extensionID: ethers.utils.formatBytes32String(""),
+                    extensionID: ethers.utils.hexZeroPad("0x0", 32),
                     extensionData: "0x",
                     dexId: 1, // UNISWAP_V2
                     lpFeeProfile: { fee: 0, tickLower: 0, tickUpper: 0 },
                     taxDuration: 0,
                     antiFarmerDuration: 0,
-                    mktBps: 5000,
+                    mktBps: 10000, // 100% of tax to beneficiary
                     deflationBps: 0,
-                    dividendBps: 5000,
+                    dividendBps: 0,
                     lpBps: 0,
                     minimumShareBalance: ethers.utils.parseEther("1000000")
                 };
 
-                showToast("Deploying to Flap... Please wait.");
-                const tx = await contract.deployNewToken(params, { gasLimit: 1500000 });
+                showToast("Deploying... Please confirm in wallet.");
+                const tx = await contract.deployNewToken(params, { gasLimit: 2000000 });
                 await tx.wait();
                 showToast("Token Deployed Successfully!");
             } catch (err) {
                 console.error(err);
-                let msg = err.message;
-                if (err.data?.message) msg = err.data.message;
-                if (msg.includes("transfer amount exceeds balance")) msg = "SOU balance insufficient for fee";
-                showToast("Error: " + msg);
+                showToast("Error: " + (err.data?.message || err.message));
             } finally {
                 btn.disabled = false;
                 btn.innerText = "Deploy (Cost 10,000 SOU)";
@@ -335,7 +323,6 @@
             if (!contract) return connectWallet();
             const id = document.getElementById('query-id').value;
             if (!id) return showToast("Please enter an ID");
-
             try {
                 const addr = await contract.deployedTokens(id);
                 if (addr === "0x0000000000000000000000000000000000000000") {
