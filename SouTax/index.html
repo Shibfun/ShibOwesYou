@@ -2,389 +2,738 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SOU Token Deployer - Ecosystem Hub</title>
-    <link rel="icon" type="image/png" href="https://www.woofswap.finance/image/tokens/sou.png">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SouTaxToken 部署器</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.1/dist.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/keccak256@1.0.6/keccak256.js"></script>
     <style>
-        :root {
-            --primary: #6366f1; --primary-light: #818cf8; --primary-dark: #4f46e5;
-            --accent: #a855f7; --accent-light: #c084fc; --success: #10b981;
-            --warning: #f59e0b; --error: #ef4444; --dark-1: #030712;
-            --dark-2: #0f172a; --dark-3: #1e293b; --dark-4: #334155;
-            --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-tertiary: #64748b;
-            --border: rgba(255, 255, 255, 0.06); --border-focus: rgba(99, 102, 241, 0.4);
-            --glass: rgba(15, 23, 42, 0.65); --glass-heavy: rgba(15, 23, 42, 0.85);
-            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            --safe-top: env(safe-area-inset-top, 0px);
-            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; outline: none; }
+
         body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--dark-1);
-            color: var(--text-primary); min-height: 100vh; position: relative;
-            overflow-x: hidden; display: flex; flex-direction: column;
-            line-height: 1.5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
-        .bg-glow {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
-                        radial-gradient(circle at 90% 90%, rgba(168, 85, 247, 0.15) 0%, transparent 40%),
-                        radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 1) 0%, rgba(3, 7, 18, 1) 100%);
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
         }
-        nav {
-            position: fixed; top: 0; left: 0; right: 0; background: var(--glass);
-            backdrop-filter: blur(20px); border-bottom: 1px solid var(--border);
-            padding: calc(12px + var(--safe-top)) 20px 12px; display: flex; justify-content: space-between; align-items: center; z-index: 1000;
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
         }
-        @media (min-width: 1024px) { nav { padding: 16px 60px; } }
-        .logo-nav { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 800; color: var(--text-primary); text-decoration: none; }
-        .logo-nav img { width: 32px; height: 32px; border-radius: 10px; }
-        .nav-right { display: flex; align-items: center; gap: 12px; }
-        .wrapper { position: relative; z-index: 1; padding-top: calc(80px + var(--safe-top)); flex: 1; padding-bottom: calc(40px + var(--safe-bottom)); }
-        .app-container { width: 100%; max-width: 600px; margin: 0 auto; padding: 0 16px; display: flex; flex-direction: column; gap: 24px; }
-        .card { background: var(--glass-heavy); backdrop-filter: blur(40px); border-radius: 32px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6); }
-        .card-content { padding: 20px; }
-        @media (min-width: 768px) { .card-content { padding: 32px; } }
-        .tab-nav { display: flex; background: rgba(0, 0, 0, 0.3); padding: 6px; margin-bottom: 24px; border-radius: 20px; border: 1px solid var(--border); gap: 4px; }
-        .tab-btn { flex: 1; padding: 12px 10px; border: none; background: transparent; color: var(--text-secondary); font-weight: 700; font-size: 13px; cursor: pointer; border-radius: 16px; transition: var(--transition); }
-        .tab-btn.active { background: var(--primary); color: white; }
-        .input-section { margin-bottom: 16px; }
-        .input-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; color: var(--text-secondary); font-weight: 700; padding-left: 6px; }
-        .input-box { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border); border-radius: 18px; padding: 14px 18px; display: flex; align-items: center; gap: 12px; transition: var(--transition); }
-        .input-box:focus-within { border-color: var(--primary); background: rgba(0, 0, 0, 0.4); }
-        input, textarea { flex: 1; background: transparent; border: none; color: var(--text-primary); font-size: 15px; font-weight: 600; outline: none; width: 100%; font-family: inherit; }
-        textarea { height: 80px; resize: none; padding-top: 4px; }
-        input::placeholder, textarea::placeholder { color: var(--text-tertiary); }
-        .action-button { width: 100%; padding: 18px; background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); border: none; border-radius: 20px; color: white; font-size: 16px; font-weight: 800; cursor: pointer; transition: var(--transition); margin-top: 12px; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2); display: flex; align-items: center; justify-content: center; }
-        .action-button:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(99, 102, 241, 0.3); }
-        .action-button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-        .secondary-button { width: 100%; padding: 14px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 18px; color: var(--text-secondary); font-size: 14px; font-weight: 700; cursor: pointer; transition: var(--transition); margin-top: 8px; }
-        .secondary-button:hover { background: rgba(255,255,255,0.1); color: white; }
-        .wallet-info { display: flex; align-items: center; gap: 10px; padding: 8px 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 16px; font-size: 13px; font-weight: 700; cursor: pointer; }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--error); }
-        .status-dot.connected { background: var(--success); box-shadow: 0 0 10px var(--success); }
-        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; }
-        .toast { padding: 14px 20px; border-radius: 16px; background: var(--glass-heavy); backdrop-filter: blur(20px); border: 1px solid var(--border); color: white; font-size: 14px; font-weight: 600; box-shadow: 0 20px 40px rgba(0,0,0,0.4); animation: toastIn 0.3s ease-out forwards; }
-        @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        .result-box { margin-top: 20px; padding: 16px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 18px; display: none; }
-        .result-title { font-size: 12px; color: var(--success); font-weight: 800; text-transform: uppercase; margin-bottom: 8px; }
-        .result-text { font-family: 'Space Mono', monospace; font-size: 13px; color: white; word-break: break-all; }
-        .file-input-wrapper { position: relative; width: 100%; }
-        .file-input-wrapper input[type="file"] { position: absolute; top: 0; left: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
-        .file-label { display: flex; align-items: center; gap: 10px; color: var(--text-secondary); font-size: 14px; font-weight: 600; }
-        .preview-img { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; display: none; border: 1px solid var(--border); }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="file"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="file"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 12px;
+            background: #f5f5f5;
+            border: 2px dashed #ddd;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .file-input-label:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .file-name {
+            color: #667eea;
+            font-weight: 600;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #e0e0e0;
+        }
+
+        .alert {
+            padding: 14px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-info {
+            background: #e3f2fd;
+            color: #1565c0;
+            border-left: 4px solid #1565c0;
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #2e7d32;
+        }
+
+        .alert-error {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #c62828;
+        }
+
+        .alert-warning {
+            background: #fff3e0;
+            color: #e65100;
+            border-left: 4px solid #e65100;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats {
+            background: #f9f9f9;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-weight: 600;
+        }
+
+        .stat-value {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .helper-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 6px;
+        }
+
+        .result-section {
+            background: #f9f9f9;
+            padding: 16px;
+            border-radius: 6px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        .result-item {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #333;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .result-value {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            word-break: break-all;
+            font-size: 12px;
+            color: #666;
+            background: white;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .copy-btn {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            font-size: 11px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        .copy-btn:hover {
+            background: #764ba2;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 24px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="bg-glow"></div>
-    <nav>
-        <a href="#" class="logo-nav">
-            <img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU">
-            <span>SOU Deployer</span>
-        </a>
-        <div class="nav-right">
-            <div class="wallet-info" id="connect-wallet">
-                <div class="status-dot" id="status-dot"></div>
-                <span id="wallet-address">Connect Wallet</span>
-            </div>
-        </div>
-    </nav>
+    <div class="container">
+        <h1>🚀 SouTaxToken 部署器</h1>
+        <p class="subtitle">通过 Flap 协议在 BSC 主网上部署税收代币</p>
 
-    <div class="wrapper">
-        <div class="app-container">
-            <div class="card">
-                <div class="card-content">
-                    <div class="tab-nav">
-                        <button class="tab-btn active" onclick="switchTab('deploy')">Deploy Token</button>
-                        <button class="tab-btn" onclick="switchTab('query')">Query CA</button>
-                    </div>
+        <div id="alertContainer"></div>
 
-                    <!-- Deploy Section -->
-                    <div id="deploy-section">
-                        <div class="input-section">
-                            <div class="input-label">Token Logo</div>
-                            <div class="input-box file-input-wrapper">
-                                <div class="file-label">
-                                    <img id="logo-preview" class="preview-img">
-                                    <span id="file-name">Click to upload Logo (PNG/JPG)</span>
-                                </div>
-                                <input type="file" id="token-logo" accept="image/*" onchange="handleFileSelect(this)">
-                            </div>
-                        </div>
-                        <div class="input-section">
-                            <div class="input-label">Token Name</div>
-                            <div class="input-box"><input type="text" id="token-name" placeholder="e.g. Sou Magic Token"></div>
-                        </div>
-                        <div class="input-section">
-                            <div class="input-label">Token Symbol</div>
-                            <div class="input-box"><input type="text" id="token-symbol" placeholder="e.g. SMT"></div>
-                        </div>
-                        <div class="input-section">
-                            <div class="input-label">Description</div>
-                            <div class="input-box"><textarea id="token-desc" placeholder="Tell us about your project..."></textarea></div>
-                        </div>
-                        <div class="input-section">
-                            <div class="input-label">Mechanism</div>
-                            <div class="input-box"><input type="text" value="Fixed 3% Tax to Marketing Wallet" readonly style="color: var(--text-tertiary); font-size: 13px;"></div>
-                        </div>
-                        
-                        <button class="action-button" id="deploy-btn" onclick="handleDeploy()">Upload & Deploy (10,000 SOU)</button>
-                        <p class="tip-text">Marketing Wallet: 0xa819Eaf3f1d79E03a6D1001818889655532A9150</p>
-                    </div>
-
-                    <!-- Query Section -->
-                    <div id="query-section" style="display: none;">
-                        <div class="input-section">
-                            <div class="input-label">Token ID</div>
-                            <div class="input-box"><input type="number" id="query-id" placeholder="Enter ID (e.g. 1)"></div>
-                        </div>
-                        <button class="action-button" onclick="handleQuery()">Query Address</button>
-                        
-                        <div class="result-box" id="query-result">
-                            <div class="result-title">Contract Address (CA)</div>
-                            <div class="result-text" id="ca-display"></div>
-                        </div>
-                    </div>
+        <form id="deployForm">
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-label">钱包状态</span>
+                    <span class="stat-value" id="walletStatus">未连接</span>
                 </div>
+                <div class="stat-item">
+                    <span class="stat-label">网络</span>
+                    <span class="stat-value" id="networkStatus">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">SOU 余额</span>
+                    <span class="stat-value" id="souBalance">-</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="tokenName">代币名称 *</label>
+                <input type="text" id="tokenName" placeholder="例如：My Tax Token" required>
+                <div class="helper-text">代币的完整名称</div>
+            </div>
+
+            <div class="form-group">
+                <label for="tokenSymbol">代币符号 *</label>
+                <input type="text" id="tokenSymbol" placeholder="例如：MTT" maxlength="10" required>
+                <div class="helper-text">代币的缩写符号（通常 3-5 个字符）</div>
+            </div>
+
+            <div class="form-group">
+                <label for="tokenDescription">代币描述 *</label>
+                <textarea id="tokenDescription" placeholder="描述您的代币的用途和特点" required></textarea>
+                <div class="helper-text">简要描述代币的功能和特点</div>
+            </div>
+
+            <div class="form-group">
+                <label for="tokenLogo">代币 Logo *</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="tokenLogo" accept="image/png,image/jpeg,image/gif" required>
+                    <label for="tokenLogo" class="file-input-label">
+                        📁 点击选择或拖拽 Logo 文件
+                    </label>
+                    <div class="file-name" id="fileName"></div>
+                </div>
+                <div class="helper-text">支持 PNG、JPEG、GIF 格式，建议 512x512 像素</div>
+            </div>
+
+            <div class="form-group">
+                <label for="website">官网 URL</label>
+                <input type="text" id="website" placeholder="https://example.com">
+                <div class="helper-text">可选，您的项目官网地址</div>
+            </div>
+
+            <div class="form-group">
+                <label for="twitter">Twitter</label>
+                <input type="text" id="twitter" placeholder="https://twitter.com/yourhandle">
+                <div class="helper-text">可选，您的 Twitter 账户链接</div>
+            </div>
+
+            <div class="form-group">
+                <label for="telegram">Telegram</label>
+                <input type="text" id="telegram" placeholder="https://t.me/yourchannel">
+                <div class="helper-text">可选，您的 Telegram 频道链接</div>
+            </div>
+
+            <div class="form-group">
+                <label for="marketingWallet">营销钱包地址 *</label>
+                <input type="text" id="marketingWallet" placeholder="0xa819Eaf3f1d79E03a6D1001818889655532A9150" required>
+                <div class="helper-text">接收 100% 税收的钱包地址</div>
+            </div>
+
+            <div class="form-group">
+                <label for="bnbAmount">初始 BNB 金额 *</label>
+                <input type="number" id="bnbAmount" placeholder="0.1" step="0.001" min="0.001" required>
+                <div class="helper-text">用于初始流动性的 BNB 数量</div>
+            </div>
+
+            <div class="button-group">
+                <button type="button" class="btn-secondary" id="connectBtn">连接钱包</button>
+                <button type="submit" class="btn-primary" id="deployBtn">部署代币</button>
+            </div>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p id="loadingText">处理中...</p>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="result-item">
+                <div class="result-label">元数据 CID</div>
+                <div class="result-value" id="resultCid">-</div>
+                <button class="copy-btn" onclick="copyToClipboard('resultCid')">复制</button>
+            </div>
+            <div class="result-item">
+                <div class="result-label">计算的 Salt</div>
+                <div class="result-value" id="resultSalt">-</div>
+                <button class="copy-btn" onclick="copyToClipboard('resultSalt')">复制</button>
+            </div>
+            <div class="result-item">
+                <div class="result-label">预期代币地址</div>
+                <div class="result-value" id="resultAddress">-</div>
+                <button class="copy-btn" onclick="copyToClipboard('resultAddress')">复制</button>
+            </div>
+            <div class="result-item">
+                <div class="result-label">部署交易哈希</div>
+                <div class="result-value" id="resultTxHash">-</div>
+                <button class="copy-btn" onclick="copyToClipboard('resultTxHash')">复制</button>
             </div>
         </div>
     </div>
 
-    <div id="toast-container"></div>
-
     <script>
-        const CONTRACT_ADDRESS = "0x880Fd8963d824cdf61e7fd3315f3285eEf5F51B2";
-        const SOU_TOKEN_ADDRESS = "0xb65bD36fef84ebc5114Cfd803A4F25B2b57F7777";
-        const FLAP_PORTAL_ADDRESS = "0xe2cE6ab80874Fa9Fa2aAE65D277Dd6B8e65C9De0";
-        const TAX_TOKEN_V2_IMPL = "0xae562c6A05b798499507c6276C6Ed796027807BA";
-        const MARKETING_WALLET = "0xa819Eaf3f1d79E03a6D1001818889655532A9150";
-        const FLAP_UPLOAD_API = "https://funcs.flap.sh/api/upload";
-        const BSC_CHAIN_ID = "0x38";
+        const FLAP_UPLOAD_API = 'https://funcs.flap.sh/api/upload';
+        const PORTAL_ADDRESS = '0xe2cE6ab80874Fa9Fa2aAE65D277Dd6B8e65C9De0';
+        const TAX_TOKEN_V1_IMPL = '0x29e6383F0ce68507b5A72a53c2B118a118332aA8';
+        const FACTORY_ADDRESS = '0x82768dCD5b4df30247A6B816a101c3D93a8a9779';
+        const SOU_TOKEN_ADDRESS = '0x9B5F27f6ea9bBD753ce3793a07CbA3cAC3f3023d';
+        const SOU_FEE = ethers.parseEther('10000');
 
-        const ABI = [
-            "function deployNewToken(tuple(string name, string symbol, string meta, uint8 dexThresh, bytes32 salt, uint16 taxRate, uint8 migratorType, address quoteToken, uint256 quoteAmt, address beneficiary, bytes permitData, bytes32 extensionID, bytes extensionData, uint8 dexId, tuple(uint24 fee, int24 tickLower, int24 tickUpper) lpFeeProfile, uint64 taxDuration, uint64 antiFarmerDuration, uint16 mktBps, uint16 deflationBps, uint16 dividendBps, uint16 lpBps, uint256 minimumShareBalance) params) external",
-            "function deployedTokens(uint256) view returns (address)",
-            "function nextTokenId() view returns (uint256)"
+        const FACTORY_ABI = [
+            'function deployNewToken(tuple(string name, string symbol, string meta, uint8 dexThresh, bytes32 salt, uint16 taxRate, uint8 migratorType, address quoteToken, uint256 quoteAmt, address beneficiary, bytes permitData, bytes32 extensionID, bytes extensionData, uint8 dexId, tuple(uint24 fee, int24 tickLower, int24 tickUpper) lpFeeProfile, uint64 taxDuration, uint64 antiFarmerDuration, uint16 mktBps, uint16 deflationBps, uint16 dividendBps, uint16 lpBps, uint256 minimumShareBalance) params) payable returns (address)'
         ];
 
-        const ERC20_ABI = [
-            "function approve(address spender, uint256 amount) public returns (bool)",
-            "function allowance(address owner, address spender) view returns (uint256)",
-            "function balanceOf(address account) view returns (uint256)"
+        const SOU_ABI = [
+            'function approve(address spender, uint256 amount) returns (bool)',
+            'function balanceOf(address account) view returns (uint256)',
+            'function allowance(address owner, address spender) view returns (uint256)'
         ];
 
-        let provider, signer, contract, selectedFile;
+        let provider, signer, userAddress;
+
+        async function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} show`;
+            alertDiv.textContent = message;
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+            setTimeout(() => alertDiv.classList.remove('show'), 5000);
+        }
 
         async function connectWallet() {
-            if (!window.ethereum) return showToast("Please install MetaMask");
             try {
-                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-                if (chainId !== BSC_CHAIN_ID) {
-                    await window.ethereum.request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: BSC_CHAIN_ID }],
-                    });
+                if (!window.ethereum) {
+                    showAlert('请安装 MetaMask 或其他 Web3 钱包', 'error');
+                    return;
                 }
+
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                updateWalletUI(accounts[0]);
-                initContract();
-            } catch (err) {
-                showToast("Connection failed: " + err.message);
-            }
-        }
+                userAddress = accounts[0];
 
-        function updateWalletUI(addr) {
-            document.getElementById('wallet-address').innerText = addr.slice(0, 6) + "..." + addr.slice(-4);
-            document.getElementById('status-dot').classList.add('connected');
-        }
+                provider = new ethers.BrowserProvider(window.ethereum);
+                signer = await provider.getSigner();
 
-        function initContract() {
-            provider = new ethers.providers.Web3Provider(window.ethereum);
-            signer = provider.getSigner();
-            contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
-        }
-
-        function handleFileSelect(input) {
-            if (input.files && input.files[0]) {
-                selectedFile = input.files[0];
-                document.getElementById('file-name').innerText = selectedFile.name;
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const preview = document.getElementById('logo-preview');
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                };
-                reader.readAsDataURL(selectedFile);
-            }
-        }
-
-        async function uploadToFlap(name, symbol, desc, file) {
-            const form = new FormData();
-            const MUTATION_CREATE = `
-            mutation Create($file: Upload!, $meta: MetadataInput!) {
-              create(file: $file, meta: $meta)
-            }
-            `;
-            form.append("operations", JSON.stringify({
-                query: MUTATION_CREATE,
-                variables: {
-                    file: null,
-                    meta: {
-                        website: "",
-                        twitter: "",
-                        telegram: "",
-                        description: desc,
-                        creator: "0x0000000000000000000000000000000000000000",
+                const network = await provider.getNetwork();
+                if (network.chainId !== 56n) {
+                    showAlert('请切换到 BSC 主网（Chain ID: 56）', 'warning');
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: '0x38' }],
+                        });
+                    } catch (e) {
+                        console.error('切换网络失败:', e);
                     }
-                },
-            }));
-            form.append("map", JSON.stringify({ "0": ["variables.file"] }));
-            form.append("0", file);
-
-            const res = await axios.post(FLAP_UPLOAD_API, form, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
-            if (res.status !== 200 || !res.data.data.create) {
-                throw new Error("Failed to upload metadata to Flap");
-            }
-            return res.data.data.create;
-        }
-
-        function predictAddress(salt, tokenImpl, portal) {
-            const bytecode = "0x3d602d80600a3d3981f3363d3d373d3d3d363d73"
-                + tokenImpl.slice(2).toLowerCase()
-                + "5af43d82803e903d91602b57fd5bf3";
-            const saltBytes = ethers.utils.arrayify(salt);
-            const bytecodeHash = ethers.utils.keccak256(bytecode);
-            return ethers.utils.getCreate2Address(portal, saltBytes, bytecodeHash);
-        }
-
-        async function findValidSalt(suffix) {
-            let salt = ethers.utils.hexlify(ethers.utils.randomBytes(32));
-            let iterations = 0;
-            while (!predictAddress(salt, TAX_TOKEN_V2_IMPL, FLAP_PORTAL_ADDRESS).toLowerCase().endsWith(suffix.toLowerCase())) {
-                salt = ethers.utils.keccak256(salt);
-                iterations++;
-                if (iterations > 15000) return findValidSalt(suffix);
-            }
-            return salt;
-        }
-
-        async function handleDeploy() {
-            if (!contract) return connectWallet();
-            const name = document.getElementById('token-name').value;
-            const symbol = document.getElementById('token-symbol').value;
-            const desc = document.getElementById('token-desc').value;
-            
-            if (!name || !symbol || !selectedFile) return showToast("Please fill all fields and upload Logo");
-
-            const btn = document.getElementById('deploy-btn');
-            btn.disabled = true;
-            btn.innerText = "Uploading Metadata...";
-
-            try {
-                const userAddr = await signer.getAddress();
-                const souContract = new ethers.Contract(SOU_TOKEN_ADDRESS, ERC20_ABI, signer);
-                
-                const balance = await souContract.balanceOf(userAddr);
-                const needed = ethers.utils.parseEther("10000");
-                if (balance.lt(needed)) throw new Error("Insufficient SOU balance");
-
-                const allowance = await souContract.allowance(userAddr, CONTRACT_ADDRESS);
-                if (allowance.lt(needed)) {
-                    showToast("Approving SOU...");
-                    const txApprove = await souContract.approve(CONTRACT_ADDRESS, ethers.constants.MaxUint256);
-                    await txApprove.wait();
                 }
 
-                // 1. Upload to Flap
-                const cid = await uploadToFlap(name, symbol, desc, selectedFile);
-                showToast("Metadata uploaded! CID: " + cid.slice(0, 10) + "...");
+                updateWalletStatus();
+                showAlert('钱包已连接', 'success');
+            } catch (error) {
+                showAlert('连接钱包失败: ' + error.message, 'error');
+            }
+        }
 
-                // 2. Calculate Salt
-                btn.innerText = "Calculating Salt...";
-                const salt = await findValidSalt("7777");
+        async function updateWalletStatus() {
+            if (!userAddress) return;
 
-                // 3. Deploy
-                btn.innerText = "Deploying...";
+            document.getElementById('walletStatus').textContent = userAddress.substring(0, 6) + '...' + userAddress.substring(38);
+            document.getElementById('networkStatus').textContent = 'BSC 主网';
+
+            try {
+                const souContract = new ethers.Contract(SOU_TOKEN_ADDRESS, SOU_ABI, provider);
+                const balance = await souContract.balanceOf(userAddress);
+                document.getElementById('souBalance').textContent = ethers.formatEther(balance) + ' SOU';
+            } catch (e) {
+                document.getElementById('souBalance').textContent = '获取失败';
+            }
+        }
+
+        async function uploadMetadata(file, name, symbol, description, website, twitter, telegram) {
+            try {
+                const formData = new FormData();
+
+                const mutation = `
+                    mutation Create($file: Upload!, $meta: MetadataInput!) {
+                        create(file: $file, meta: $meta)
+                    }
+                `;
+
+                formData.append('operations', JSON.stringify({
+                    query: mutation,
+                    variables: {
+                        file: null,
+                        meta: {
+                            website: website || null,
+                            twitter: twitter || null,
+                            telegram: telegram || null,
+                            description: description,
+                            creator: '0x0000000000000000000000000000000000000000'
+                        }
+                    }
+                }));
+
+                formData.append('map', JSON.stringify({
+                    '0': ['variables.file']
+                }));
+
+                formData.append('0', file);
+
+                const response = await fetch(FLAP_UPLOAD_API, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`上传失败: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                if (data.errors) {
+                    throw new Error(data.errors[0].message);
+                }
+
+                return data.data.create;
+            } catch (error) {
+                throw new Error('元数据上传失败: ' + error.message);
+            }
+        }
+
+        function predictTokenAddress(salt, tokenImpl, portal) {
+            const bytecode = '0x3d602d80600a3d3981f3363d3d373d3d3d363d73' +
+                tokenImpl.slice(2).toLowerCase() +
+                '5af43d82803e903d91602b57fd5bf3';
+
+            const hash = ethers.solidityPacked(
+                ['bytes1', 'address', 'bytes32', 'bytes32'],
+                ['0xff', portal, salt, ethers.keccak256(bytecode)]
+            );
+
+            return '0x' + ethers.keccak256(hash).slice(-40);
+        }
+
+        async function findVanitySalt(suffix = '7777') {
+            let iterations = 0;
+            let seed = ethers.randomBytes(32);
+            let salt = ethers.keccak256(seed);
+
+            while (!predictTokenAddress(salt, TAX_TOKEN_V1_IMPL, PORTAL_ADDRESS).endsWith(suffix)) {
+                salt = ethers.keccak256(salt);
+                iterations++;
+                if (iterations % 1000 === 0) {
+                    document.getElementById('loadingText').textContent = `计算 Salt... (${iterations} 次迭代)`;
+                }
+            }
+
+            return {
+                salt,
+                address: predictTokenAddress(salt, TAX_TOKEN_V1_IMPL, PORTAL_ADDRESS),
+                iterations
+            };
+        }
+
+        async function handleDeploy(e) {
+            e.preventDefault();
+
+            if (!userAddress) {
+                showAlert('请先连接钱包', 'warning');
+                return;
+            }
+
+            try {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('deployForm').style.display = 'none';
+                document.getElementById('resultSection').classList.remove('show');
+
+                const name = document.getElementById('tokenName').value;
+                const symbol = document.getElementById('tokenSymbol').value;
+                const description = document.getElementById('tokenDescription').value;
+                const website = document.getElementById('website').value;
+                const twitter = document.getElementById('twitter').value;
+                const telegram = document.getElementById('telegram').value;
+                const marketingWallet = document.getElementById('marketingWallet').value;
+                const bnbAmount = ethers.parseEther(document.getElementById('bnbAmount').value);
+                const logoFile = document.getElementById('tokenLogo').files[0];
+
+                if (!ethers.isAddress(marketingWallet)) {
+                    throw new Error('营销钱包地址无效');
+                }
+
+                document.getElementById('loadingText').textContent = '上传元数据到 IPFS...';
+                const cid = await uploadMetadata(logoFile, name, symbol, description, website, twitter, telegram);
+                console.log('CID:', cid);
+
+                document.getElementById('loadingText').textContent = '计算 Salt...';
+                const { salt, address, iterations } = await findVanitySalt('7777');
+                console.log('Salt:', salt, 'Address:', address, 'Iterations:', iterations);
+
+                document.getElementById('loadingText').textContent = '检查 SOU 授权...';
+                const souContract = new ethers.Contract(SOU_TOKEN_ADDRESS, SOU_ABI, signer);
+                const allowance = await souContract.allowance(userAddress, FACTORY_ADDRESS);
+                if (allowance < SOU_FEE) {
+                    document.getElementById('loadingText').textContent = '授权 SOU 代币...';
+                    const approveTx = await souContract.approve(FACTORY_ADDRESS, ethers.MaxUint256);
+                    await approveTx.wait();
+                }
+
+                document.getElementById('loadingText').textContent = '部署代币...';
+                const factoryContract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
+
                 const params = {
-                    name: name,
-                    symbol: symbol,
+                    name,
+                    symbol,
                     meta: cid,
                     dexThresh: 1,
-                    salt: salt,
+                    salt,
                     taxRate: 300,
                     migratorType: 2,
-                    quoteToken: "0x0000000000000000000000000000000000000000",
-                    quoteAmt: ethers.utils.parseEther("0.01"),
-                    beneficiary: MARKETING_WALLET,
-                    permitData: "0x",
-                    extensionID: ethers.utils.hexZeroPad("0x0", 32),
-                    extensionData: "0x",
+                    quoteToken: ethers.ZeroAddress,
+                    quoteAmt: bnbAmount,
+                    beneficiary: marketingWallet,
+                    permitData: '0x',
+                    extensionID: ethers.ZeroHash,
+                    extensionData: '0x',
                     dexId: 1,
-                    lpFeeProfile: { fee: 0, tickLower: 0, tickUpper: 0 },
-                    taxDuration: 0,
-                    antiFarmerDuration: 0,
+                    lpFeeProfile: {
+                        fee: 0,
+                        tickLower: 0,
+                        tickUpper: 0
+                    },
+                    taxDuration: 0n,
+                    antiFarmerDuration: 0n,
                     mktBps: 10000,
                     deflationBps: 0,
                     dividendBps: 0,
                     lpBps: 0,
-                    minimumShareBalance: ethers.utils.parseEther("1000000")
+                    minimumShareBalance: 0n
                 };
 
-                const tx = await contract.deployNewToken(params, { gasLimit: 2500000 });
-                await tx.wait();
-                showToast("Token Deployed Successfully!");
-            } catch (err) {
-                console.error(err);
-                showToast("Error: " + (err.response?.data?.errors?.[0]?.message || err.message));
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Upload & Deploy (10,000 SOU)";
+                const deployTx = await factoryContract.deployNewToken(params, { value: bnbAmount });
+                const receipt = await deployTx.wait();
+
+                document.getElementById('resultCid').textContent = cid;
+                document.getElementById('resultSalt').textContent = salt;
+                document.getElementById('resultAddress').textContent = address;
+                document.getElementById('resultTxHash').textContent = receipt.hash;
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('resultSection').classList.add('show');
+                showAlert('代币部署成功！', 'success');
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('deployForm').style.display = 'block';
+                showAlert('部署失败: ' + error.message, 'error');
+                console.error(error);
             }
         }
 
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById('deploy-section').style.display = tab === 'deploy' ? 'block' : 'none';
-            document.getElementById('query-section').style.display = tab === 'query' ? 'block' : 'none';
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                showAlert('已复制到剪贴板', 'success');
+            });
         }
 
-        function showToast(msg) {
-            const t = document.createElement('div');
-            t.className = 'toast';
-            t.innerText = msg;
-            document.getElementById('toast-container').appendChild(t);
-            setTimeout(() => t.remove(), 5000);
-        }
+        document.getElementById('connectBtn').addEventListener('click', connectWallet);
+        document.getElementById('deployForm').addEventListener('submit', handleDeploy);
 
-        async function handleQuery() {
-            if (!contract) return connectWallet();
-            const id = document.getElementById('query-id').value;
-            if (!id) return showToast("Please enter an ID");
-            try {
-                const addr = await contract.deployedTokens(id);
-                if (addr === "0x0000000000000000000000000000000000000000") {
-                    showToast("ID not found");
-                } else {
-                    document.getElementById('query-result').style.display = 'block';
-                    document.getElementById('ca-display').innerText = addr;
-                }
-            } catch (err) {
-                showToast("Query failed");
+        document.getElementById('tokenLogo').addEventListener('change', (e) => {
+            const fileName = e.target.files[0]?.name || '';
+            document.getElementById('fileName').textContent = fileName ? '✓ ' + fileName : '';
+        });
+
+        window.addEventListener('load', () => {
+            if (window.ethereum) {
+                window.ethereum.on('accountsChanged', (accounts) => {
+                    if (accounts.length === 0) {
+                        userAddress = null;
+                        document.getElementById('walletStatus').textContent = '未连接';
+                    } else {
+                        userAddress = accounts[0];
+                        updateWalletStatus();
+                    }
+                });
+
+                window.ethereum.on('chainChanged', () => {
+                    location.reload();
+                });
             }
-        }
-
-        document.getElementById('connect-wallet').onclick = connectWallet;
-        if (window.ethereum) {
-            window.ethereum.on('accountsChanged', (acc) => acc.length > 0 ? updateWalletUI(acc[0]) : location.reload());
-            window.ethereum.on('chainChanged', () => location.reload());
-        }
+        });
     </script>
 </body>
 </html>
