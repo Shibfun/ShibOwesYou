@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SouTaxToken 部署器</title>
     <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.1/dist.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/keccak256@1.0.6/keccak256.js"></script>
     <style>
         * {
             margin: 0;
@@ -27,7 +26,7 @@
             background: white;
             border-radius: 12px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 600px;
+            max-width: 700px;
             width: 100%;
             padding: 40px;
         }
@@ -247,6 +246,7 @@
         .stat-value {
             color: #333;
             font-weight: 500;
+            word-break: break-all;
         }
 
         .helper-text {
@@ -312,6 +312,26 @@
             background: #764ba2;
         }
 
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .status-connected {
+            background: #2e7d32;
+        }
+
+        .status-disconnected {
+            background: #c62828;
+        }
+
+        .status-warning {
+            background: #e65100;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 24px;
@@ -337,16 +357,26 @@
         <form id="deployForm">
             <div class="stats">
                 <div class="stat-item">
-                    <span class="stat-label">钱包状态</span>
+                    <span class="stat-label">
+                        <span class="status-indicator" id="walletStatusIndicator"></span>
+                        钱包状态
+                    </span>
                     <span class="stat-value" id="walletStatus">未连接</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">网络</span>
+                    <span class="stat-label">
+                        <span class="status-indicator" id="networkStatusIndicator"></span>
+                        网络
+                    </span>
                     <span class="stat-value" id="networkStatus">-</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">SOU 余额</span>
                     <span class="stat-value" id="souBalance">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">BNB 余额</span>
+                    <span class="stat-value" id="bnbBalance">-</span>
                 </div>
             </div>
 
@@ -400,19 +430,19 @@
 
             <div class="form-group">
                 <label for="marketingWallet">营销钱包地址 *</label>
-                <input type="text" id="marketingWallet" placeholder="0xa819Eaf3f1d79E03a6D1001818889655532A9150" required>
+                <input type="text" id="marketingWallet" placeholder="0xa819Eaf3f1d79E03a6D1001818889655532A9150" value="0xa819Eaf3f1d79E03a6D1001818889655532A9150" required>
                 <div class="helper-text">接收 100% 税收的钱包地址</div>
             </div>
 
             <div class="form-group">
-                <label for="bnbAmount">初始 BNB 金额 *</label>
-                <input type="number" id="bnbAmount" placeholder="0.1" step="0.001" min="0.001" required>
-                <div class="helper-text">用于初始流动性的 BNB 数量</div>
+                <label for="devFee">开发者份额 (BNB) *</label>
+                <input type="number" id="devFee" placeholder="0.1" step="0.001" min="0.001" required>
+                <div class="helper-text">开发者需要支付的 BNB 份额</div>
             </div>
 
             <div class="button-group">
                 <button type="button" class="btn-secondary" id="connectBtn">连接钱包</button>
-                <button type="submit" class="btn-primary" id="deployBtn">部署代币</button>
+                <button type="submit" class="btn-primary" id="deployBtn" disabled>部署代币</button>
             </div>
         </form>
 
@@ -477,18 +507,31 @@
 
         async function connectWallet() {
             try {
-                if (!window.ethereum) {
-                    showAlert('请安装 MetaMask 或其他 Web3 钱包', 'error');
+                if (typeof window.ethereum === 'undefined') {
+                    showAlert('请安装 MetaMask 或其他 Web3 钱包扩展', 'error');
                     return;
                 }
 
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                console.log('开始连接钱包...');
+                
+                const accounts = await window.ethereum.request({ 
+                    method: 'eth_requestAccounts' 
+                });
+
+                if (!accounts || accounts.length === 0) {
+                    showAlert('未能获取账户，请重试', 'error');
+                    return;
+                }
+
                 userAddress = accounts[0];
+                console.log('已连接账户:', userAddress);
 
                 provider = new ethers.BrowserProvider(window.ethereum);
                 signer = await provider.getSigner();
 
                 const network = await provider.getNetwork();
+                console.log('网络 ID:', network.chainId);
+
                 if (network.chainId !== 56n) {
                     showAlert('请切换到 BSC 主网（Chain ID: 56）', 'warning');
                     try {
@@ -496,30 +539,49 @@
                             method: 'wallet_switchEthereumChain',
                             params: [{ chainId: '0x38' }],
                         });
-                    } catch (e) {
-                        console.error('切换网络失败:', e);
+                        showAlert('已切换到 BSC 主网', 'success');
+                    } catch (switchError) {
+                        console.error('切换网络失败:', switchError);
+                        showAlert('切换网络失败，请手动切换到 BSC 主网', 'error');
+                        return;
                     }
                 }
 
-                updateWalletStatus();
+                await updateWalletStatus();
+                document.getElementById('deployBtn').disabled = false;
                 showAlert('钱包已连接', 'success');
             } catch (error) {
+                console.error('连接钱包错误:', error);
                 showAlert('连接钱包失败: ' + error.message, 'error');
             }
         }
 
         async function updateWalletStatus() {
-            if (!userAddress) return;
-
-            document.getElementById('walletStatus').textContent = userAddress.substring(0, 6) + '...' + userAddress.substring(38);
-            document.getElementById('networkStatus').textContent = 'BSC 主网';
+            if (!userAddress || !provider) return;
 
             try {
+                document.getElementById('walletStatus').textContent = userAddress.substring(0, 6) + '...' + userAddress.substring(38);
+                document.getElementById('walletStatusIndicator').className = 'status-indicator status-connected';
+
+                const network = await provider.getNetwork();
+                if (network.chainId === 56n) {
+                    document.getElementById('networkStatus').textContent = 'BSC 主网';
+                    document.getElementById('networkStatusIndicator').className = 'status-indicator status-connected';
+                } else {
+                    document.getElementById('networkStatus').textContent = '非 BSC 主网';
+                    document.getElementById('networkStatusIndicator').className = 'status-indicator status-warning';
+                }
+
                 const souContract = new ethers.Contract(SOU_TOKEN_ADDRESS, SOU_ABI, provider);
-                const balance = await souContract.balanceOf(userAddress);
-                document.getElementById('souBalance').textContent = ethers.formatEther(balance) + ' SOU';
+                const souBalance = await souContract.balanceOf(userAddress);
+                document.getElementById('souBalance').textContent = ethers.formatEther(souBalance) + ' SOU';
+
+                const bnbBalance = await provider.getBalance(userAddress);
+                document.getElementById('bnbBalance').textContent = ethers.formatEther(bnbBalance) + ' BNB';
             } catch (e) {
+                console.error('更新钱包状态失败:', e);
                 document.getElementById('souBalance').textContent = '获取失败';
+                document.getElementById('bnbBalance').textContent = '获取失败';
             }
         }
 
@@ -626,7 +688,7 @@
                 const twitter = document.getElementById('twitter').value;
                 const telegram = document.getElementById('telegram').value;
                 const marketingWallet = document.getElementById('marketingWallet').value;
-                const bnbAmount = ethers.parseEther(document.getElementById('bnbAmount').value);
+                const devFee = ethers.parseEther(document.getElementById('devFee').value);
                 const logoFile = document.getElementById('tokenLogo').files[0];
 
                 if (!ethers.isAddress(marketingWallet)) {
@@ -662,7 +724,7 @@
                     taxRate: 300,
                     migratorType: 2,
                     quoteToken: ethers.ZeroAddress,
-                    quoteAmt: bnbAmount,
+                    quoteAmt: 0,
                     beneficiary: marketingWallet,
                     permitData: '0x',
                     extensionID: ethers.ZeroHash,
@@ -682,7 +744,7 @@
                     minimumShareBalance: 0n
                 };
 
-                const deployTx = await factoryContract.deployNewToken(params, { value: bnbAmount });
+                const deployTx = await factoryContract.deployNewToken(params, { value: devFee });
                 const receipt = await deployTx.wait();
 
                 document.getElementById('resultCid').textContent = cid;
@@ -718,11 +780,17 @@
         });
 
         window.addEventListener('load', () => {
-            if (window.ethereum) {
+            console.log('页面加载完成，检查 Web3 环境...');
+            console.log('window.ethereum:', typeof window.ethereum);
+
+            if (typeof window.ethereum !== 'undefined') {
                 window.ethereum.on('accountsChanged', (accounts) => {
+                    console.log('账户已更改:', accounts);
                     if (accounts.length === 0) {
                         userAddress = null;
                         document.getElementById('walletStatus').textContent = '未连接';
+                        document.getElementById('walletStatusIndicator').className = 'status-indicator status-disconnected';
+                        document.getElementById('deployBtn').disabled = true;
                     } else {
                         userAddress = accounts[0];
                         updateWalletStatus();
@@ -730,8 +798,20 @@
                 });
 
                 window.ethereum.on('chainChanged', () => {
+                    console.log('网络已更改，重新加载页面');
                     location.reload();
                 });
+
+                window.ethereum.on('disconnect', () => {
+                    console.log('钱包已断开连接');
+                    userAddress = null;
+                    document.getElementById('walletStatus').textContent = '未连接';
+                    document.getElementById('walletStatusIndicator').className = 'status-indicator status-disconnected';
+                    document.getElementById('deployBtn').disabled = true;
+                });
+            } else {
+                console.warn('未检测到 Web3 钱包');
+                showAlert('未检测到 Web3 钱包，请安装 MetaMask 或其他钱包扩展', 'warning');
             }
         });
     </script>
