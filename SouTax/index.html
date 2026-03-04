@@ -2,264 +2,387 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>SouTaxToken 部署器</title>
-    <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.1/dist.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --accent: #a855f7;
+            --success: #10b981;
+            --error: #ef4444;
+            --dark-1: #030712;
+            --dark-2: #0f172a;
+            --dark-3: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-tertiary: #64748b;
+            --border: rgba(255, 255, 255, 0.06);
+            --glass: rgba(15, 23, 42, 0.65);
+            --glass-heavy: rgba(15, 23, 42, 0.85);
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--dark-1);
+            color: var(--text-primary);
             min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.5;
+        }
+
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 90%, rgba(168, 85, 247, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 1) 0%, rgba(3, 7, 18, 1) 100%);
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .logo-nav {
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-primary);
+            text-decoration: none;
         }
 
-        .container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 700px;
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .wallet-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .wallet-info span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--error);
+            flex-shrink: 0;
+        }
+
+        .status-dot.connected {
+            background: var(--success);
+            box-shadow: 0 0 12px var(--success);
+        }
+
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            padding-top: 100px;
+            flex: 1;
+            padding-bottom: 40px;
+        }
+
+        .app-container {
             width: 100%;
-            padding: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
         }
 
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 28px;
+        .card {
+            background: var(--glass-heavy);
+            backdrop-filter: blur(40px);
+            border-radius: 32px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
         }
 
-        .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 14px;
+        .card-content {
+            padding: 32px;
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, #fff, var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-subtitle {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            margin-bottom: 24px;
         }
 
         .form-group {
             margin-bottom: 24px;
         }
 
-        label {
-            display: block;
-            color: #333;
+        .input-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 700;
+            padding-left: 6px;
+        }
+
+        .input-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+        }
+
+        .input-box:focus-within {
+            border-color: var(--primary);
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        input,
+        textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 16px;
             font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        input[type="file"],
-        textarea,
-        select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: border-color 0.3s;
-        }
-
-        input[type="text"]:focus,
-        input[type="number"]:focus,
-        input[type="file"]:focus,
-        textarea:focus,
-        select:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            width: 100%;
+            min-width: 0;
+            font-family: inherit;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: var(--text-tertiary);
         }
 
         textarea {
             resize: vertical;
-            min-height: 80px;
+            min-height: 100px;
+            padding: 18px 20px;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
         }
 
         .file-input-wrapper {
             position: relative;
             overflow: hidden;
-            display: inline-block;
+            display: block;
             width: 100%;
         }
 
-        input[type="file"] {
+        .file-input-wrapper input[type="file"] {
             position: absolute;
             left: -9999px;
         }
 
         .file-input-label {
             display: block;
-            padding: 12px;
-            background: #f5f5f5;
-            border: 2px dashed #ddd;
-            border-radius: 6px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px dashed var(--border);
+            border-radius: 20px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
-            color: #666;
-            font-weight: 500;
+            transition: var(--transition);
+            color: var(--text-secondary);
+            font-weight: 600;
         }
 
         .file-input-label:hover {
-            border-color: #667eea;
-            background: #f0f4ff;
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
         }
 
         .file-name {
-            color: #667eea;
+            color: var(--primary-light);
             font-weight: 600;
             margin-top: 8px;
             font-size: 13px;
         }
 
-        .button-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 32px;
-        }
-
-        button {
-            flex: 1;
-            padding: 14px;
+        .action-button {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
             border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 22px;
             color: white;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 12px;
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.6;
+        .action-button:disabled {
+            opacity: 0.4;
             cursor: not-allowed;
         }
 
-        .btn-secondary {
-            background: #f0f0f0;
-            color: #333;
+        .action-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.4);
         }
 
-        .btn-secondary:hover:not(:disabled) {
-            background: #e0e0e0;
-        }
-
-        .alert {
-            padding: 14px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            display: none;
-        }
-
-        .alert.show {
-            display: block;
-        }
-
-        .alert-info {
-            background: #e3f2fd;
-            color: #1565c0;
-            border-left: 4px solid #1565c0;
-        }
-
-        .alert-success {
-            background: #e8f5e9;
-            color: #2e7d32;
-            border-left: 4px solid #2e7d32;
-        }
-
-        .alert-error {
-            background: #ffebee;
-            color: #c62828;
-            border-left: 4px solid #c62828;
-        }
-
-        .alert-warning {
-            background: #fff3e0;
-            color: #e65100;
-            border-left: 4px solid #e65100;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .stats {
-            background: #f9f9f9;
-            padding: 16px;
-            border-radius: 6px;
-            margin-bottom: 24px;
-            font-size: 13px;
-            color: #666;
-        }
-
-        .stat-item {
+        .button-group {
             display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
+            gap: 12px;
+            margin-top: 24px;
         }
 
-        .stat-item:last-child {
-            border-bottom: none;
+        .button-group .action-button {
+            flex: 1;
+            margin-top: 0;
         }
 
-        .stat-label {
+        .balance-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .balance-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 100%);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .balance-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .balance-val {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-primary);
+            font-family: 'Space Mono', monospace;
+            letter-spacing: -1.5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #toast-container {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+            width: 90%;
+            max-width: 420px;
+        }
+
+        .toast {
+            padding: 16px 24px;
+            border-radius: 20px;
+            background: var(--glass-heavy);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--border);
+            color: white;
             font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: toastIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            pointer-events: auto;
         }
 
-        .stat-value {
-            color: #333;
-            font-weight: 500;
-            word-break: break-all;
-        }
-
-        .helper-text {
-            font-size: 12px;
-            color: #999;
-            margin-top: 6px;
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .result-section {
-            background: #f9f9f9;
-            padding: 16px;
-            border-radius: 6px;
-            margin-top: 20px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 24px;
+            border-radius: 20px;
             display: none;
         }
 
@@ -268,9 +391,9 @@
         }
 
         .result-item {
-            margin-bottom: 12px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #eee;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .result-item:last-child {
@@ -280,200 +403,206 @@
         }
 
         .result-label {
-            font-weight: 600;
-            color: #333;
-            font-size: 13px;
-            margin-bottom: 4px;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 12px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .result-value {
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-family: 'Space Mono', monospace;
             word-break: break-all;
             font-size: 12px;
-            color: #666;
-            background: white;
-            padding: 8px;
-            border-radius: 4px;
+            color: var(--text-secondary);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
 
-        .copy-btn {
-            display: inline-block;
-            padding: 4px 8px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            font-size: 11px;
-            cursor: pointer;
-            margin-left: 8px;
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
         }
 
-        .copy-btn:hover {
-            background: #764ba2;
-        }
-
-        .status-indicator {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
+        .spinner {
+            border: 4px solid rgba(99, 102, 241, 0.2);
+            border-top: 4px solid var(--primary);
             border-radius: 50%;
-            margin-right: 6px;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
         }
 
-        .status-connected {
-            background: #2e7d32;
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
-        .status-disconnected {
-            background: #c62828;
-        }
-
-        .status-warning {
-            background: #e65100;
+        .loading-text {
+            font-size: 14px;
+            color: var(--text-secondary);
         }
 
         @media (max-width: 600px) {
-            .container {
-                padding: 24px;
+            .card-content {
+                padding: 20px;
             }
 
-            h1 {
-                font-size: 24px;
+            .card-title {
+                font-size: 20px;
             }
 
-            .button-group {
-                flex-direction: column;
+            nav {
+                padding: 12px 16px;
+            }
+
+            .wallet-info {
+                font-size: 12px;
+                padding: 8px 12px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🚀 SouTaxToken 部署器</h1>
-        <p class="subtitle">通过 Flap 协议在 BSC 主网上部署税收代币</p>
+    <div class="bg-glow"></div>
 
-        <div id="alertContainer"></div>
-
-        <form id="deployForm">
-            <div class="stats">
-                <div class="stat-item">
-                    <span class="stat-label">
-                        <span class="status-indicator" id="walletStatusIndicator"></span>
-                        钱包状态
-                    </span>
-                    <span class="stat-value" id="walletStatus">未连接</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">
-                        <span class="status-indicator" id="networkStatusIndicator"></span>
-                        网络
-                    </span>
-                    <span class="stat-value" id="networkStatus">-</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">SOU 余额</span>
-                    <span class="stat-value" id="souBalance">-</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">BNB 余额</span>
-                    <span class="stat-value" id="bnbBalance">-</span>
-                </div>
+    <nav>
+        <div class="logo-nav">🚀 SouTaxToken</div>
+        <div class="nav-right">
+            <div class="wallet-info" id="walletBtn" onclick="connectWallet()">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="walletAddr">未连接</span>
             </div>
-
-            <div class="form-group">
-                <label for="tokenName">代币名称 *</label>
-                <input type="text" id="tokenName" placeholder="例如：My Tax Token" required>
-                <div class="helper-text">代币的完整名称</div>
-            </div>
-
-            <div class="form-group">
-                <label for="tokenSymbol">代币符号 *</label>
-                <input type="text" id="tokenSymbol" placeholder="例如：MTT" maxlength="10" required>
-                <div class="helper-text">代币的缩写符号（通常 3-5 个字符）</div>
-            </div>
-
-            <div class="form-group">
-                <label for="tokenDescription">代币描述 *</label>
-                <textarea id="tokenDescription" placeholder="描述您的代币的用途和特点" required></textarea>
-                <div class="helper-text">简要描述代币的功能和特点</div>
-            </div>
-
-            <div class="form-group">
-                <label for="tokenLogo">代币 Logo *</label>
-                <div class="file-input-wrapper">
-                    <input type="file" id="tokenLogo" accept="image/png,image/jpeg,image/gif" required>
-                    <label for="tokenLogo" class="file-input-label">
-                        📁 点击选择或拖拽 Logo 文件
-                    </label>
-                    <div class="file-name" id="fileName"></div>
-                </div>
-                <div class="helper-text">支持 PNG、JPEG、GIF 格式，建议 512x512 像素</div>
-            </div>
-
-            <div class="form-group">
-                <label for="website">官网 URL</label>
-                <input type="text" id="website" placeholder="https://example.com">
-                <div class="helper-text">可选，您的项目官网地址</div>
-            </div>
-
-            <div class="form-group">
-                <label for="twitter">Twitter</label>
-                <input type="text" id="twitter" placeholder="https://twitter.com/yourhandle">
-                <div class="helper-text">可选，您的 Twitter 账户链接</div>
-            </div>
-
-            <div class="form-group">
-                <label for="telegram">Telegram</label>
-                <input type="text" id="telegram" placeholder="https://t.me/yourchannel">
-                <div class="helper-text">可选，您的 Telegram 频道链接</div>
-            </div>
-
-            <div class="form-group">
-                <label for="marketingWallet">营销钱包地址 *</label>
-                <input type="text" id="marketingWallet" placeholder="0xa819Eaf3f1d79E03a6D1001818889655532A9150" value="0xa819Eaf3f1d79E03a6D1001818889655532A9150" required>
-                <div class="helper-text">接收 100% 税收的钱包地址</div>
-            </div>
-
-            <div class="form-group">
-                <label for="devFee">开发者份额 (BNB) *</label>
-                <input type="number" id="devFee" placeholder="0.1" step="0.001" min="0.001" required>
-                <div class="helper-text">开发者需要支付的 BNB 份额</div>
-            </div>
-
-            <div class="button-group">
-                <button type="button" class="btn-secondary" id="connectBtn">连接钱包</button>
-                <button type="submit" class="btn-primary" id="deployBtn" disabled>部署代币</button>
-            </div>
-        </form>
-
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p id="loadingText">处理中...</p>
         </div>
+    </nav>
 
-        <div class="result-section" id="resultSection">
-            <div class="result-item">
-                <div class="result-label">元数据 CID</div>
-                <div class="result-value" id="resultCid">-</div>
-                <button class="copy-btn" onclick="copyToClipboard('resultCid')">复制</button>
-            </div>
-            <div class="result-item">
-                <div class="result-label">计算的 Salt</div>
-                <div class="result-value" id="resultSalt">-</div>
-                <button class="copy-btn" onclick="copyToClipboard('resultSalt')">复制</button>
-            </div>
-            <div class="result-item">
-                <div class="result-label">预期代币地址</div>
-                <div class="result-value" id="resultAddress">-</div>
-                <button class="copy-btn" onclick="copyToClipboard('resultAddress')">复制</button>
-            </div>
-            <div class="result-item">
-                <div class="result-label">部署交易哈希</div>
-                <div class="result-value" id="resultTxHash">-</div>
-                <button class="copy-btn" onclick="copyToClipboard('resultTxHash')">复制</button>
+    <div class="wrapper">
+        <div class="app-container">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-title">部署税收代币</div>
+                    <div class="card-subtitle">通过 Flap 协议在 BSC 主网上部署</div>
+
+                    <div class="balance-grid" id="balanceGrid">
+                        <div class="balance-card">
+                            <div class="balance-label">SOU 余额</div>
+                            <div class="balance-val" id="souBalance">0.00</div>
+                        </div>
+                        <div class="balance-card">
+                            <div class="balance-label">BNB 余额</div>
+                            <div class="balance-val" id="bnbBalance">0.00</div>
+                        </div>
+                    </div>
+
+                    <form id="deployForm">
+                        <div class="form-group">
+                            <div class="input-label">代币名称 *</div>
+                            <div class="input-box">
+                                <input type="text" id="tokenName" placeholder="例如：My Tax Token" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-label">代币符号 *</div>
+                            <div class="input-box">
+                                <input type="text" id="tokenSymbol" placeholder="例如：MTT" maxlength="10" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-label">代币描述 *</div>
+                            <textarea id="tokenDescription" placeholder="描述您的代币的用途和特点" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-label">代币 Logo *</div>
+                            <div class="file-input-wrapper">
+                                <input type="file" id="tokenLogo" accept="image/png,image/jpeg,image/gif" required>
+                                <label for="tokenLogo" class="file-input-label">
+                                    📁 点击选择或拖拽 Logo 文件
+                                </label>
+                                <div class="file-name" id="fileName"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-label">官网 URL</div>
+                            <div class="input-box">
+                                <input type="text" id="website" placeholder="https://example.com">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-label">Twitter</div>
+                            <div class="input-box">
+                                <input type="text" id="twitter" placeholder="https://twitter.com/yourhandle">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-label">Telegram</div>
+                            <div class="input-box">
+                                <input type="text" id="telegram" placeholder="https://t.me/yourchannel">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-label">营销钱包地址 *</div>
+                            <div class="input-box">
+                                <input type="text" id="marketingWallet" placeholder="0xa819Eaf3f1d79E03a6D1001818889655532A9150" value="0xa819Eaf3f1d79E03a6D1001818889655532A9150" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-label">开发者份额 (BNB) *</div>
+                            <div class="input-box">
+                                <input type="number" id="devFee" placeholder="0.1" step="0.001" min="0.001" required>
+                            </div>
+                        </div>
+
+                        <div class="button-group">
+                            <button type="submit" class="action-button" id="deployBtn" disabled>部署代币</button>
+                        </div>
+                    </form>
+
+                    <div class="loading" id="loading">
+                        <div class="spinner"></div>
+                        <div class="loading-text" id="loadingText">处理中...</div>
+                    </div>
+
+                    <div class="result-section" id="resultSection">
+                        <div class="result-item">
+                            <div class="result-label">元数据 CID</div>
+                            <div class="result-value" id="resultCid">-</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">计算的 Salt</div>
+                            <div class="result-value" id="resultSalt">-</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">预期代币地址</div>
+                            <div class="result-value" id="resultAddress">-</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">部署交易哈希</div>
+                            <div class="result-value" id="resultTxHash">-</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <div id="toast-container"></div>
 
     <script>
         const FLAP_UPLOAD_API = 'https://funcs.flap.sh/api/upload';
@@ -481,7 +610,8 @@
         const TAX_TOKEN_V1_IMPL = '0x29e6383F0ce68507b5A72a53c2B118a118332aA8';
         const FACTORY_ADDRESS = '0x82768dCD5b4df30247A6B816a101c3D93a8a9779';
         const SOU_TOKEN_ADDRESS = '0x9B5F27f6ea9bBD753ce3793a07CbA3cAC3f3023d';
-        const SOU_FEE = ethers.parseEther('10000');
+        const SOU_FEE = ethers.utils.parseEther('10000');
+        const BSC_CHAIN_ID = 56;
 
         const FACTORY_ABI = [
             'function deployNewToken(tuple(string name, string symbol, string meta, uint8 dexThresh, bytes32 salt, uint16 taxRate, uint8 migratorType, address quoteToken, uint256 quoteAmt, address beneficiary, bytes permitData, bytes32 extensionID, bytes extensionData, uint8 dexId, tuple(uint24 fee, int24 tickLower, int24 tickUpper) lpFeeProfile, uint64 taxDuration, uint64 antiFarmerDuration, uint16 mktBps, uint16 deflationBps, uint16 dividendBps, uint16 lpBps, uint256 minimumShareBalance) params) payable returns (address)'
@@ -493,146 +623,116 @@
             'function allowance(address owner, address spender) view returns (uint256)'
         ];
 
-        let provider, signer, userAddress;
+        let provider, signer, userAddr;
 
-        async function showAlert(message, type = 'info') {
-            const alertContainer = document.getElementById('alertContainer');
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type} show`;
-            alertDiv.textContent = message;
-            alertContainer.innerHTML = '';
-            alertContainer.appendChild(alertDiv);
-            setTimeout(() => alertDiv.classList.remove('show'), 5000);
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
         }
 
         async function connectWallet() {
             try {
-                if (typeof window.ethereum === 'undefined') {
-                    showAlert('请安装 MetaMask 或其他 Web3 钱包扩展', 'error');
+                if (!window.ethereum) {
+                    showToast('请安装 MetaMask 或其他 Web3 钱包扩展', 'error');
                     return;
                 }
 
-                console.log('开始连接钱包...');
-                
-                const accounts = await window.ethereum.request({ 
-                    method: 'eth_requestAccounts' 
-                });
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                const { chainId } = await provider.getNetwork();
 
-                if (!accounts || accounts.length === 0) {
-                    showAlert('未能获取账户，请重试', 'error');
-                    return;
-                }
-
-                userAddress = accounts[0];
-                console.log('已连接账户:', userAddress);
-
-                provider = new ethers.BrowserProvider(window.ethereum);
-                signer = await provider.getSigner();
-
-                const network = await provider.getNetwork();
-                console.log('网络 ID:', network.chainId);
-
-                if (network.chainId !== 56n) {
-                    showAlert('请切换到 BSC 主网（Chain ID: 56）', 'warning');
+                if (chainId !== BSC_CHAIN_ID) {
+                    showToast('请切换到 BSC 主网（Chain ID: 56）', 'error');
                     try {
                         await window.ethereum.request({
                             method: 'wallet_switchEthereumChain',
                             params: [{ chainId: '0x38' }],
                         });
-                        showAlert('已切换到 BSC 主网', 'success');
-                    } catch (switchError) {
-                        console.error('切换网络失败:', switchError);
-                        showAlert('切换网络失败，请手动切换到 BSC 主网', 'error');
-                        return;
+                        location.reload();
+                    } catch (e) {
+                        console.error('切换网络失败:', e);
                     }
+                    return;
                 }
 
-                await updateWalletStatus();
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                signer = provider.getSigner();
+                userAddr = await signer.getAddress();
+
+                document.getElementById('walletAddr').innerText = userAddr.substring(0, 6) + '...' + userAddr.substring(38);
+                document.getElementById('statusDot').classList.add('connected');
                 document.getElementById('deployBtn').disabled = false;
-                showAlert('钱包已连接', 'success');
+
+                await refreshUI();
+                showToast('钱包已连接', 'success');
             } catch (error) {
                 console.error('连接钱包错误:', error);
-                showAlert('连接钱包失败: ' + error.message, 'error');
+                showToast('连接钱包失败: ' + error.message, 'error');
             }
         }
 
-        async function updateWalletStatus() {
-            if (!userAddress || !provider) return;
+        async function refreshUI() {
+            if (!userAddr || !provider) return;
 
             try {
-                document.getElementById('walletStatus').textContent = userAddress.substring(0, 6) + '...' + userAddress.substring(38);
-                document.getElementById('walletStatusIndicator').className = 'status-indicator status-connected';
+                const sou = new ethers.Contract(SOU_TOKEN_ADDRESS, SOU_ABI, provider);
+                const souBalance = await sou.balanceOf(userAddr);
+                document.getElementById('souBalance').innerText = ethers.utils.formatUnits(souBalance, 18);
 
-                const network = await provider.getNetwork();
-                if (network.chainId === 56n) {
-                    document.getElementById('networkStatus').textContent = 'BSC 主网';
-                    document.getElementById('networkStatusIndicator').className = 'status-indicator status-connected';
-                } else {
-                    document.getElementById('networkStatus').textContent = '非 BSC 主网';
-                    document.getElementById('networkStatusIndicator').className = 'status-indicator status-warning';
-                }
-
-                const souContract = new ethers.Contract(SOU_TOKEN_ADDRESS, SOU_ABI, provider);
-                const souBalance = await souContract.balanceOf(userAddress);
-                document.getElementById('souBalance').textContent = ethers.formatEther(souBalance) + ' SOU';
-
-                const bnbBalance = await provider.getBalance(userAddress);
-                document.getElementById('bnbBalance').textContent = ethers.formatEther(bnbBalance) + ' BNB';
+                const bnbBalance = await provider.getBalance(userAddr);
+                document.getElementById('bnbBalance').innerText = ethers.utils.formatUnits(bnbBalance, 18);
             } catch (e) {
-                console.error('更新钱包状态失败:', e);
-                document.getElementById('souBalance').textContent = '获取失败';
-                document.getElementById('bnbBalance').textContent = '获取失败';
+                console.error('刷新 UI 失败:', e);
             }
         }
 
         async function uploadMetadata(file, name, symbol, description, website, twitter, telegram) {
-            try {
-                const formData = new FormData();
+            const formData = new FormData();
 
-                const mutation = `
-                    mutation Create($file: Upload!, $meta: MetadataInput!) {
-                        create(file: $file, meta: $meta)
-                    }
-                `;
-
-                formData.append('operations', JSON.stringify({
-                    query: mutation,
-                    variables: {
-                        file: null,
-                        meta: {
-                            website: website || null,
-                            twitter: twitter || null,
-                            telegram: telegram || null,
-                            description: description,
-                            creator: '0x0000000000000000000000000000000000000000'
-                        }
-                    }
-                }));
-
-                formData.append('map', JSON.stringify({
-                    '0': ['variables.file']
-                }));
-
-                formData.append('0', file);
-
-                const response = await fetch(FLAP_UPLOAD_API, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (!response.ok) {
-                    throw new Error(`上传失败: ${response.statusText}`);
+            const mutation = `
+                mutation Create($file: Upload!, $meta: MetadataInput!) {
+                    create(file: $file, meta: $meta)
                 }
+            `;
 
-                const data = await response.json();
-                if (data.errors) {
-                    throw new Error(data.errors[0].message);
+            formData.append('operations', JSON.stringify({
+                query: mutation,
+                variables: {
+                    file: null,
+                    meta: {
+                        website: website || null,
+                        twitter: twitter || null,
+                        telegram: telegram || null,
+                        description: description,
+                        creator: '0x0000000000000000000000000000000000000000'
+                    }
                 }
+            }));
 
-                return data.data.create;
-            } catch (error) {
-                throw new Error('元数据上传失败: ' + error.message);
+            formData.append('map', JSON.stringify({
+                '0': ['variables.file']
+            }));
+
+            formData.append('0', file);
+
+            const response = await fetch(FLAP_UPLOAD_API, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`上传失败: ${response.statusText}`);
             }
+
+            const data = await response.json();
+            if (data.errors) {
+                throw new Error(data.errors[0].message);
+            }
+
+            return data.data.create;
         }
 
         function predictTokenAddress(salt, tokenImpl, portal) {
@@ -640,21 +740,21 @@
                 tokenImpl.slice(2).toLowerCase() +
                 '5af43d82803e903d91602b57fd5bf3';
 
-            const hash = ethers.solidityPacked(
+            const hash = ethers.utils.solidityPack(
                 ['bytes1', 'address', 'bytes32', 'bytes32'],
-                ['0xff', portal, salt, ethers.keccak256(bytecode)]
+                ['0xff', portal, salt, ethers.utils.keccak256(bytecode)]
             );
 
-            return '0x' + ethers.keccak256(hash).slice(-40);
+            return '0x' + ethers.utils.keccak256(hash).slice(-40);
         }
 
         async function findVanitySalt(suffix = '7777') {
             let iterations = 0;
-            let seed = ethers.randomBytes(32);
-            let salt = ethers.keccak256(seed);
+            let seed = ethers.utils.randomBytes(32);
+            let salt = ethers.utils.keccak256(seed);
 
             while (!predictTokenAddress(salt, TAX_TOKEN_V1_IMPL, PORTAL_ADDRESS).endsWith(suffix)) {
-                salt = ethers.keccak256(salt);
+                salt = ethers.utils.keccak256(salt);
                 iterations++;
                 if (iterations % 1000 === 0) {
                     document.getElementById('loadingText').textContent = `计算 Salt... (${iterations} 次迭代)`;
@@ -671,14 +771,14 @@
         async function handleDeploy(e) {
             e.preventDefault();
 
-            if (!userAddress) {
-                showAlert('请先连接钱包', 'warning');
+            if (!userAddr) {
+                showToast('请先连接钱包', 'error');
                 return;
             }
 
             try {
-                document.getElementById('loading').style.display = 'block';
                 document.getElementById('deployForm').style.display = 'none';
+                document.getElementById('loading').style.display = 'block';
                 document.getElementById('resultSection').classList.remove('show');
 
                 const name = document.getElementById('tokenName').value;
@@ -688,27 +788,25 @@
                 const twitter = document.getElementById('twitter').value;
                 const telegram = document.getElementById('telegram').value;
                 const marketingWallet = document.getElementById('marketingWallet').value;
-                const devFee = ethers.parseEther(document.getElementById('devFee').value);
+                const devFee = ethers.utils.parseEther(document.getElementById('devFee').value);
                 const logoFile = document.getElementById('tokenLogo').files[0];
 
-                if (!ethers.isAddress(marketingWallet)) {
+                if (!ethers.utils.isAddress(marketingWallet)) {
                     throw new Error('营销钱包地址无效');
                 }
 
                 document.getElementById('loadingText').textContent = '上传元数据到 IPFS...';
                 const cid = await uploadMetadata(logoFile, name, symbol, description, website, twitter, telegram);
-                console.log('CID:', cid);
 
                 document.getElementById('loadingText').textContent = '计算 Salt...';
                 const { salt, address, iterations } = await findVanitySalt('7777');
-                console.log('Salt:', salt, 'Address:', address, 'Iterations:', iterations);
 
                 document.getElementById('loadingText').textContent = '检查 SOU 授权...';
                 const souContract = new ethers.Contract(SOU_TOKEN_ADDRESS, SOU_ABI, signer);
-                const allowance = await souContract.allowance(userAddress, FACTORY_ADDRESS);
-                if (allowance < SOU_FEE) {
+                const allowance = await souContract.allowance(userAddr, FACTORY_ADDRESS);
+                if (allowance.lt(SOU_FEE)) {
                     document.getElementById('loadingText').textContent = '授权 SOU 代币...';
-                    const approveTx = await souContract.approve(FACTORY_ADDRESS, ethers.MaxUint256);
+                    const approveTx = await souContract.approve(FACTORY_ADDRESS, ethers.constants.MaxUint256);
                     await approveTx.wait();
                 }
 
@@ -723,11 +821,11 @@
                     salt,
                     taxRate: 300,
                     migratorType: 2,
-                    quoteToken: ethers.ZeroAddress,
+                    quoteToken: ethers.constants.AddressZero,
                     quoteAmt: 0,
                     beneficiary: marketingWallet,
                     permitData: '0x',
-                    extensionID: ethers.ZeroHash,
+                    extensionID: ethers.constants.HashZero,
                     extensionData: '0x',
                     dexId: 1,
                     lpFeeProfile: {
@@ -735,43 +833,34 @@
                         tickLower: 0,
                         tickUpper: 0
                     },
-                    taxDuration: 0n,
-                    antiFarmerDuration: 0n,
+                    taxDuration: 0,
+                    antiFarmerDuration: 0,
                     mktBps: 10000,
                     deflationBps: 0,
                     dividendBps: 0,
                     lpBps: 0,
-                    minimumShareBalance: 0n
+                    minimumShareBalance: 0
                 };
 
                 const deployTx = await factoryContract.deployNewToken(params, { value: devFee });
                 const receipt = await deployTx.wait();
 
-                document.getElementById('resultCid').textContent = cid;
-                document.getElementById('resultSalt').textContent = salt;
-                document.getElementById('resultAddress').textContent = address;
-                document.getElementById('resultTxHash').textContent = receipt.hash;
+                document.getElementById('resultCid').innerText = cid;
+                document.getElementById('resultSalt').innerText = salt;
+                document.getElementById('resultAddress').innerText = address;
+                document.getElementById('resultTxHash').innerText = receipt.transactionHash;
 
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('resultSection').classList.add('show');
-                showAlert('代币部署成功！', 'success');
+                showToast('代币部署成功！', 'success');
             } catch (error) {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('deployForm').style.display = 'block';
-                showAlert('部署失败: ' + error.message, 'error');
+                showToast('部署失败: ' + error.message, 'error');
                 console.error(error);
             }
         }
 
-        function copyToClipboard(elementId) {
-            const element = document.getElementById(elementId);
-            const text = element.textContent;
-            navigator.clipboard.writeText(text).then(() => {
-                showAlert('已复制到剪贴板', 'success');
-            });
-        }
-
-        document.getElementById('connectBtn').addEventListener('click', connectWallet);
         document.getElementById('deployForm').addEventListener('submit', handleDeploy);
 
         document.getElementById('tokenLogo').addEventListener('change', (e) => {
@@ -779,41 +868,27 @@
             document.getElementById('fileName').textContent = fileName ? '✓ ' + fileName : '';
         });
 
-        window.addEventListener('load', () => {
-            console.log('页面加载完成，检查 Web3 环境...');
-            console.log('window.ethereum:', typeof window.ethereum);
+        if (window.ethereum && window.ethereum.selectedAddress) {
+            connectWallet();
+        }
 
-            if (typeof window.ethereum !== 'undefined') {
-                window.ethereum.on('accountsChanged', (accounts) => {
-                    console.log('账户已更改:', accounts);
-                    if (accounts.length === 0) {
-                        userAddress = null;
-                        document.getElementById('walletStatus').textContent = '未连接';
-                        document.getElementById('walletStatusIndicator').className = 'status-indicator status-disconnected';
-                        document.getElementById('deployBtn').disabled = true;
-                    } else {
-                        userAddress = accounts[0];
-                        updateWalletStatus();
-                    }
-                });
-
-                window.ethereum.on('chainChanged', () => {
-                    console.log('网络已更改，重新加载页面');
-                    location.reload();
-                });
-
-                window.ethereum.on('disconnect', () => {
-                    console.log('钱包已断开连接');
-                    userAddress = null;
-                    document.getElementById('walletStatus').textContent = '未连接';
-                    document.getElementById('walletStatusIndicator').className = 'status-indicator status-disconnected';
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length === 0) {
+                    userAddr = null;
+                    document.getElementById('walletAddr').innerText = '未连接';
+                    document.getElementById('statusDot').classList.remove('connected');
                     document.getElementById('deployBtn').disabled = true;
-                });
-            } else {
-                console.warn('未检测到 Web3 钱包');
-                showAlert('未检测到 Web3 钱包，请安装 MetaMask 或其他钱包扩展', 'warning');
-            }
-        });
+                } else {
+                    userAddr = accounts[0];
+                    connectWallet();
+                }
+            });
+
+            window.ethereum.on('chainChanged', () => {
+                location.reload();
+            });
+        }
     </script>
 </body>
 </html>
