@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>veWOOF 管理 - WOOF ↔ veWOOF</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-dark: #5a4bc7;
+            --bg: #0f0f1a;
+            --card: #1a1a2e;
+            --text: #e0e0ff;
+            --accent: #00d4ff;
+            --danger: #ff4757;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: var(--accent);
+            margin-bottom: 30px;
+        }
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+        .card h2 {
+            margin-top: 0;
+            color: #a29bfe;
+            border-bottom: 1px solid #333;
+            padding-bottom: 12px;
+        }
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 8px 8px 8px 0;
+        }
+        button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            background: #444;
+            cursor: not-allowed;
+        }
+        .connect-btn {
+            background: #00b894;
+            font-weight: bold;
+        }
+        .transfer-section input,
+        .info {
+            width: 100%;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #222;
+            color: var(--text);
+            font-size: 1rem;
+        }
+        .nft-list {
+            display: grid;
+            gap: 16px;
+        }
+        .nft-item {
+            background: #222;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        .nft-item strong {
+            color: var(--accent);
+        }
+        .balance {
+            font-size: 1.4rem;
+            text-align: center;
+            margin: 20px 0;
+            color: #ffeaa7;
+        }
+        .error {
+            color: var(--danger);
+            margin: 12px 0;
+        }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #777;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>veWOOF 管理面板</h1>
+
+        <div class="card">
+            <h2>连接钱包</h2>
+            <button class="connect-btn" id="connectBtn">连接 MetaMask</button>
+            <div class="info">钱包地址: <span id="wallet">未连接</span></div>
+            <div class="balance" id="veWoofBal">veWOOF 持有数量: 0</div>
+            <div class="balance" id="votingPower">总投票权: 0 veWOOF</div>
+        </div>
+
+        <div class="card">
+            <h2>我的 veWOOF NFT</h2>
+            <div id="nftList" class="nft-list"></div>
+            <div id="noNfts" class="info" style="display:none;">您当前没有 veWOOF NFT</div>
+        </div>
+
+        <div class="card transfer-section">
+            <h2>转账 veWOOF NFT</h2>
+            <input type="text" id="tokenIdInput" placeholder="输入 veWOOF Token ID (数字)">
+            <input type="text" id="toAddressInput" placeholder="接收方地址 (0x...)">
+            <button id="transferBtn">转账 veWOOF</button>
+            <div class="info">注意：转账前确保接收方支持 ERC-721，且您有足够的权限。</div>
+            <div id="transferStatus" class="error"></div>
+        </div>
+    </div>
+
+    <footer>Powered by Shibarium | veWOOF 合约: 0xb4cb5dB549e483539EA38d44c4109F3B25259847 © 2026</footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <script>
+        let web3, account;
+        const CHAIN_ID = 109;
+        const VE_WOOF = '0xb4cb5dB549e483539EA38d44c4109F3B25259847';
+
+        const veABI = [
+            {"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"locked","outputs":[{"components":[{"internalType":"int128","name":"amount","type":"int128"},{"internalType":"uint256","name":"end","type":"uint256"}],"internalType":"struct IVotingEscrow.LockedBalance","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"balanceOfNFT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"uint256","name":"index","type":"uint256"}],"name":"tokenOfOwnerByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
+        ];
+
+        async function init() {
+            if (window.ethereum) {
+                web3 = new Web3(window.ethereum);
+            } else {
+                alert('请安装 MetaMask！');
+            }
+        }
+
+        async function connect() {
+            const btn = document.getElementById('connectBtn');
+            try {
+                btn.innerText = '连接中...';
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                account = accounts[0];
+
+                const chain = await web3.eth.getChainId();
+                if (chain !== CHAIN_ID) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: '0x6d' }]
+                        });
+                    } catch (switchError) {
+                        if (switchError.code === 4902) {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: '0x6d',
+                                    chainName: 'Shibarium',
+                                    rpcUrls: ['https://www.shibrpc.com'],
+                                    nativeCurrency: { name: 'BONE', symbol: 'BONE', decimals: 18 },
+                                    blockExplorerUrls: ['https://shibariumscan.io']
+                                }]
+                            });
+                        } else {
+                            throw switchError;
+                        }
+                    }
+                }
+
+                document.getElementById('wallet').innerText = `${account.slice(0,6)}...${account.slice(-4)}`;
+                updateDashboard();
+            } catch (err) {
+                alert('连接失败: ' + err.message);
+            } finally {
+                btn.innerText = '连接 MetaMask';
+            }
+        }
+
+        async function updateDashboard() {
+            if (!account) return;
+
+            const veContract = new web3.eth.Contract(veABI, VE_WOOF);
+
+            try {
+                const balance = await veContract.methods.balanceOf(account).call();
+                document.getElementById('veWoofBal').innerText = `veWOOF 持有数量: ${balance}`;
+
+                let totalPower = 0n;
+                const listEl = document.getElementById('nftList');
+                listEl.innerHTML = '';
+                document.getElementById('noNfts').style.display = 'none';
+
+                if (Number(balance) === 0) {
+                    document.getElementById('noNfts').style.display = 'block';
+                } else {
+                    for (let i = 0; i < Number(balance); i++) {
+                        const tokenId = await veContract.methods.tokenOfOwnerByIndex(account, i).call();
+                        const locked = await veContract.methods.locked(tokenId).call();
+                        const power = await veContract.methods.balanceOfNFT(tokenId).call();
+
+                        const amount = Number(locked.amount) / 1e18;
+                        const endDate = new Date(Number(locked.end) * 1000).toLocaleString();
+
+                        totalPower += BigInt(power);
+
+                        const div = document.createElement('div');
+                        div.className = 'nft-item';
+                        div.innerHTML = `
+                            <strong>Token ID:</strong> ${tokenId}<br>
+                            <strong>锁仓 WOOF:</strong> ${amount.toFixed(4)}<br>
+                            <strong>到期时间:</strong> ${endDate}<br>
+                            <strong>当前投票权:</strong> ${Number(power) / 1e18} veWOOF
+                        `;
+                        listEl.appendChild(div);
+                    }
+                }
+
+                document.getElementById('votingPower').innerText = `总投票权: ${(Number(totalPower) / 1e18).toFixed(4)} veWOOF`;
+            } catch (err) {
+                console.error(err);
+                document.getElementById('nftList').innerHTML = '<p class="error">加载失败，请检查网络或合约状态</p>';
+            }
+        }
+
+        async function transferNFT() {
+            const tokenId = document.getElementById('tokenIdInput').value.trim();
+            const toAddr = document.getElementById('toAddressInput').value.trim();
+            const status = document.getElementById('transferStatus');
+
+            if (!tokenId || isNaN(tokenId) || !web3.utils.isAddress(toAddr)) {
+                status.innerText = '请输入有效的 Token ID 和接收地址';
+                return;
+            }
+
+            const veContract = new web3.eth.Contract(veABI, VE_WOOF);
+            status.innerText = '交易发送中...';
+
+            try {
+                await veContract.methods.safeTransferFrom(account, toAddr, tokenId).send({ from: account });
+                status.innerText = '转账成功！';
+                updateDashboard();
+            } catch (err) {
+                status.innerText = '转账失败: ' + (err.reason || err.message);
+            }
+        }
+
+        document.getElementById('connectBtn').onclick = connect;
+        document.getElementById('transferBtn').onclick = transferNFT;
+
+        setInterval(() => {
+            if (account) updateDashboard();
+        }, 30000);
+
+        init();
+    </script>
+</body>
+</html>
