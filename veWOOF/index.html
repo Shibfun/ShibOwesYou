@@ -48,7 +48,6 @@
             margin: 8px 8px 8px 0;
         }
         button:hover { background: var(--primary-dark); transform: translateY(-2px); }
-        button:disabled { background: #444; cursor: not-allowed; opacity: 0.6; }
         .connect-btn { background: #00b894; font-weight: bold; }
         .reset-btn { background: #ff9800; font-weight: bold; }
         .reset-btn:hover { background: #f57c00; }
@@ -103,10 +102,10 @@
             <input type="text" id="tokenIdInput" placeholder="输入 veWOOF Token ID">
             <input type="text" id="toAddressInput" placeholder="接收方地址 (0x...)">
             <button id="checkTransferBtn">先检查状态</button>
-            <button id="transferBtn" disabled>执行转账</button>
+            <button id="transferBtn">执行转账（强制可点）</button>
             <div class="status" id="transferStatus">等待输入 Token ID...</div>
             <div class="info warning">
-                转账按钮只有状态完全符合时才会亮起。
+                转账按钮已强制可点击，无论检查是否通过都能尝试（合约可能 revert "attached"）。
             </div>
         </div>
 
@@ -117,7 +116,7 @@
             <div class="status" id="resetStatus">等待输入 Token ID...</div>
             <div class="info">
                 输入有效的 Token ID 后按钮才会亮起。<br>
-                执行后 MetaMask 会弹出。如果没弹出，检查 F12 Console。
+                执行后 MetaMask 会弹出确认。如果没弹出，请检查 F12 Console。
             </div>
         </div>
     </div>
@@ -242,15 +241,14 @@
                 msg += `你是否 owner 或 approved: ${isApproved} ${!isApproved ? '→ <span class="error">无权限</span>' : '→ OK'}<br>`;
                 if (canTransfer) {
                     msg += '<br><span class="success">状态完全符合，可以转账！</span>';
-                    transferBtn.disabled = false;
                 } else {
-                    msg += '<br><span class="warning">不符合条件，转账按钮灰色（不可点击）。<br>如果 voted=true，请先执行 Reset Vote。</span>';
-                    transferBtn.disabled = true;
+                    msg += '<br><span class="warning">不符合条件，但转账按钮已强制可点击（合约可能 revert）。</span>';
                 }
                 status.innerHTML = msg;
+                transferBtn.disabled = false;
             } catch (err) {
                 status.innerHTML = `<span class="error">检查失败: ${err.message || 'RPC 错误'}</span>`;
-                document.getElementById('transferBtn').disabled = true;
+                document.getElementById('transferBtn').disabled = false;
             }
         }
 
