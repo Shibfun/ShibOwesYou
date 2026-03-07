@@ -15,6 +15,7 @@
             --accent: #00d4ff;
             --danger: #ff4757;
             --warning: #ffca28;
+            --success: #4caf50;
         }
         body {
             font-family: system-ui, -apple-system, sans-serif;
@@ -49,6 +50,8 @@
         button:hover { background: var(--primary-dark); transform: translateY(-2px); }
         button:disabled { background: #444; cursor: not-allowed; }
         .connect-btn { background: #00b894; font-weight: bold; }
+        .abstain-btn { background: var(--danger); }
+        .abstain-btn:hover { background: #e53935; }
         input, .info {
             width: 100%;
             padding: 12px;
@@ -70,6 +73,7 @@
         .balance { font-size: 1.4rem; text-align: center; margin: 20px 0; color: #ffeaa7; }
         .error { color: var(--danger); margin: 12px 0; }
         .warning { color: var(--warning); margin: 12px 0; font-weight: bold; }
+        .success { color: var(--success); margin: 12px 0; font-weight: bold; }
         .status { margin: 16px 0; padding: 12px; border-radius: 8px; background: #222; border: 1px solid #444; }
         footer { text-align: center; margin-top: 40px; color: #777; font-size: 0.9rem; }
     </style>
@@ -96,12 +100,20 @@
 
         <div class="card">
             <h2>转账 veWOOF NFT</h2>
-            <input type="text" id="tokenIdInput" placeholder="输入 veWOOF Token ID (如 1)">
+            <input type="text" id="tokenIdInput" placeholder="输入 veWOOF Token ID (如 337)">
             <input type="text" id="toAddressInput" placeholder="接收方地址 (0x...)">
             <button id="checkTransferBtn">先检查能否转账</button>
             <button id="transferBtn" disabled>执行转账</button>
             <div class="status" id="transferStatus">等待输入 Token ID...</div>
             <div class="info">点击“先检查能否转账”会查询 attachments、voted 和权限状态。</div>
+        </div>
+
+        <div class="card">
+            <h2>手动 Abstain (清除投票状态)</h2>
+            <input type="text" id="abstainTokenId" placeholder="输入要 Abstain 的 Token ID">
+            <button id="abstainBtn" class="abstain-btn">执行 Abstain</button>
+            <div class="status" id="abstainStatus">等待输入 Token ID...</div>
+            <div class="info warning">警告：此操作会尝试将 voted 设为 false。仅在你确定需要清除投票时使用。</div>
         </div>
     </div>
 
@@ -123,7 +135,8 @@
             {"inputs":[{"internalType":"address","name":"_owner","type":"address"},{"internalType":"uint256","name":"_tokenIndex","type":"uint256"}],"name":"tokenOfOwnerByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
             {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"attachments","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
             {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"voted","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"address","name":"_spender","type":"address"},{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"isApprovedOrOwner","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}
+            {"inputs":[{"internalType":"address","name":"_spender","type":"address"},{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"isApprovedOrOwner","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"abstain","outputs":[],"stateMutability":"nonpayable","type":"function"}
         ];
 
         async function initWeb3() {
@@ -214,15 +227,16 @@
                 const attachmentsVal = await veContract.methods.attachments(tokenId).call();
                 const votedVal = await veContract.methods.voted(tokenId).call();
                 const isApproved = await veContract.methods.isApprovedOrOwner(account, tokenId).call();
+                let canTransfer = (Number(attachmentsVal) === 0) && (votedVal === 'false') && isApproved;
                 let msg = `<strong>诊断结果 (Token ID: ${tokenId})：</strong><br>`;
                 msg += `attachments: ${attachmentsVal} ${attachmentsVal > 0 ? '→ <span class="error">被附着，无法转账</span>' : '→ OK'}<br>`;
-                msg += `voted: ${votedVal} ${votedVal === 'true' ? '→ <span class="error">已投票，无法转账</span>' : '→ OK'}<br>`;
-                msg += `你是否 owner 或 approved: ${isApproved} ${!isApproved ? '→ <span class="error">你没有权限（不是 owner 或未 approve）</span>' : '→ OK'}<br>`;
-                if (Number(attachmentsVal) === 0 && votedVal === 'false' && isApproved) {
-                    msg += '<br><span style="color:#4caf50; font-weight:bold;">所有检查通过，可以转账！</span>';
+                msg += `voted: ${votedVal} ${votedVal === 'true' ? '→ <span class="error">已投票，无法转账（需 abstain 或等 epoch）</span>' : '→ OK'}<br>`;
+                msg += `你是否 owner 或 approved: ${isApproved} ${!isApproved ? '→ <span class="error">无权限</span>' : '→ OK'}<br>`;
+                if (canTransfer) {
+                    msg += '<br><span class="success">所有检查通过，可以转账！</span>';
                     transferBtn.disabled = false;
                 } else {
-                    msg += '<br><span class="warning">请先解决以上问题（通常需等待 epoch 或在项目 dApp remove vote/detach）</span>';
+                    msg += '<br><span class="warning">无法转账，请解决以上红色问题</span>';
                     transferBtn.disabled = true;
                 }
                 status.innerHTML = msg;
@@ -244,7 +258,7 @@
             status.innerHTML += '<br>发送交易中...';
             try {
                 await veContract.methods.safeTransferFrom(account, toAddr, tokenId).send({ from: account });
-                status.innerHTML += '<br><span style="color:#4caf50;">转账成功！</span>';
+                status.innerHTML += '<br><span class="success">转账成功！</span>';
                 setTimeout(updateDashboard, 6000);
             } catch (err) {
                 let reason = err.reason || err.message || '未知错误';
@@ -253,9 +267,32 @@
             }
         }
 
+        async function doAbstain() {
+            const tokenId = document.getElementById('abstainTokenId').value.trim();
+            const status = document.getElementById('abstainStatus');
+            if (!tokenId || isNaN(tokenId)) {
+                status.innerHTML = '<span class="error">请输入有效的 Token ID</span>';
+                return;
+            }
+            const veContract = new web3.eth.Contract(veABI, VE_WOOF);
+            status.innerHTML = '执行 Abstain 中...';
+            try {
+                await veContract.methods.abstain(tokenId).send({ from: account });
+                status.innerHTML = `<span class="success">Abstain 成功！voted 已重置为 false。</span><br>建议稍等几秒后重新检查转账状态。`;
+                setTimeout(() => {
+                    document.getElementById('tokenIdInput').value = tokenId;
+                    checkTransfer();
+                }, 5000);
+            } catch (err) {
+                let reason = err.reason || err.message || '未知错误';
+                status.innerHTML = `<span class="error">Abstain 失败: ${reason}</span><br>可能原因：你不是 owner、合约已过期、或 voter 限制调用。`;
+            }
+        }
+
         document.getElementById('connectBtn').onclick = connect;
         document.getElementById('checkTransferBtn').onclick = checkTransfer;
         document.getElementById('transferBtn').onclick = transferNFT;
+        document.getElementById('abstainBtn').onclick = doAbstain;
 
         initWeb3();
     </script>
