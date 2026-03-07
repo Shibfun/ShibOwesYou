@@ -71,7 +71,7 @@
             background: #555577; 
             cursor: not-allowed; 
         }
-        input[type="text"], input[type="number"] {
+        input[type="number"] {
             width: 100%;
             padding: 12px;
             margin: 10px 0;
@@ -119,6 +119,7 @@
             <button id="connectBtn">Connect MetaMask</button>
             <div class="info">Wallet: <span id="wallet">Not connected</span></div>
             <div class="balance" id="woofBal">WOOF Balance: 0</div>
+            <div class="balance" id="souBal">Your SOU Balance: 0</div>
         </div>
 
         <div class="section">
@@ -128,20 +129,24 @@
             <div class="info">
                 1 WOOF = 1 SOU<br>
                 Contract: 0x4A08b432923ed5c74b45273d05e085c56c8df1E3<br>
-                Approve WOOF first, then exchange. SOU will be sent directly.
+                Approve WOOF first if needed.
             </div>
-            <div class="balance" id="souBal">Your SOU Balance: 0</div>
         </div>
 
         <div class="section owner-only" id="ownerSec" style="display:none;">
-            <div class="title">Owner Zone</div>
-            <div class="balance">Contract SOU Balance: <span id="contractSou">0 SOU</span></div>
-            <div class="info">Visible only to contract owner (for liquidity check)</div>
+            <div class="title">Owner Controls (Deposit SOU)</div>
+            <div class="balance">Contract SOU Liquidity: <span id="contractSou">0 SOU</span></div>
+            <input type="number" id="depositInput" placeholder="Enter SOU amount to deposit" min="0" step="any">
+            <button id="depositBtn">Deposit SOU to Pool</button>
+            <div class="info">
+                Only visible/usable by owner (0x0c6F...Fce6).<br>
+                Approve SOU to contract first if needed.
+            </div>
         </div>
 
     </div>
 
-    <footer>Powered by Shibarium | WOOF ↔ SOU 1:1 Exchange © 2026</footer>
+    <footer>Powered by Shibarium | WOOF ↔ SOU 1:1 © 2026</footer>
 
     <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
     <script>
@@ -149,7 +154,6 @@
 
         const RPC = 'https://rpc.shibarium.shib.io';
         const CHAIN_ID = 109;
-        const CHAIN_NAME = 'Shibarium';
         const WOOF = '0xD0daa7B6ff1B40d3cc6F0B2Cf7E85cB993D1c834';
         const SOU  = '0x5e1AeE526d1Aa049B4d95E5B68aE7bb556e2D799';
         const EXCHANGE = '0x4A08b432923ed5c74b45273d05e085c56c8df1E3';
@@ -161,17 +165,18 @@
         ];
 
         const exchangeABI = [
-            {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"exchange","outputs":[],"stateMutability":"nonpayable","type":"function"}
+            {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"exchange","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}
         ];
 
         function format(num) {
-            return (Number(num) / 1e18).toFixed(2);
+            return (Number(num) / 1e18).toFixed(4);
         }
 
         async function connect() {
             const btn = document.getElementById('connectBtn');
             try {
-                if (!window.ethereum) return alert('Please install MetaMask');
+                if (!window.ethereum) return alert('Install MetaMask!');
                 btn.innerText = 'Connecting...';
                 web3 = new Web3(RPC);
                 const accounts = await window.ethereum.request({method: 'eth_requestAccounts'});
@@ -179,33 +184,24 @@
                 const chain = await web3.eth.getChainId();
                 if (chain !== CHAIN_ID) {
                     try {
-                        await window.ethereum.request({
-                            method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: '0x' + CHAIN_ID.toString(16) }],
-                        });
+                        await window.ethereum.request({method: 'wallet_switchEthereumChain', params: [{chainId: '0x6d'}]});
                     } catch (e) {
                         if (e.code === 4902) {
                             await window.ethereum.request({
                                 method: 'wallet_addEthereumChain',
-                                params: [{
-                                    chainId: '0x6d',
-                                    chainName: CHAIN_NAME,
-                                    rpcUrls: [RPC],
-                                    nativeCurrency: {name: 'BONE', symbol: 'BONE', decimals: 18},
-                                    blockExplorerUrls: ['https://shibariumscan.io']
-                                }]
+                                params: [{chainId: '0x6d', chainName: 'Shibarium', rpcUrls: [RPC], nativeCurrency: {name: 'BONE', symbol: 'BONE', decimals: 18}, blockExplorerUrls: ['https://shibariumscan.io']}]
                             });
                         } else throw e;
                     }
                 }
                 woofContract = new web3.eth.Contract(tokenABI, WOOF);
-                souContract  = new web3.eth.Contract(tokenABI, SOU);
+                souContract = new web3.eth.Contract(tokenABI, SOU);
                 exchangeContract = new web3.eth.Contract(exchangeABI, EXCHANGE);
                 document.getElementById('wallet').innerText = account.slice(0,6) + '...' + account.slice(-4);
                 updateBalances();
                 checkOwner();
             } catch (err) {
-                alert('Connection failed: ' + err.message);
+                alert('Failed: ' + err.message);
             } finally {
                 btn.innerText = 'Connect MetaMask';
             }
@@ -213,12 +209,10 @@
 
         async function updateBalances() {
             if (!account) return;
-            try {
-                const wbal = await woofContract.methods.balanceOf(account).call();
-                document.getElementById('woofBal').innerText = `WOOF Balance: ${format(wbal)}`;
-                const sbal = await souContract.methods.balanceOf(account).call();
-                document.getElementById('souBal').innerText = `Your SOU Balance: ${format(sbal)}`;
-            } catch(e) { console.log(e); }
+            const wbal = await woofContract.methods.balanceOf(account).call().catch(()=>0);
+            document.getElementById('woofBal').innerText = `WOOF Balance: ${format(wbal)}`;
+            const sbal = await souContract.methods.balanceOf(account).call().catch(()=>0);
+            document.getElementById('souBal').innerText = `Your SOU Balance: ${format(sbal)}`;
         }
 
         async function checkOwner() {
@@ -226,39 +220,63 @@
                 const owner = await exchangeContract.methods.owner().call();
                 if (account.toLowerCase() === owner.toLowerCase()) {
                     document.getElementById('ownerSec').style.display = 'block';
-                    const contSou = await souContract.methods.balanceOf(EXCHANGE).call();
+                    const contSou = await souContract.methods.balanceOf(EXCHANGE).call().catch(()=>0);
                     document.getElementById('contractSou').innerText = `${format(contSou)} SOU`;
                 }
-            } catch(e) {}
+            } catch(e) { console.log(e); }
         }
 
         async function doExchange() {
             const btn = document.getElementById('exchangeBtn');
-            const amtStr = document.getElementById('amountInput').value.trim();
-            if (!amtStr || isNaN(amtStr) || Number(amtStr) <= 0) return alert('Please enter a valid amount');
-            const amountWei = web3.utils.toWei(amtStr, 'ether');
+            const amt = document.getElementById('amountInput').value.trim();
+            if (!amt || isNaN(amt) || Number(amt) <= 0) return alert('Enter valid amount');
+            const wei = web3.utils.toWei(amt, 'ether');
             try {
-                btn.innerText = 'Exchanging...';
+                btn.innerText = 'Processing...';
                 const allow = await woofContract.methods.allowance(account, EXCHANGE).call();
-                if (Number(allow) < Number(amountWei)) {
-                    await woofContract.methods.approve(EXCHANGE, web3.utils.toBN('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')).send({from: account});
-                    alert('WOOF approved. Proceed to exchange.');
+                if (Number(allow) < Number(wei)) {
+                    await woofContract.methods.approve(EXCHANGE, '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff').send({from: account});
+                    alert('WOOF approved!');
                 }
-                await exchangeContract.methods.exchange(amountWei).send({from: account});
-                alert('Exchange successful! SOU received.');
+                await exchangeContract.methods.exchange(wei).send({from: account});
+                alert('Exchanged! SOU received.');
                 updateBalances();
                 checkOwner();
             } catch(err) {
-                alert('Exchange failed: ' + (err.message || err));
+                alert('Failed: ' + (err.reason || err.message || err));
             } finally {
                 btn.innerText = 'Exchange to SOU';
             }
         }
 
+        async function doDeposit() {
+            const btn = document.getElementById('depositBtn');
+            const amt = document.getElementById('depositInput').value.trim();
+            if (!amt || isNaN(amt) || Number(amt) <= 0) return alert('Enter valid amount');
+            const wei = web3.utils.toWei(amt, 'ether');
+            try {
+                btn.innerText = 'Depositing...';
+                const allow = await souContract.methods.allowance(account, EXCHANGE).call();
+                if (Number(allow) < Number(wei)) {
+                    await souContract.methods.approve(EXCHANGE, '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff').send({from: account});
+                    alert('SOU approved for deposit!');
+                }
+                await exchangeContract.methods.depositSOU(wei).send({from: account});
+                alert('Deposit successful! Liquidity added.');
+                updateBalances();
+                checkOwner();  // refresh contract balance
+            } catch(err) {
+                alert('Deposit failed: ' + (err.reason || err.message || err));
+            } finally {
+                btn.innerText = 'Deposit SOU to Pool';
+            }
+        }
+
         document.getElementById('connectBtn').onclick = connect;
         document.getElementById('exchangeBtn').onclick = doExchange;
+        document.getElementById('depositBtn').onclick = doDeposit;
 
-        setInterval(() => { if (account) updateBalances(); }, 10000);
+        setInterval(() => { if (account) { updateBalances(); checkOwner(); } }, 15000);
     </script>
 </body>
 </html>
