@@ -1,239 +1,158 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FeedFun - WOOF ↔ SOU 兑换</title>
+    <title>WOOF → SOU Exchange</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
             font-family: 'Press Start 2P', cursive;
-            background: #0f0f1f;
-            color: #e0e0ff;
-            line-height: 1.6;
+            background: #0a0a1e;
+            color: #d0d0ff;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            image-rendering: pixelated;
-        }
-
-        h1, h2, button, .section-title {
-            font-family: 'Press Start 2P', cursive;
-            image-rendering: pixelated;
-        }
-
-        .header {
-            width: 100%;
             padding: 20px 10px;
-            text-align: center;
-            background: #1a1a3a;
-            border-bottom: 4px solid #ff55aa;
-            box-shadow: 0 4px 0 #000;
+            image-rendering: pixelated;
         }
-
-        .header h1 {
-            font-size: 1.8em;
-            color: #ff88cc;
-            text-shadow: 3px 3px #000;
+        h1 { 
+            font-size: 2em; 
+            color: #ff77cc; 
+            text-shadow: 4px 4px #000; 
+            margin: 20px 0;
         }
-
         .container {
             width: 100%;
-            max-width: 480px;
-            padding: 20px 10px;
-            flex-grow: 1;
+            max-width: 500px;
         }
-
         .section {
-            background: #222244;
-            border: 4px solid #55aaff;
-            border-radius: 0;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 6px 6px 0 #000;
-            position: relative;
+            background: #1c1c3a;
+            border: 5px solid #44ccff;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 8px 8px 0 #000;
         }
-
-        .section-title {
-            font-size: 1.1em;
-            color: #88ffdd;
+        .title {
+            font-size: 1.2em;
+            color: #88ffaa;
             margin-bottom: 15px;
-            text-shadow: 2px 2px #000;
+            text-shadow: 3px 3px #000;
             background: #000;
-            padding: 8px;
-            border-bottom: 4px solid #ff55aa;
+            padding: 10px;
+            border-bottom: 5px solid #ff44aa;
         }
-
         button {
-            background: #ff55aa;
-            color: #fff;
-            border: 4px solid #000;
-            padding: 12px 24px;
-            font-size: 1em;
+            background: #ff44aa;
+            color: white;
+            border: 5px solid #000;
+            padding: 15px 30px;
+            font-size: 1.1em;
             cursor: pointer;
-            margin: 8px;
-            box-shadow: 4px 4px 0 #000;
-            transition: all 0.1s;
+            margin: 10px 0;
+            box-shadow: 6px 6px 0 #000;
+            transition: all 0.15s;
             image-rendering: pixelated;
         }
-
-        button:hover {
-            background: #ff88cc;
-            transform: translate(2px, 2px);
-            box-shadow: 2px 2px 0 #000;
+        button:hover { 
+            background: #ff88dd; 
+            transform: translate(3px,3px); 
+            box-shadow: 3px 3px 0 #000; 
         }
-
-        button:active {
-            transform: translate(4px, 4px);
-            box-shadow: 0 0 0 #000;
+        button:active { 
+            transform: translate(6px,6px); 
+            box-shadow: 0 0 0 #000; 
         }
-
-        button:disabled {
-            background: #444466;
-            cursor: not-allowed;
-            box-shadow: 4px 4px 0 #000;
+        button:disabled { 
+            background: #555577; 
+            cursor: not-allowed; 
         }
-
-        input[type="text"] {
+        input[type="text"], input[type="number"] {
             width: 100%;
             padding: 12px;
             margin: 10px 0;
             background: #111133;
-            border: 4px solid #55aaff;
-            color: #e0e0ff;
+            border: 5px solid #44ccff;
+            color: #d0d0ff;
             font-family: 'Press Start 2P', cursive;
             font-size: 0.9em;
         }
-
-        .game-info, .rules-text {
-            font-size: 0.85em;
-            color: #aaccff;
-            line-height: 1.8;
-        }
-
-        .balance {
-            font-size: 1.1em;
-            color: #ffdd88;
+        .info {
+            font-size: 0.9em;
+            color: #aaddff;
+            line-height: 1.7;
             margin: 10px 0;
         }
-
+        .balance {
+            font-size: 1.3em;
+            color: #ffdd77;
+            margin: 15px 0;
+            text-align: center;
+        }
         .owner-only {
             border-color: #ffaa55;
         }
-
-        .owner-only .section-title {
+        .owner-only .title {
             color: #ffdd88;
             border-bottom-color: #ffaa55;
         }
-
         footer {
-            background: #1a1a3a;
-            width: 100%;
-            padding: 15px;
-            text-align: center;
+            margin-top: auto;
+            padding: 20px;
             font-size: 0.8em;
             color: #88aaff;
-            border-top: 4px solid #ff55aa;
-            margin-top: auto;
-        }
-
-        .hidden {
-            display: none !important;
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>FeedFun</h1>
-        <div class="balance" id="feedBalance">0 FEED</div>
-    </div>
+    <h1>WOOF → SOU Exchange</h1>
 
     <div class="container">
 
         <div class="section">
-            <div class="section-title">连接钱包</div>
-            <button id="connectButton">连接 MetaMask</button>
-            <div class="game-info">钱包: <span id="walletAddress">未连接</span></div>
+            <div class="title">Connect Wallet</div>
+            <button id="connectBtn">Connect MetaMask</button>
+            <div class="info">Wallet: <span id="wallet">Not connected</span></div>
+            <div class="balance" id="woofBal">WOOF Balance: 0</div>
         </div>
 
         <div class="section">
-            <div class="section-title">10人游戏</div>
-            <button id="betButton">下注 10B FEED</button>
-            <div class="game-info">当前轮次: <span id="currentRound">1</span> | 奖池: <span id="coinPool">0 FEED</span></div>
-            <div id="betPosition">你还没参与本轮！</div>
-            <table style="width:100%;margin-top:10px;font-size:0.8em;">
-                <thead><tr><th>#</th><th>玩家</th></tr></thead>
-                <tbody id="currentBets"></tbody>
-            </table>
-        </div>
-
-        <div class="section">
-            <div class="section-title">翻硬币游戏</div>
-            <button id="coinHeadsButton">正面 (1B FEED)</button>
-            <button id="coinTailsButton">反面 (1B FEED)</button>
-            <div class="game-info">你的连败: <span id="coinLosses">0</span></div>
-        </div>
-
-        <div class="section owner-only" id="ownerSection" style="display:none;">
-            <div class="section-title">管理员专区 - SOU 管理</div>
-            <div class="game-info">合约 SOU 余额: <span id="souBalance">0 SOU</span></div>
-            <input type="text" id="exchangeAmount" placeholder="输入兑换数量 (WOOF → SOU)">
-            <button id="exchangeButton">WOOF 兑换 SOU (1:1)</button>
-            <div class="game-info" style="margin-top:15px;color:#ffdd88;">仅合约拥有者可见</div>
-        </div>
-
-        <div class="section">
-            <div class="section-title">玩法说明</div>
-            <div class="rules-text">
-                <strong>10人游戏：</strong><br>
-                每人下注10B FEED，需要推荐人。<br>
-                满10人自动结算，赢家得80B，推荐链分8.8B，剩余进翻硬币池。<br><br>
-                <strong>翻硬币：</strong><br>
-                下注1B FEED，40%几率赢1.8B，推荐人得0.2B。<br>
-                输的进入奖池，奖池低于2B暂停。<br><br>
-                先授权 FEED 代币哦！
+            <div class="title">Exchange WOOF for SOU (1:1)</div>
+            <input type="number" id="amountInput" placeholder="Enter WOOF amount" min="0" step="any">
+            <button id="exchangeBtn">Exchange to SOU</button>
+            <div class="info">
+                1 WOOF = 1 SOU<br>
+                Contract: 0x4A08b432923ed5c74b45273d05e085c56c8df1E3<br>
+                Approve WOOF first, then exchange. SOU will be sent directly.
             </div>
+            <div class="balance" id="souBal">Your SOU Balance: 0</div>
+        </div>
+
+        <div class="section owner-only" id="ownerSec" style="display:none;">
+            <div class="title">Owner Zone</div>
+            <div class="balance">Contract SOU Balance: <span id="contractSou">0 SOU</span></div>
+            <div class="info">Visible only to contract owner (for liquidity check)</div>
         </div>
 
     </div>
 
-    <footer>Powered by Shibarium © 2025</footer>
+    <footer>Powered by Shibarium | WOOF ↔ SOU 1:1 Exchange © 2026</footer>
 
     <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
     <script>
-        let web3, accounts, contract, feedContract;
-        const contractAddress = "0x6Ff816320fA51e8DBCD5a1286aaB6cd2c9F35B26";
-        const feedAddress = "0xe9Cb2D7ADC24Fc59FE00D6C0A0669BDF16805Fe0";
-        const woofAddress = "0xD0daa7B6ff1B40d3cc6F0B2Cf7E85cB993D1c834";
-        const souAddress = "0x5e1AeE526d1Aa049B4d95E5B68aE7bb556e2D799";
-        const woofToSouContract = "0x4A08b432923ed5c74b45273d05e085c56c8df1E3";
+        let web3, account, woofContract, souContract, exchangeContract;
 
-        const contractABI = [ /* 原 ABI 保持不变，省略以缩短 */ 
-            {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},
-            {"inputs":[],"name":"COIN_BET_AMOUNT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-            {"inputs":[],"name":"currentRound","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-            {"inputs":[],"name":"coinGamePool","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"address","name":"bettor","type":"address"}],"name":"hasBetInCurrentRound","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
-            {"inputs":[],"name":"getCurrentBetCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-            {"inputs":[],"name":"getCurrentBets","outputs":[{"components":[{"internalType":"address","name":"bettor","type":"address"},{"internalType":"uint256","name":"blockNumber","type":"uint256"}],"internalType":"struct FeedFun.Bet[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},
-            {"inputs":[],"name":"getCoinGameHistory","outputs":[{"components":[{"internalType":"address","name":"player","type":"address"},{"internalType":"bool","name":"won","type":"bool"},{"internalType":"bool","name":"guess","type":"bool"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"uint256","name":"timestamp","type":"uint256"}],"internalType":"struct FeedFun.CoinGameResult[10]","name":"","type":"tuple[10]"}],"stateMutability":"view","type":"function"},
-            {"inputs":[],"name":"getTenGameHistory","outputs":[{"components":[{"internalType":"address","name":"winner","type":"address"},{"internalType":"uint256","name":"winningNumber","type":"uint256"},{"internalType":"uint256","name":"totalBets","type":"uint256"},{"internalType":"uint256","name":"timestamp","type":"uint256"}],"internalType":"struct FeedFun.RoundInfo[10]","name":"","type":"tuple[10]"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getLossCount","outputs":[{"internalType":"uint256","name":"tenLosses","type":"uint256"},{"internalType":"uint256","name":"coinLosses","type":"uint256"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"address","name":"referrer","type":"address"}],"name":"setReferrer","outputs":[],"stateMutability":"nonpayable","type":"function"},
-            {"inputs":[],"name":"placeBet","outputs":[],"stateMutability":"nonpayable","type":"function"},
-            {"inputs":[{"internalType":"bool","name":"guess","type":"bool"}],"name":"playCoinGame","outputs":[],"stateMutability":"nonpayable","type":"function"},
-            {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"referrers","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}
-        ];
+        const RPC = 'https://rpc.shibarium.shib.io';
+        const CHAIN_ID = 109;
+        const CHAIN_NAME = 'Shibarium';
+        const WOOF = '0xD0daa7B6ff1B40d3cc6F0B2Cf7E85cB993D1c834';
+        const SOU  = '0x5e1AeE526d1Aa049B4d95E5B68aE7bb556e2D799';
+        const EXCHANGE = '0x4A08b432923ed5c74b45273d05e085c56c8df1E3';
 
         const tokenABI = [
             {"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
@@ -241,204 +160,105 @@
             {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
         ];
 
-        const shibariumMainnet = {
-            chainId: "0x6d",
-            chainName: 'Shibarium',
-            nativeCurrency: { name: 'BONE', symbol: 'BONE', decimals: 18 },
-            rpcUrls: ['https://rpc.shibarium.shib.io'],
-            blockExplorerUrls: ['https://shibariumscan.io']
-        };
+        const exchangeABI = [
+            {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"exchange","outputs":[],"stateMutability":"nonpayable","type":"function"}
+        ];
 
-        function formatAmount(amount) {
-            const val = Number(amount) / 1e9;
-            return val.toFixed(1) + 'B';
+        function format(num) {
+            return (Number(num) / 1e18).toFixed(2);
         }
 
-        async function connectWallet() {
-            const btn = document.getElementById('connectButton');
+        async function connect() {
+            const btn = document.getElementById('connectBtn');
             try {
-                if (!window.ethereum) return alert('请安装MetaMask！');
-                btn.innerText = "连接中...";
-                web3 = new Web3(window.ethereum);
-                accounts = await window.ethereum.request({method: 'eth_requestAccounts'});
-                let chainId = await web3.eth.getChainId();
-                if (chainId !== 109) {
+                if (!window.ethereum) return alert('Please install MetaMask');
+                btn.innerText = 'Connecting...';
+                web3 = new Web3(RPC);
+                const accounts = await window.ethereum.request({method: 'eth_requestAccounts'});
+                account = accounts[0];
+                const chain = await web3.eth.getChainId();
+                if (chain !== CHAIN_ID) {
                     try {
                         await window.ethereum.request({
                             method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: '0x6d' }],
+                            params: [{ chainId: '0x' + CHAIN_ID.toString(16) }],
                         });
-                    } catch (switchErr) {
-                        if (switchErr.code === 4902) {
+                    } catch (e) {
+                        if (e.code === 4902) {
                             await window.ethereum.request({
                                 method: 'wallet_addEthereumChain',
-                                params: [shibariumMainnet],
+                                params: [{
+                                    chainId: '0x6d',
+                                    chainName: CHAIN_NAME,
+                                    rpcUrls: [RPC],
+                                    nativeCurrency: {name: 'BONE', symbol: 'BONE', decimals: 18},
+                                    blockExplorerUrls: ['https://shibariumscan.io']
+                                }]
                             });
-                        } else {
-                            alert('请切换到Shibarium网络');
-                            return;
-                        }
+                        } else throw e;
                     }
                 }
-                document.getElementById('walletAddress').innerText = accounts[0].slice(0,6)+'...'+accounts[0].slice(-4);
-                contract = new web3.eth.Contract(contractABI, contractAddress);
-                feedContract = new web3.eth.Contract(tokenABI, feedAddress);
-                updateUI();
+                woofContract = new web3.eth.Contract(tokenABI, WOOF);
+                souContract  = new web3.eth.Contract(tokenABI, SOU);
+                exchangeContract = new web3.eth.Contract(exchangeABI, EXCHANGE);
+                document.getElementById('wallet').innerText = account.slice(0,6) + '...' + account.slice(-4);
+                updateBalances();
                 checkOwner();
             } catch (err) {
-                alert('连接失败: ' + err.message);
+                alert('Connection failed: ' + err.message);
             } finally {
-                btn.innerText = "连接 MetaMask";
+                btn.innerText = 'Connect MetaMask';
             }
+        }
+
+        async function updateBalances() {
+            if (!account) return;
+            try {
+                const wbal = await woofContract.methods.balanceOf(account).call();
+                document.getElementById('woofBal').innerText = `WOOF Balance: ${format(wbal)}`;
+                const sbal = await souContract.methods.balanceOf(account).call();
+                document.getElementById('souBal').innerText = `Your SOU Balance: ${format(sbal)}`;
+            } catch(e) { console.log(e); }
         }
 
         async function checkOwner() {
-            if (!contract) return;
             try {
-                const owner = await contract.methods.owner().call();
-                if (accounts[0].toLowerCase() === owner.toLowerCase()) {
-                    document.getElementById('ownerSection').style.display = 'block';
-                    const souContract = new web3.eth.Contract(tokenABI, souAddress);
-                    const bal = await souContract.methods.balanceOf(woofToSouContract).call();
-                    document.getElementById('souBalance').innerText = formatAmount(bal) + ' SOU';
+                const owner = await exchangeContract.methods.owner().call();
+                if (account.toLowerCase() === owner.toLowerCase()) {
+                    document.getElementById('ownerSec').style.display = 'block';
+                    const contSou = await souContract.methods.balanceOf(EXCHANGE).call();
+                    document.getElementById('contractSou').innerText = `${format(contSou)} SOU`;
                 }
-            } catch(e){}
+            } catch(e) {}
         }
 
-        async function updateUI() {
-            if (!web3 || !contract || !accounts) return;
+        async function doExchange() {
+            const btn = document.getElementById('exchangeBtn');
+            const amtStr = document.getElementById('amountInput').value.trim();
+            if (!amtStr || isNaN(amtStr) || Number(amtStr) <= 0) return alert('Please enter a valid amount');
+            const amountWei = web3.utils.toWei(amtStr, 'ether');
             try {
-                const round = await contract.methods.currentRound().call();
-                document.getElementById('currentRound').innerText = round;
-
-                const pool = await contract.methods.coinGamePool().call();
-                document.getElementById('coinPool').innerText = formatAmount(pool) + ' FEED';
-
-                const count = await contract.methods.getCurrentBetCount().call();
-                const bets = await contract.methods.getCurrentBets().call();
-                let html = '';
-                let pos = -1;
-                bets.forEach((b, i) => {
-                    html += `<tr><td>${i+1}</td><td>${b.bettor.slice(0,6)}...${b.bettor.slice(-4)}</td></tr>`;
-                    if (b.bettor.toLowerCase() === accounts[0].toLowerCase()) pos = i+1;
-                });
-                document.getElementById('currentBets').innerHTML = html;
-                document.getElementById('betPosition').innerText = pos > 0 ? `你在第 #${pos} 位` : '你还没参与本轮！';
-
-                document.getElementById('betButton').disabled = await contract.methods.hasBetInCurrentRound(accounts[0]).call();
-
-                const ref = await contract.methods.referrers(accounts[0]).call();
-                const hasRef = ref !== '0x0000000000000000000000000000000000000000';
-
-                const bal = await feedContract.methods.balanceOf(accounts[0]).call();
-                document.getElementById('feedBalance').innerText = formatAmount(bal) + ' FEED';
-
-                const losses = await contract.methods.getLossCount(accounts[0]).call();
-                document.getElementById('coinLosses').innerText = losses[1];
-
-                const lowPool = Number(web3.utils.fromWei(pool, 'ether')) / 1e9 < 2;
-                document.getElementById('coinHeadsButton').disabled = lowPool || !hasRef;
-                document.getElementById('coinTailsButton').disabled = lowPool || !hasRef;
-            } catch(e) {
-                console.log(e);
-            }
-        }
-
-        async function placeBet() {
-            const btn = document.getElementById('betButton');
-            try {
-                btn.innerText = "处理中...";
-                const amt = await contract.methods.TEN_BET_AMOUNT().call();
-                const allow = await feedContract.methods.allowance(accounts[0], contractAddress).call();
-                if (Number(allow) < Number(amt)) {
-                    await feedContract.methods.approve(contractAddress, '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff').send({from: accounts[0]});
-                    alert('已授权 FEED，继续下注');
+                btn.innerText = 'Exchanging...';
+                const allow = await woofContract.methods.allowance(account, EXCHANGE).call();
+                if (Number(allow) < Number(amountWei)) {
+                    await woofContract.methods.approve(EXCHANGE, web3.utils.toBN('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')).send({from: account});
+                    alert('WOOF approved. Proceed to exchange.');
                 }
-                const cnt = await contract.methods.getCurrentBetCount().call();
-                if (cnt == '9') alert('你是第10位！请增加50% Gas Limit 来结算轮次');
-                await contract.methods.placeBet().send({from: accounts[0]});
-                alert('下注成功！祝好运！');
-                updateUI();
-            } catch(e) {
-                alert('操作失败: ' + e.message);
-            } finally {
-                btn.innerText = "下注 10B FEED";
-            }
-        }
-
-        async function playCoin(guess) {
-            const btn = guess ? document.getElementById('coinHeadsButton') : document.getElementById('coinTailsButton');
-            try {
-                btn.innerText = "翻转中...";
-                const amt = await contract.methods.COIN_BET_AMOUNT().call();
-                const allow = await feedContract.methods.allowance(accounts[0], contractAddress).call();
-                if (Number(allow) < Number(amt)) {
-                    await feedContract.methods.approve(contractAddress, '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff').send({from: accounts[0]});
-                    alert('已授权，继续翻硬币');
-                }
-                await contract.methods.playCoinGame(guess).send({from: accounts[0]});
-                alert('硬币已翻！请查看结果');
-                updateUI();
-            } catch(e) {
-                alert('失败: ' + e.message);
-            } finally {
-                btn.innerText = guess ? "正面 (1B FEED)" : "反面 (1B FEED)";
-            }
-        }
-
-        async function exchangeWOOFtoSOU() {
-            const btn = document.getElementById('exchangeButton');
-            const amtInput = document.getElementById('exchangeAmount').value.trim();
-            if (!amtInput || isNaN(amtInput) || Number(amtInput) <= 0) {
-                alert('请输入有效数量');
-                return;
-            }
-            const amount = web3.utils.toWei((Number(amtInput) * 1e9).toString(), 'ether');
-            try {
-                btn.innerText = "兑换中...";
-                const woof = new web3.eth.Contract(tokenABI, woofAddress);
-                const allow = await woof.methods.allowance(accounts[0], woofToSouContract).call();
-                if (Number(allow) < Number(amount)) {
-                    await woof.methods.approve(woofToSouContract, '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff').send({from: accounts[0]});
-                    alert('已授权 WOOF，继续兑换');
-                }
-                const exchContract = new web3.eth.Contract([
-                    {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"exchange","outputs":[],"stateMutability":"nonpayable","type":"function"}
-                ], woofToSouContract);
-                await exchContract.methods.exchange(amount).send({from: accounts[0]});
-                alert('兑换成功！SOU 已到账');
-                updateUI();
+                await exchangeContract.methods.exchange(amountWei).send({from: account});
+                alert('Exchange successful! SOU received.');
+                updateBalances();
                 checkOwner();
-            } catch(e) {
-                alert('兑换失败: ' + e.message);
+            } catch(err) {
+                alert('Exchange failed: ' + (err.message || err));
             } finally {
-                btn.innerText = "WOOF 兑换 SOU (1:1)";
+                btn.innerText = 'Exchange to SOU';
             }
         }
 
-        document.getElementById('connectButton').onclick = connectWallet;
-        document.getElementById('betButton').onclick = placeBet;
-        document.getElementById('coinHeadsButton').onclick = () => playCoin(true);
-        document.getElementById('coinTailsButton').onclick = () => playCoin(false);
-        document.getElementById('exchangeButton').onclick = exchangeWOOFtoSOU;
+        document.getElementById('connectBtn').onclick = connect;
+        document.getElementById('exchangeBtn').onclick = doExchange;
 
-        window.ethereum?.on('chainChanged', chainId => {
-            if (parseInt(chainId, 16) !== 109) {
-                alert('请切换到Shibarium网络');
-            } else {
-                connectWallet();
-            }
-        });
-
-        window.ethereum?.on('accountsChanged', accs => {
-            if (accs.length) connectWallet();
-            else {
-                document.getElementById('walletAddress').innerText = '未连接';
-                document.getElementById('ownerSection').style.display = 'none';
-            }
-        });
-
-        setInterval(updateUI, 8000);
+        setInterval(() => { if (account) updateBalances(); }, 10000);
     </script>
 </body>
 </html>
