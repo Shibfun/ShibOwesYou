@@ -48,10 +48,9 @@
             margin: 8px 8px 8px 0;
         }
         button:hover { background: var(--primary-dark); transform: translateY(-2px); }
-        button:disabled { background: #444; cursor: not-allowed; }
         .connect-btn { background: #00b894; font-weight: bold; }
-        .abstain-btn { background: var(--danger); }
-        .abstain-btn:hover { background: #e53935; }
+        .force-btn { background: var(--danger); font-weight: bold; }
+        .force-btn:hover { background: #d32f2f; }
         input, .info {
             width: 100%;
             padding: 12px;
@@ -102,18 +101,15 @@
             <h2>转账 veWOOF NFT</h2>
             <input type="text" id="tokenIdInput" placeholder="输入 veWOOF Token ID (如 337)">
             <input type="text" id="toAddressInput" placeholder="接收方地址 (0x...)">
-            <button id="checkTransferBtn">先检查能否转账</button>
-            <button id="transferBtn" disabled>执行转账</button>
+            <button id="checkTransferBtn">先检查状态</button>
+            <button id="transferBtn">执行转账</button>
+            <button id="forceTransferBtn" class="force-btn">强制转账（高 gas 尝试）</button>
             <div class="status" id="transferStatus">等待输入 Token ID...</div>
-            <div class="info">点击“先检查能否转账”会查询 attachments、voted 和权限状态。</div>
-        </div>
-
-        <div class="card">
-            <h2>手动 Abstain (清除投票状态)</h2>
-            <input type="text" id="abstainTokenId" placeholder="输入要 Abstain 的 Token ID">
-            <button id="abstainBtn" class="abstain-btn">执行 Abstain</button>
-            <div class="status" id="abstainStatus">等待输入 Token ID...</div>
-            <div class="info warning">警告：此操作会尝试将 voted 设为 false。仅在你确定需要清除投票时使用。</div>
+            <div class="info warning">
+                注意：如果 voted = true，合约会强制 revert "attached"，无法绕过。<br>
+                强制转账只是增加 gas limit 尝试，但合约逻辑挡不住。<br>
+                必须由 voter 调用 abstain(tokenId) 才能真正解决。
+            </div>
         </div>
     </div>
 
@@ -124,7 +120,6 @@
         let web3, account;
         const CHAIN_ID = 109;
         const VE_WOOF = '0xb4cb5dB549e483539EA38d44c4109F3B25259847';
-        const RPC_URL = 'https://rpc.shibarium.shib.io';
 
         const veABI = [
             {"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
@@ -135,8 +130,7 @@
             {"inputs":[{"internalType":"address","name":"_owner","type":"address"},{"internalType":"uint256","name":"_tokenIndex","type":"uint256"}],"name":"tokenOfOwnerByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
             {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"attachments","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
             {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"voted","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"address","name":"_spender","type":"address"},{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"isApprovedOrOwner","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"abstain","outputs":[],"stateMutability":"nonpayable","type":"function"}
+            {"inputs":[{"internalType":"address","name":"_spender","type":"address"},{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"isApprovedOrOwner","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}
         ];
 
         async function initWeb3() {
@@ -215,10 +209,8 @@
         async function checkTransfer() {
             const tokenId = document.getElementById('tokenIdInput').value.trim();
             const status = document.getElementById('transferStatus');
-            const transferBtn = document.getElementById('transferBtn');
             if (!tokenId || isNaN(tokenId)) {
                 status.innerHTML = '<span class="error">请输入有效的 Token ID</span>';
-                transferBtn.disabled = true;
                 return;
             }
             const veContract = new web3.eth.Contract(veABI, VE_WOOF);
@@ -227,26 +219,24 @@
                 const attachmentsVal = await veContract.methods.attachments(tokenId).call();
                 const votedVal = await veContract.methods.voted(tokenId).call();
                 const isApproved = await veContract.methods.isApprovedOrOwner(account, tokenId).call();
-                let canTransfer = (Number(attachmentsVal) === 0) && (votedVal === 'false') && isApproved;
                 let msg = `<strong>诊断结果 (Token ID: ${tokenId})：</strong><br>`;
                 msg += `attachments: ${attachmentsVal} ${attachmentsVal > 0 ? '→ <span class="error">被附着，无法转账</span>' : '→ OK'}<br>`;
-                msg += `voted: ${votedVal} ${votedVal === 'true' ? '→ <span class="error">已投票，无法转账（需 abstain 或等 epoch）</span>' : '→ OK'}<br>`;
+                msg += `voted: ${votedVal} ${votedVal === 'true' ? '→ <span class="error">已投票，无法转账（合约强制要求 voted=false）</span>' : '→ OK'}<br>`;
                 msg += `你是否 owner 或 approved: ${isApproved} ${!isApproved ? '→ <span class="error">无权限</span>' : '→ OK'}<br>`;
-                if (canTransfer) {
-                    msg += '<br><span class="success">所有检查通过，可以转账！</span>';
-                    transferBtn.disabled = false;
+                if (votedVal === 'true') {
+                    msg += '<br><span class="warning">voted = true 是当前唯一挡路点。<br>即使 attachments=0，转账也会 revert "attached"。<br>强制转账也无法绕过合约逻辑。<br>必须由 voter 调用 abstain(tokenId) 才能清除。</span>';
+                } else if (Number(attachmentsVal) === 0 && isApproved) {
+                    msg += '<br><span class="success">状态正常，可以尝试转账。</span>';
                 } else {
-                    msg += '<br><span class="warning">无法转账，请解决以上红色问题</span>';
-                    transferBtn.disabled = true;
+                    msg += '<br><span class="warning">无法转账，请解决红色问题</span>';
                 }
                 status.innerHTML = msg;
             } catch (err) {
                 status.innerHTML = `<span class="error">检查失败: ${err.message || 'RPC 错误'}</span>`;
-                transferBtn.disabled = true;
             }
         }
 
-        async function transferNFT() {
+        async function transferNFT(useHighGas = false) {
             const tokenId = document.getElementById('tokenIdInput').value.trim();
             const toAddr = document.getElementById('toAddressInput').value.trim();
             const status = document.getElementById('transferStatus');
@@ -255,44 +245,28 @@
                 return;
             }
             const veContract = new web3.eth.Contract(veABI, VE_WOOF);
-            status.innerHTML += '<br>发送交易中...';
+            status.innerHTML += '<br>发送交易中... ' + (useHighGas ? '(使用高 gas limit 尝试)' : '');
             try {
-                await veContract.methods.safeTransferFrom(account, toAddr, tokenId).send({ from: account });
+                let gasOptions = { from: account };
+                if (useHighGas) {
+                    const gasEstimate = await veContract.methods.safeTransferFrom(account, toAddr, tokenId).estimateGas({ from: account });
+                    gasOptions.gas = Math.floor(gasEstimate * 1.5);
+                }
+                await veContract.methods.safeTransferFrom(account, toAddr, tokenId).send(gasOptions);
                 status.innerHTML += '<br><span class="success">转账成功！</span>';
                 setTimeout(updateDashboard, 6000);
             } catch (err) {
                 let reason = err.reason || err.message || '未知错误';
-                if (reason.includes('attached')) reason = '合约拒绝：attachments > 0 或 voted = true ("attached" 错误)';
+                if (reason.includes('attached')) reason = '合约拒绝：voted = true 或 attachments > 0 ("attached" 错误)。无法绕过。';
+                if (reason.includes('out of gas')) reason += ' (gas 不足，即使高 gas 也失败)';
                 status.innerHTML += `<br><span class="error">转账失败: ${reason}</span>`;
-            }
-        }
-
-        async function doAbstain() {
-            const tokenId = document.getElementById('abstainTokenId').value.trim();
-            const status = document.getElementById('abstainStatus');
-            if (!tokenId || isNaN(tokenId)) {
-                status.innerHTML = '<span class="error">请输入有效的 Token ID</span>';
-                return;
-            }
-            const veContract = new web3.eth.Contract(veABI, VE_WOOF);
-            status.innerHTML = '执行 Abstain 中...';
-            try {
-                await veContract.methods.abstain(tokenId).send({ from: account });
-                status.innerHTML = `<span class="success">Abstain 成功！voted 已重置为 false。</span><br>建议稍等几秒后重新检查转账状态。`;
-                setTimeout(() => {
-                    document.getElementById('tokenIdInput').value = tokenId;
-                    checkTransfer();
-                }, 5000);
-            } catch (err) {
-                let reason = err.reason || err.message || '未知错误';
-                status.innerHTML = `<span class="error">Abstain 失败: ${reason}</span><br>可能原因：你不是 owner、合约已过期、或 voter 限制调用。`;
             }
         }
 
         document.getElementById('connectBtn').onclick = connect;
         document.getElementById('checkTransferBtn').onclick = checkTransfer;
-        document.getElementById('transferBtn').onclick = transferNFT;
-        document.getElementById('abstainBtn').onclick = doAbstain;
+        document.getElementById('transferBtn').onclick = () => transferNFT(false);
+        document.getElementById('forceTransferBtn').onclick = () => transferNFT(true);
 
         initWeb3();
     </script>
