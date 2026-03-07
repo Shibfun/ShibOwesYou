@@ -99,10 +99,12 @@
             margin: 20px 0;
             color: #ffeaa7;
         }
-        .error {
+        .error, .loading {
             color: var(--danger);
             margin: 12px 0;
+            text-align: center;
         }
+        .loading { color: #a29bfe; }
         footer {
             text-align: center;
             margin-top: 40px;
@@ -126,6 +128,8 @@
 
         <div class="card">
             <h2>我的 veWOOF NFT</h2>
+            <div id="nftLoading" class="loading" style="display:none;">加载中...</div>
+            <div id="nftError" class="error" style="display:none;"></div>
             <div id="nftList" class="nft-list"></div>
             <div id="noNfts" class="info" style="display:none;">您当前没有 veWOOF NFT</div>
         </div>
@@ -140,13 +144,14 @@
         </div>
     </div>
 
-    <footer>Powered by Shibarium | veWOOF 合约: 0xb4cb5dB549e483539EA38d44c4109F3B25259847 © 2026</footer>
+    <footer>Powered by Shibarium | veWOOF 合约: 0xb4cb5dB549e483539EA38d44c4109F3B25259847 | RPC: https://rpc.shibarium.shib.io © 2026</footer>
 
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script>
         let web3, account;
         const CHAIN_ID = 109;
         const VE_WOOF = '0xb4cb5dB549e483539EA38d44c4109F3B25259847';
+        const RPC_URL = 'https://rpc.shibarium.shib.io';
 
         const veABI = [
             {"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
@@ -154,15 +159,17 @@
             {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"locked","outputs":[{"components":[{"internalType":"int128","name":"amount","type":"int128"},{"internalType":"uint256","name":"end","type":"uint256"}],"internalType":"struct IVotingEscrow.LockedBalance","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},
             {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"balanceOfNFT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
             {"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},
-            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"uint256","name":"index","type":"uint256"}],"name":"tokenOfOwnerByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
+            {"inputs":[{"internalType":"address","name":"_owner","type":"address"},{"internalType":"uint256","name":"_tokenIndex","type":"uint256"}],"name":"tokenOfOwnerByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
         ];
 
-        async function init() {
+        async function initWeb3() {
             if (window.ethereum) {
                 web3 = new Web3(window.ethereum);
             } else {
                 alert('请安装 MetaMask！');
+                return false;
             }
+            return true;
         }
 
         async function connect() {
@@ -186,9 +193,9 @@
                                 params: [{
                                     chainId: '0x6d',
                                     chainName: 'Shibarium',
-                                    rpcUrls: ['https://www.shibrpc.com'],
+                                    rpcUrls: [RPC_URL, 'https://shibarium.drpc.org'],
                                     nativeCurrency: { name: 'BONE', symbol: 'BONE', decimals: 18 },
-                                    blockExplorerUrls: ['https://shibariumscan.io']
+                                    blockExplorerUrls: ['https://www.shibariumscan.io']
                                 }]
                             });
                         } else {
@@ -200,7 +207,8 @@
                 document.getElementById('wallet').innerText = `${account.slice(0,6)}...${account.slice(-4)}`;
                 updateDashboard();
             } catch (err) {
-                alert('连接失败: ' + err.message);
+                alert('连接失败: ' + (err.message || err));
+                console.error(err);
             } finally {
                 btn.innerText = '连接 MetaMask';
             }
@@ -210,45 +218,62 @@
             if (!account) return;
 
             const veContract = new web3.eth.Contract(veABI, VE_WOOF);
+            const loadingEl = document.getElementById('nftLoading');
+            const errorEl = document.getElementById('nftError');
+            const listEl = document.getElementById('nftList');
+            const noNftsEl = document.getElementById('noNfts');
+
+            loadingEl.style.display = 'block';
+            errorEl.style.display = 'none';
+            listEl.innerHTML = '';
+            noNftsEl.style.display = 'none';
 
             try {
                 const balance = await veContract.methods.balanceOf(account).call();
                 document.getElementById('veWoofBal').innerText = `veWOOF 持有数量: ${balance}`;
 
                 let totalPower = 0n;
-                const listEl = document.getElementById('nftList');
-                listEl.innerHTML = '';
-                document.getElementById('noNfts').style.display = 'none';
 
                 if (Number(balance) === 0) {
-                    document.getElementById('noNfts').style.display = 'block';
+                    noNftsEl.style.display = 'block';
                 } else {
                     for (let i = 0; i < Number(balance); i++) {
-                        const tokenId = await veContract.methods.tokenOfOwnerByIndex(account, i).call();
-                        const locked = await veContract.methods.locked(tokenId).call();
-                        const power = await veContract.methods.balanceOfNFT(tokenId).call();
+                        try {
+                            const tokenId = await veContract.methods.tokenOfOwnerByIndex(account, i).call();
+                            const locked = await veContract.methods.locked(tokenId).call();
+                            const power = await veContract.methods.balanceOfNFT(tokenId).call();
 
-                        const amount = Number(locked.amount) / 1e18;
-                        const endDate = new Date(Number(locked.end) * 1000).toLocaleString();
+                            const amount = Number(locked.amount) / 1e18;
+                            const endDate = locked.end === '0' ? '已过期' : new Date(Number(locked.end) * 1000).toLocaleString();
 
-                        totalPower += BigInt(power);
+                            totalPower += BigInt(power);
 
-                        const div = document.createElement('div');
-                        div.className = 'nft-item';
-                        div.innerHTML = `
-                            <strong>Token ID:</strong> ${tokenId}<br>
-                            <strong>锁仓 WOOF:</strong> ${amount.toFixed(4)}<br>
-                            <strong>到期时间:</strong> ${endDate}<br>
-                            <strong>当前投票权:</strong> ${Number(power) / 1e18} veWOOF
-                        `;
-                        listEl.appendChild(div);
+                            const div = document.createElement('div');
+                            div.className = 'nft-item';
+                            div.innerHTML = `
+                                <strong>Token ID:</strong> ${tokenId}<br>
+                                <strong>锁仓 WOOF:</strong> ${amount.toFixed(4)} WOOF<br>
+                                <strong>到期时间:</strong> ${endDate}<br>
+                                <strong>当前投票权:</strong> ${(Number(power) / 1e18).toFixed(4)} veWOOF
+                            `;
+                            listEl.appendChild(div);
+                        } catch (nftErr) {
+                            console.error(`NFT index ${i} 查询失败:`, nftErr);
+                            const errDiv = document.createElement('div');
+                            errDiv.className = 'error';
+                            errDiv.innerText = `Token 查询失败 (index ${i}): ${nftErr.message || 'RPC 超时/限速'}`;
+                            listEl.appendChild(errDiv);
+                        }
                     }
                 }
 
                 document.getElementById('votingPower').innerText = `总投票权: ${(Number(totalPower) / 1e18).toFixed(4)} veWOOF`;
             } catch (err) {
-                console.error(err);
-                document.getElementById('nftList').innerHTML = '<p class="error">加载失败，请检查网络或合约状态</p>';
+                console.error('Dashboard 更新失败:', err);
+                errorEl.innerText = '加载失败: ' + (err.message || 'RPC 连接问题，请检查网络或稍后重试');
+                errorEl.style.display = 'block';
+            } finally {
+                loadingEl.style.display = 'none';
             }
         }
 
@@ -267,10 +292,11 @@
 
             try {
                 await veContract.methods.safeTransferFrom(account, toAddr, tokenId).send({ from: account });
-                status.innerText = '转账成功！';
-                updateDashboard();
+                status.innerText = '转账成功！页面将自动刷新数据。';
+                setTimeout(updateDashboard, 5000);
             } catch (err) {
-                status.innerText = '转账失败: ' + (err.reason || err.message);
+                status.innerText = '转账失败: ' + (err.reason || err.message || '未知错误');
+                console.error(err);
             }
         }
 
@@ -281,7 +307,7 @@
             if (account) updateDashboard();
         }, 30000);
 
-        init();
+        initWeb3();
     </script>
 </body>
 </html>
