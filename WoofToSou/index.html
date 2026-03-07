@@ -151,7 +151,6 @@
     <script>
         let web3, account, woofContract, souContract, exchangeContract;
 
-        const RPC = 'https://rpc.shibarium.shib.io';
         const CHAIN_ID = 109;
         const WOOF = '0xD0daa7B6ff1B40d3cc6F0B2Cf7E85cB993D1c834';
         const SOU  = '0x5e1AeE526d1Aa049B4d95E5B68aE7bb556e2D799';
@@ -165,6 +164,7 @@
 
         const exchangeABI = [
             {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"exchange","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"depositSOU","outputs":[],"stateMutability":"nonpayable","type":"function"},
             {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}
         ];
 
@@ -175,9 +175,9 @@
         async function connect() {
             const btn = document.getElementById('connectBtn');
             try {
-                if (!window.ethereum) return alert('Install MetaMask!');
+                if (!window.ethereum) return alert('Please install MetaMask!');
                 btn.innerText = 'Connecting...';
-                web3 = new Web3(RPC);
+                web3 = new Web3(window.ethereum);
                 const accounts = await window.ethereum.request({method: 'eth_requestAccounts'});
                 account = accounts[0];
                 const chain = await web3.eth.getChainId();
@@ -188,7 +188,7 @@
                         if (e.code === 4902) {
                             await window.ethereum.request({
                                 method: 'wallet_addEthereumChain',
-                                params: [{chainId: '0x6d', chainName: 'Shibarium', rpcUrls: [RPC], nativeCurrency: {name: 'BONE', symbol: 'BONE', decimals: 18}, blockExplorerUrls: ['https://shibariumscan.io']}]
+                                params: [{chainId: '0x6d', chainName: 'Shibarium', rpcUrls: ['https://rpc.shibarium.shib.io'], nativeCurrency: {name: 'BONE', symbol: 'BONE', decimals: 18}, blockExplorerUrls: ['https://shibariumscan.io']}]
                             });
                         } else throw e;
                     }
@@ -222,7 +222,7 @@
                     const contSou = await souContract.methods.balanceOf(EXCHANGE).call().catch(()=>0);
                     document.getElementById('contractSou').innerText = `${format(contSou)} SOU`;
                 }
-            } catch(e) { console.log(e); }
+            } catch(e) {}
         }
 
         async function doExchange() {
@@ -263,7 +263,7 @@
                 await exchangeContract.methods.depositSOU(wei).send({from: account});
                 alert('Deposit successful! Liquidity added.');
                 updateBalances();
-                checkOwner();  // refresh contract balance
+                checkOwner();
             } catch(err) {
                 alert('Deposit failed: ' + (err.reason || err.message || err));
             } finally {
