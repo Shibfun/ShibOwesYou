@@ -131,7 +131,18 @@
         const VE_WOOF = '0xb4cb5dB549e483539EA38d44c4109F3B25259847';
         const VOTER = '0x30d9159c8c9e403A0e9597837052F70cf8c362c';
 
-        const veABI = [ /* ... 同之前，省略以节省空间 */ ];
+        const veABI = [
+            {"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"locked","outputs":[{"components":[{"internalType":"int128","name":"amount","type":"int128"},{"internalType":"uint256","name":"end","type":"uint256"}],"internalType":"struct IVotingEscrow.LockedBalance","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"balanceOfNFT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"_owner","type":"address"},{"internalType":"uint256","name":"_tokenIndex","type":"uint256"}],"name":"tokenOfOwnerByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"attachments","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"voted","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"_spender","type":"address"},{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"isApprovedOrOwner","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}
+        ];
+
         const voterABI = [
             {"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"reset","outputs":[],"stateMutability":"nonpayable","type":"function"}
         ];
@@ -141,7 +152,132 @@
             else alert('请安装 MetaMask！');
         }
 
-        // ... connect, updateDashboard, checkTransfer, transferNFT 函数同之前，省略 ...
+        async function connect() {
+            const btn = document.getElementById('connectBtn');
+            btn.innerText = '连接中...';
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                account = accounts[0];
+                const chain = await web3.eth.getChainId();
+                if (chain !== CHAIN_ID) {
+                    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x6d' }] });
+                }
+                document.getElementById('wallet').innerText = `${account.slice(0,6)}...${account.slice(-4)}`;
+                updateDashboard();
+            } catch (err) {
+                alert('连接失败: ' + err.message);
+            } finally {
+                btn.innerText = '连接 MetaMask';
+            }
+        }
+
+        async function updateDashboard() {
+            if (!account) return;
+            const veContract = new web3.eth.Contract(veABI, VE_WOOF);
+            const loadingEl = document.getElementById('nftLoading');
+            const listEl = document.getElementById('nftList');
+            const noNftsEl = document.getElementById('noNfts');
+            loadingEl.style.display = 'block';
+            listEl.innerHTML = '';
+            noNftsEl.style.display = 'none';
+            try {
+                const balance = await veContract.methods.balanceOf(account).call();
+                document.getElementById('veWoofBal').innerText = `veWOOF 持有数量: ${balance}`;
+                let totalPower = 0n;
+                if (Number(balance) === 0) {
+                    noNftsEl.style.display = 'block';
+                } else {
+                    for (let i = 0; i < Number(balance); i++) {
+                        try {
+                            const tokenId = await veContract.methods.tokenOfOwnerByIndex(account, i).call();
+                            const locked = await veContract.methods.locked(tokenId).call();
+                            const power = await veContract.methods.balanceOfNFT(tokenId).call();
+                            const amount = Number(locked.amount) / 1e18;
+                            const endDate = locked.end === '0' ? '已过期' : new Date(Number(locked.end) * 1000).toLocaleString();
+                            totalPower += BigInt(power);
+                            const div = document.createElement('div');
+                            div.className = 'nft-item';
+                            div.innerHTML = `
+                                <strong>Token ID:</strong> ${tokenId}<br>
+                                <strong>锁仓 WOOF:</strong> ${amount.toFixed(4)} WOOF<br>
+                                <strong>到期时间:</strong> ${endDate}<br>
+                                <strong>当前投票权:</strong> ${(Number(power) / 1e18).toFixed(4)} veWOOF
+                            `;
+                            listEl.appendChild(div);
+                        } catch (nftErr) {
+                            const errDiv = document.createElement('div');
+                            errDiv.className = 'error';
+                            errDiv.innerText = `Token 查询失败 (index ${i}): ${nftErr.message || 'RPC 超时'}`;
+                            listEl.appendChild(errDiv);
+                        }
+                    }
+                }
+                document.getElementById('votingPower').innerText = `总投票权: ${(Number(totalPower) / 1e18).toFixed(4)} veWOOF`;
+            } catch (err) {
+                listEl.innerHTML = '<p class="error">加载失败，请检查网络或稍后重试</p>';
+            } finally {
+                loadingEl.style.display = 'none';
+            }
+        }
+
+        async function checkTransfer() {
+            const tokenId = document.getElementById('tokenIdInput').value.trim();
+            const status = document.getElementById('transferStatus');
+            const transferBtn = document.getElementById('transferBtn');
+            if (!tokenId || isNaN(tokenId)) {
+                status.innerHTML = '<span class="error">请输入有效的 Token ID</span>';
+                transferBtn.disabled = true;
+                return;
+            }
+            const veContract = new web3.eth.Contract(veABI, VE_WOOF);
+            status.innerHTML = '检查中...';
+            try {
+                const attachmentsVal = await veContract.methods.attachments(tokenId).call();
+                const votedVal = await veContract.methods.voted(tokenId).call();
+                const isApproved = await veContract.methods.isApprovedOrOwner(account, tokenId).call();
+                let canTransfer = (Number(attachmentsVal) === 0) && (votedVal === 'false') && isApproved;
+                let msg = `<strong>诊断结果 (Token ID: ${tokenId})：</strong><br>`;
+                msg += `attachments: ${attachmentsVal} ${attachmentsVal > 0 ? '→ <span class="error">被附着，无法转账</span>' : '→ OK'}<br>`;
+                msg += `voted: ${votedVal} ${votedVal === 'true' ? '→ <span class="error">已投票，无法转账（需 Reset Vote）</span>' : '→ OK'}<br>`;
+                msg += `你是否 owner 或 approved: ${isApproved} ${!isApproved ? '→ <span class="error">无权限</span>' : '→ OK'}<br>`;
+                if (canTransfer) {
+                    msg += '<br><span class="success">状态完全符合，可以转账！</span>';
+                    transferBtn.disabled = false;
+                } else {
+                    msg += '<br><span class="warning">不符合条件，转账按钮灰色（不可点击）。<br>如果 voted=true，请先执行 Reset Vote。</span>';
+                    transferBtn.disabled = true;
+                }
+                status.innerHTML = msg;
+            } catch (err) {
+                status.innerHTML = `<span class="error">检查失败: ${err.message || 'RPC 错误'}</span>`;
+                document.getElementById('transferBtn').disabled = true;
+            }
+        }
+
+        async function transferNFT() {
+            const tokenId = document.getElementById('tokenIdInput').value.trim();
+            const toAddr = document.getElementById('toAddressInput').value.trim();
+            const status = document.getElementById('transferStatus');
+            if (!web3.utils.isAddress(toAddr)) {
+                status.innerHTML += '<br><span class="error">无效接收地址</span>';
+                return;
+            }
+            const veContract = new web3.eth.Contract(veABI, VE_WOOF);
+            status.innerHTML += '<br>发送交易中...';
+            try {
+                const gasEstimate = await veContract.methods.safeTransferFrom(account, toAddr, tokenId).estimateGas({ from: account }).catch(() => 200000);
+                await veContract.methods.safeTransferFrom(account, toAddr, tokenId).send({ 
+                    from: account,
+                    gas: Math.floor(gasEstimate * 1.2)
+                });
+                status.innerHTML += '<br><span class="success">转账成功！</span>';
+                setTimeout(updateDashboard, 6000);
+            } catch (err) {
+                let reason = err.reason || err.message || '未知错误';
+                if (reason.includes('attached')) reason = '合约拒绝：voted=true 或 attachments>0 ("attached" 错误)';
+                status.innerHTML += `<br><span class="error">转账失败: ${reason}</span>`;
+            }
+        }
 
         function validateResetId() {
             const tokenId = document.getElementById('resetTokenId').value.trim();
@@ -152,7 +288,7 @@
                 status.innerHTML = 'Token ID 有效，可以执行 Reset Vote';
             } else {
                 btn.disabled = true;
-                status.innerHTML = '<span class="error">请输入有效的 Token ID (数字)</span>';
+                status.innerHTML = '<span class="error">请输入有效的 Token ID (正整数)</span>';
             }
         }
 
@@ -164,12 +300,9 @@
                 return;
             }
             status.innerHTML = '执行中... (MetaMask 应弹出确认)';
-            console.log('开始 Reset Vote for tokenId:', tokenId);
             const voterContract = new web3.eth.Contract(voterABI, VOTER);
             try {
-                console.log('估算 gas...');
-                const gasEstimate = await voterContract.methods.reset(tokenId).estimateGas({ from: account });
-                console.log('gasEstimate:', gasEstimate);
+                const gasEstimate = await voterContract.methods.reset(tokenId).estimateGas({ from: account }).catch(() => 250000);
                 await voterContract.methods.reset(tokenId).send({ 
                     from: account,
                     gas: Math.floor(gasEstimate * 1.5)
@@ -180,11 +313,10 @@
                     checkTransfer();
                 }, 10000);
             } catch (err) {
-                console.error('Reset Vote 错误:', err);
                 let reason = err.reason || err.message || '未知错误';
                 if (reason.includes('TOKEN_ALREADY_VOTED_THIS_EPOCH')) reason = '本 epoch 已投过票，无法 reset。需等待下一个 epoch (7天周期)。';
                 if (reason.includes('isApprovedOrOwner')) reason = '你不是 owner 或未 approve 该 tokenId。';
-                status.innerHTML = `<span class="error">Reset 失败: ${reason}</span><br>请查看浏览器 Console (F12) 详细日志。`;
+                status.innerHTML = `<span class="error">Reset 失败: ${reason}</span>`;
             }
         }
 
@@ -192,8 +324,6 @@
         document.getElementById('checkTransferBtn').onclick = checkTransfer;
         document.getElementById('transferBtn').onclick = transferNFT;
         document.getElementById('resetBtn').onclick = doReset;
-
-        // 输入框变化时验证
         document.getElementById('resetTokenId').addEventListener('input', validateResetId);
 
         initWeb3();
