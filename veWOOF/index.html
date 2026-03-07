@@ -106,7 +106,7 @@
             <button id="transferBtn" disabled>执行转账</button>
             <div class="status" id="transferStatus">等待输入 Token ID...</div>
             <div class="info warning">
-                转账按钮只有状态完全符合（voted=false 等）时才会亮起。
+                转账按钮只有状态完全符合时才会亮起。
             </div>
         </div>
 
@@ -117,19 +117,19 @@
             <div class="status" id="resetStatus">等待输入 Token ID...</div>
             <div class="info">
                 输入有效的 Token ID 后按钮才会亮起。<br>
-                执行后 MetaMask 会弹出确认。如果没弹出，请检查 F12 Console。
+                执行后 MetaMask 会弹出。如果没弹出，检查 F12 Console。
             </div>
         </div>
     </div>
 
-    <footer>Powered by Shibarium | veWOOF: 0xb4cb5dB549e483539EA38d44c4109F3B25259847 | Voter: 0x30d9159c8c9e403A0e9597837052F70cf8c362c</footer>
+    <footer>Powered by Shibarium | veWOOF: 0xb4cb5dB549e483539EA38d44c4109F3B25259847 | Voter: 0x30d9159c8c9e403A0e9597837052F70cf8eC362c</footer>
 
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <script>
         let web3, account;
         const CHAIN_ID = 109;
         const VE_WOOF = '0xb4cb5dB549e483539EA38d44c4109F3B25259847';
-        const VOTER = '0x30d9159c8c9e403A0e9597837052F70cf8c362c';
+        const VOTER = '0x30d9159c8c9e403A0e9597837052F70cf8eC362c';
 
         const veABI = [
             {"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
