@@ -6,7 +6,7 @@
     <title>SOU Exchange</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap' );
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
 
         :root {
             --primary-color: #f09542; /* Shiba Orange */
@@ -32,7 +32,7 @@
             flex-direction: column;
             align-items: center;
             padding: 20px;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><text x="10" y="30" font-size="30" fill="%23e0d5c1" opacity="0.2">🐾</text><text x="60" y="80" font-size="30" fill="%23e0d5c1" opacity="0.2">🦴</text></svg>' );
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><text x="10" y="30" font-size="30" fill="%23e0d5c1" opacity="0.2">🐾</text><text x="60" y="80" font-size="30" fill="%23e0d5c1" opacity="0.2">🦴</text></svg>');
         }
 
         header { text-align: center; margin-bottom: 40px; }
@@ -101,20 +101,22 @@
 
         <div class="card" id="veWoofOpsCard">
             <div class="card-title"><i class="fas fa-bone"></i>veWOOF → WOOF Operations</div>
-            <p class="info">Enter a veWOOF Token ID below (or click one from the list above ). If it's used for voting, reset it first, then exchange.</p>
+            <p class="info">Enter a veWOOF Token ID below (or click one from the list above). Approve first, then exchange.</p>
             <input type="number" id="veWoofTokenIdInput" placeholder="Enter veWOOF Token ID">
             <div class="button-group">
                 <button id="resetVoteBtn" class="secondary">Reset Vote</button>
-                <button id="exchangeVeWoofBtn">Exchange veWOOF</button>
+                <button id="approveVeWoofBtn" style="display: none;">Approve veWOOF</button>
             </div>
+            <button id="exchangeVeWoofBtn" style="display: none;">Exchange veWOOF</button>
             <div class="info" style="margin-top: 15px;">Pool Liquidity: <span id="veWoofPoolBalance">0</span> WOOF</div>
         </div>
 
         <div class="card">
             <div class="card-title"><i class="fas fa-coins"></i>WOOF → SOU Exchange</div>
-            <p class="info">Exchange your WOOF tokens for SOU tokens at a 1:1 ratio.</p>
+            <p class="info">Exchange your WOOF tokens for SOU tokens at a 1:1 ratio. Approve first, then exchange.</p>
             <input type="number" id="woofAmountInput" placeholder="Enter WOOF amount" min="0">
-            <button id="exchangeWoofBtn">Exchange to SOU</button>
+            <button id="approveWoofBtn" style="display: none;">Approve WOOF</button>
+            <button id="exchangeWoofBtn" style="display: none;">Exchange to SOU</button>
             <div class="info" style="margin-top: 15px;">Pool Liquidity: <span id="souPoolBalance">0</span> SOU</div>
         </div>
 
@@ -147,12 +149,12 @@
         const EXCHANGE_2_ADDR = '0xCbEC2D385c7a9E151274A36D067fce10830cfb29'; // veWOOF -> WOOF
 
         const TOKEN_ABI = [{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}, {"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}, {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}];
-        const VE_WOOF_ABI = [{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}, {"inputs":[{"internalType":"address","name":"_owner","type":"address"},{"internalType":"uint256","name":"_tokenIndex","type":"uint256"}],"name":"tokenOfOwnerByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}, {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"locked","outputs":[{"components":[{"internalType":"int128","name":"amount","type":"int128"},{"internalType":"uint256","name":"end","type":"uint256"}],"internalType":"struct IVotingEscrow.LockedBalance","name":"","type":"tuple"}],"stateMutability":"view","type":"function"}, {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"balanceOfNFT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}];
+        const VE_WOOF_ABI = [{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}, {"inputs":[{"internalType":"address","name":"_owner","type":"address"},{"internalType":"uint256","name":"_tokenIndex","type":"uint256"}],"name":"tokenOfOwnerByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}, {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"locked","outputs":[{"components":[{"internalType":"int128","name":"amount","type":"int128"},{"internalType":"uint256","name":"end","type":"uint256"}],"internalType":"struct IVotingEscrow.LockedBalance","name":"","type":"tuple"}],"stateMutability":"view","type":"function"}, {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"balanceOfNFT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}, {"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"approve","outputs":[],"stateMutability":"nonpayable","type":"function"}, {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getApproved","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}];
         const EXCHANGE_1_ABI = [{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"exchange","outputs":[],"stateMutability":"nonpayable","type":"function"}, {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"depositSOU","outputs":[],"stateMutability":"nonpayable","type":"function"}, {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}];
         const EXCHANGE_2_ABI = [{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"exchange","outputs":[],"stateMutability":"nonpayable","type":"function"}, {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"depositWoof","outputs":[],"stateMutability":"nonpayable","type":"function"}, {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}, {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"resetVote","outputs":[],"stateMutability":"nonpayable","type":"function"}];
 
         const DOM = {
-            connectBtn: document.getElementById('connectBtn' ),
+            connectBtn: document.getElementById('connectBtn'),
             walletStatus: document.getElementById('walletStatus'),
             walletAddress: document.getElementById('walletAddress'),
             woofBal: document.getElementById('woofBal'),
@@ -160,8 +162,10 @@
             souPool: document.getElementById('souPoolBalance'),
             veWoofPool: document.getElementById('veWoofPoolBalance'),
             woofAmountInput: document.getElementById('woofAmountInput'),
+            approveWoofBtn: document.getElementById('approveWoofBtn'),
             exchangeWoofBtn: document.getElementById('exchangeWoofBtn'),
             veWoofTokenIdInput: document.getElementById('veWoofTokenIdInput'),
+            approveVeWoofBtn: document.getElementById('approveVeWoofBtn'),
             exchangeVeWoofBtn: document.getElementById('exchangeVeWoofBtn'),
             resetVoteBtn: document.getElementById('resetVoteBtn'),
             ownerSection: document.getElementById('ownerSection'),
@@ -188,9 +192,7 @@
                 account = accounts[0];
 
                 const isNetworkCorrect = await ensureNetwork();
-                if (!isNetworkCorrect) {
-                    throw new Error("Could not switch to Shibarium network. Please switch manually in MetaMask.");
-                }
+                if (!isNetworkCorrect) throw new Error("Could not switch to Shibarium network. Please switch manually in MetaMask.");
 
                 initializeContracts();
                 updateUIForConnection();
@@ -207,33 +209,19 @@
         async function ensureNetwork() {
             const chainId = await web3.eth.getChainId();
             if (chainId === CHAIN_ID) return true;
-
             try {
-                await window.ethereum.request({
-                    method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: web3.utils.toHex(CHAIN_ID) }],
-                });
+                await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: web3.utils.toHex(CHAIN_ID) }] });
                 return true;
             } catch (switchError) {
                 if (switchError.code === 4902) {
                     try {
                         await window.ethereum.request({
                             method: 'wallet_addEthereumChain',
-                            params: [{
-                                chainId: web3.utils.toHex(CHAIN_ID),
-                                chainName: 'Shibarium',
-                                rpcUrls: ['https://rpc.shibarium.shib.io', 'https://www.shibrpc.com'], // Added backup RPC
-                                nativeCurrency: { name: 'BONE', symbol: 'BONE', decimals: 18 },
-                                blockExplorerUrls: ['https://shibariumscan.io']
-                            }]
-                        } );
+                            params: [{ chainId: web3.utils.toHex(CHAIN_ID), chainName: 'Shibarium', rpcUrls: ['https://rpc.shibarium.shib.io', 'https://www.shibrpc.com'], nativeCurrency: { name: 'BONE', symbol: 'BONE', decimals: 18 }, blockExplorerUrls: ['https://shibariumscan.io'] }]
+                        });
                         return true;
-                    } catch (addError) {
-                        console.error("Failed to add Shibarium network:", addError);
-                        return false;
-                    }
+                    } catch (addError) { return false; }
                 }
-                console.error("Failed to switch network:", switchError);
                 return false;
             }
         }
@@ -265,7 +253,7 @@
 
         async function fetchAllData() {
             if (!account) return;
-            await Promise.all([ updateUserBalances(), updatePoolBalances(), checkOwnerStatus(), displayUserNfts() ]);
+            await Promise.all([ updateUserBalances(), updatePoolBalances(), checkOwnerStatus(), displayUserNfts(), checkAllApprovals() ]);
         }
 
         async function updateUserBalances() {
@@ -288,10 +276,7 @@
 
         async function checkOwnerStatus() {
             try {
-                const [owner1, owner2] = await Promise.all([
-                    exchange1Contract.methods.owner().call(),
-                    exchange2Contract.methods.owner().call()
-                ]);
+                const [owner1, owner2] = await Promise.all([ exchange1Contract.methods.owner().call(), exchange2Contract.methods.owner().call() ]);
                 if (account.toLowerCase() === owner1.toLowerCase() || account.toLowerCase() === owner2.toLowerCase()) {
                     DOM.ownerSection.style.display = 'block';
                 }
@@ -310,33 +295,65 @@
                 } else {
                     let nftPromises = Array.from({ length: Number(balance) }, (_, i) =>
                         veWoofContract.methods.tokenOfOwnerByIndex(account, i).call()
-                        .then(tokenId => Promise.all([
-                            tokenId,
-                            veWoofContract.methods.locked(tokenId).call(),
-                            veWoofContract.methods.balanceOfNFT(tokenId).call()
-                        ]))
+                        .then(tokenId => Promise.all([ tokenId, veWoofContract.methods.locked(tokenId).call(), veWoofContract.methods.balanceOfNFT(tokenId).call() ]))
                     );
                     const nfts = await Promise.all(nftPromises);
                     nfts.forEach(([tokenId, locked, power]) => {
                         const div = document.createElement('div');
                         div.className = 'nft-item';
-                        div.innerHTML = `
-                            <strong>Token ID:</strong> <span class="clickable-token-id" data-token-id="${tokenId}">${tokenId}</span>  
-
-                            <strong>Locked WOOF:</strong> ${formatEth(locked.amount)}  
-
-                            <strong>Expires:</strong> ${locked.end === '0' ? 'Expired' : new Date(Number(locked.end) * 1000).toLocaleDateString()}  
-
-                            <strong>Voting Power:</strong> ${formatEth(power)} veWOOF
-                        `;
+                        div.innerHTML = `<strong>Token ID:</strong> <span class="clickable-token-id" data-token-id="${tokenId}">${tokenId}</span><br><strong>Locked WOOF:</strong> ${formatEth(locked.amount)}<br><strong>Expires:</strong> ${locked.end === '0' ? 'Expired' : new Date(Number(locked.end) * 1000).toLocaleDateString()}<br><strong>Voting Power:</strong> ${formatEth(power)} veWOOF`;
                         DOM.nftList.appendChild(div);
                     });
                 }
             } catch (err) {
                 DOM.nftList.innerHTML = `<div class="empty-text" style="color: var(--error-color)">Failed to load NFTs. Please try again.</div>`;
-                console.error("Error loading NFTs:", err);
             } finally {
                 DOM.nftLoading.style.display = 'none';
+            }
+        }
+
+        async function checkAllApprovals() {
+            await checkWoofApproval();
+            await checkVeWoofApproval();
+        }
+
+        async function checkWoofApproval() {
+            const amount = DOM.woofAmountInput.value.trim();
+            if (!account || !woofContract || !amount || isNaN(amount) || Number(amount) <= 0) {
+                DOM.approveWoofBtn.style.display = 'none';
+                DOM.exchangeWoofBtn.style.display = 'none';
+                return;
+            }
+            const weiAmount = web3.utils.toWei(amount, 'ether');
+            const allowance = await woofContract.methods.allowance(account, EXCHANGE_1_ADDR).call();
+            if (web3.utils.toBN(allowance).lt(web3.utils.toBN(weiAmount))) {
+                DOM.approveWoofBtn.style.display = 'block';
+                DOM.exchangeWoofBtn.style.display = 'none';
+            } else {
+                DOM.approveWoofBtn.style.display = 'none';
+                DOM.exchangeWoofBtn.style.display = 'block';
+            }
+        }
+
+        async function checkVeWoofApproval() {
+            const tokenId = DOM.veWoofTokenIdInput.value.trim();
+            if (!account || !veWoofContract || !tokenId || isNaN(tokenId) || Number(tokenId) < 0) {
+                DOM.approveVeWoofBtn.style.display = 'none';
+                DOM.exchangeVeWoofBtn.style.display = 'none';
+                return;
+            }
+            try {
+                const approvedAddress = await veWoofContract.methods.getApproved(tokenId).call();
+                if (approvedAddress.toLowerCase() !== EXCHANGE_2_ADDR.toLowerCase()) {
+                    DOM.approveVeWoofBtn.style.display = 'block';
+                    DOM.exchangeVeWoofBtn.style.display = 'none';
+                } else {
+                    DOM.approveVeWoofBtn.style.display = 'none';
+                    DOM.exchangeVeWoofBtn.style.display = 'block';
+                }
+            } catch (err) {
+                DOM.approveVeWoofBtn.style.display = 'none';
+                DOM.exchangeVeWoofBtn.style.display = 'none';
             }
         }
 
@@ -356,21 +373,21 @@
             }
         }
 
-        async function approveToken(tokenContract, spenderAddress, amount, button) {
-            const originalText = button.innerText;
-            button.innerText = 'Approving...';
-            const allowance = await tokenContract.methods.allowance(account, spenderAddress).call();
-            if (web3.utils.toBN(allowance).lt(web3.utils.toBN(amount))) {
-                await handleTransaction(button, tokenContract.methods.approve(spenderAddress, '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'), 'Approval successful! You can now proceed.');
-            }
-            button.innerText = originalText;
+        async function doApproveWoof() {
+            const approveAmount = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+            await handleTransaction(DOM.approveWoofBtn, woofContract.methods.approve(EXCHANGE_1_ADDR, approveAmount), 'WOOF Approved Successfully!');
+        }
+
+        async function doApproveVeWoof() {
+            const tokenId = DOM.veWoofTokenIdInput.value.trim();
+            if (!tokenId || isNaN(tokenId) || Number(tokenId) < 0) return showAlert('Please enter a valid veWOOF Token ID.');
+            await handleTransaction(DOM.approveVeWoofBtn, veWoofContract.methods.approve(EXCHANGE_2_ADDR, tokenId), 'veWOOF Approved Successfully!');
         }
 
         async function doExchangeWoof() {
             const amount = DOM.woofAmountInput.value.trim();
             if (!amount || isNaN(amount) || Number(amount) <= 0) return showAlert('Please enter a valid WOOF amount.');
             const weiAmount = web3.utils.toWei(amount, 'ether');
-            await approveToken(woofContract, EXCHANGE_1_ADDR, weiAmount, DOM.exchangeWoofBtn);
             await handleTransaction(DOM.exchangeWoofBtn, exchange1Contract.methods.exchange(weiAmount), 'WOOF exchanged for SOU successfully!');
         }
 
@@ -390,7 +407,8 @@
             const amount = DOM.depositSouInput.value.trim();
             if (!amount || isNaN(amount) || Number(amount) <= 0) return showAlert('Please enter a valid SOU amount.');
             const weiAmount = web3.utils.toWei(amount, 'ether');
-            await approveToken(souContract, EXCHANGE_1_ADDR, weiAmount, DOM.depositSouBtn);
+            const approveAmount = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+            await handleTransaction(DOM.depositSouBtn, souContract.methods.approve(EXCHANGE_1_ADDR, approveAmount), 'SOU Approved for Deposit!');
             await handleTransaction(DOM.depositSouBtn, exchange1Contract.methods.depositSOU(weiAmount), 'SOU deposited to pool successfully!');
         }
 
@@ -398,23 +416,31 @@
             const amount = DOM.depositWoofInput.value.trim();
             if (!amount || isNaN(amount) || Number(amount) <= 0) return showAlert('Please enter a valid WOOF amount.');
             const weiAmount = web3.utils.toWei(amount, 'ether');
-            await approveToken(woofContract, EXCHANGE_2_ADDR, weiAmount, DOM.depositWoofBtn);
+            const approveAmount = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+            await handleTransaction(DOM.depositWoofBtn, woofContract.methods.approve(EXCHANGE_2_ADDR, approveAmount), 'WOOF Approved for Deposit!');
             await handleTransaction(DOM.depositWoofBtn, exchange2Contract.methods.depositWoof(weiAmount), 'WOOF deposited to pool successfully!');
         }
 
         // --- Event Listeners ---
         DOM.connectBtn.onclick = connectWallet;
+        DOM.approveWoofBtn.onclick = doApproveWoof;
         DOM.exchangeWoofBtn.onclick = doExchangeWoof;
+        DOM.approveVeWoofBtn.onclick = doApproveVeWoof;
         DOM.exchangeVeWoofBtn.onclick = doExchangeVeWoof;
         DOM.resetVoteBtn.onclick = doResetVote;
         DOM.depositSouBtn.onclick = doDepositSou;
         DOM.depositWoofBtn.onclick = doDepositWoof;
+
+        DOM.woofAmountInput.addEventListener('input', checkWoofApproval);
+        DOM.veWoofTokenIdInput.addEventListener('input', checkVeWoofApproval);
+
         DOM.nftList.addEventListener('click', (e) => {
             if (e.target && e.target.classList.contains('clickable-token-id')) {
                 const tokenId = e.target.dataset.tokenId;
                 DOM.veWoofTokenIdInput.value = tokenId;
                 DOM.veWoofOpsCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 DOM.veWoofTokenIdInput.focus();
+                checkVeWoofApproval();
             }
         });
 
