@@ -3,328 +3,357 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>veWOOF 管理 - WOOF ↔ veWOOF</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <title>ShibaSwap: WOOF & SOU Exchange</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap' );
+
         :root {
-            --primary: #6c5ce7;
-            --primary-dark: #5a4bc7;
-            --bg: #0f0f1a;
-            --card: #1a1a2e;
-            --text: #e0e0ff;
-            --accent: #00d4ff;
-            --danger: #ff4757;
-            --warning: #ffca28;
-            --success: #4caf50;
+            --primary-color: #f09542; /* Shiba Orange */
+            --secondary-color: #e87722; /* Darker Orange */
+            --background-color: #fdf6e3; /* Creamy Background */
+            --card-background: #ffffff;
+            --text-color: #5a463a; /* Dark Brown */
+            --text-light: #7a6a5a;
+            --accent-color: #4a90e2; /* A slightly stronger blue for secondary actions */
+            --border-color: #e0d5c1;
+            --success-color: #4CAF50;
+            --error-color: #f44336;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
             min-height: 100vh;
-            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             padding: 20px;
-            line-height: 1.6;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><text x="10" y="30" font-size="30" fill="%23e0d5c1" opacity="0.2">🐾</text><text x="60" y="80" font-size="30" fill="%23e0d5c1" opacity="0.2">🦴</text></svg>' );
         }
-        .container { max-width: 800px; margin: 0 auto; }
-        h1 { text-align: center; color: var(--accent); margin-bottom: 30px; }
-        .card {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-        }
-        .card h2 { margin-top: 0; color: #a29bfe; border-bottom: 1px solid #333; padding-bottom: 12px; }
-        button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin: 8px 8px 8px 0;
-        }
-        button:hover { background: var(--primary-dark); transform: translateY(-2px); }
-        .connect-btn { background: #00b894; font-weight: bold; }
-        .reset-btn { background: #ff9800; font-weight: bold; }
-        .reset-btn:hover { background: #f57c00; }
-        input, .info {
-            width: 100%;
-            padding: 12px;
-            margin: 12px 0;
-            border-radius: 8px;
-            border: 1px solid #444;
-            background: #222;
-            color: var(--text);
-            font-size: 1rem;
-        }
-        .nft-list { display: grid; gap: 16px; }
-        .nft-item {
-            background: #222;
-            padding: 16px;
-            border-radius: 8px;
-            border: 1px solid #444;
-        }
-        .nft-item strong { color: var(--accent); }
-        .balance { font-size: 1.4rem; text-align: center; margin: 20px 0; color: #ffeaa7; }
-        .error { color: var(--danger); margin: 12px 0; }
-        .warning { color: var(--warning); margin: 12px 0; font-weight: bold; }
-        .success { color: var(--success); margin: 12px 0; font-weight: bold; }
-        .status { margin: 16px 0; padding: 12px; border-radius: 8px; background: #222; border: 1px solid #444; min-height: 120px; }
-        footer { text-align: center; margin-top: 40px; color: #777; font-size: 0.9rem; }
+
+        header { text-align: center; margin-bottom: 40px; }
+        header img { width: 100px; height: 100px; border-radius: 50%; border: 5px solid var(--primary-color); }
+        h1 { font-size: 2.5em; font-weight: 900; color: var(--primary-color); text-shadow: 2px 2px 0 var(--background-color), 4px 4px 0 var(--secondary-color); margin-top: 10px; }
+
+        .container { width: 100%; max-width: 600px; display: grid; gap: 30px; }
+
+        .card { background: var(--card-background); border: 1px solid var(--border-color); border-radius: 20px; padding: 25px; box-shadow: 0 10px 20px rgba(90, 70, 58, 0.1); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(90, 70, 58, 0.15); }
+
+        .card-title { font-size: 1.5em; font-weight: 700; color: var(--secondary-color); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--border-color); display: flex; align-items: center; }
+        .card-title i { margin-right: 12px; color: var(--primary-color); }
+
+        button { background: linear-gradient(145deg, var(--primary-color), var(--secondary-color)); color: white; border: none; border-radius: 12px; padding: 15px 25px; font-family: 'Nunito', sans-serif; font-size: 1.1em; font-weight: 700; cursor: pointer; width: 100%; margin-top: 10px; box-shadow: 0 4px 10px rgba(240, 149, 66, 0.4); transition: all 0.2s ease-in-out; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(240, 149, 66, 0.5); }
+        button:active { transform: translateY(1px); box-shadow: 0 2px 5px rgba(240, 149, 66, 0.3); }
+        button:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; }
+        button.secondary { background: linear-gradient(145deg, var(--accent-color), #3a7cc2); box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3); }
+        button.secondary:hover { box-shadow: 0 6px 15px rgba(74, 144, 226, 0.4); }
+        button.secondary:active { box-shadow: 0 2px 5px rgba(74, 144, 226, 0.2); }
+
+        input[type="number"] { width: 100%; padding: 12px 15px; margin: 10px 0; background: var(--background-color); border: 2px solid var(--border-color); border-radius: 10px; color: var(--text-color); font-family: 'Nunito', sans-serif; font-size: 1em; transition: border-color 0.3s; }
+        input[type="number"]:focus { outline: none; border-color: var(--primary-color); }
+
+        .info, .balance { font-size: 0.95em; color: var(--text-light); line-height: 1.6; margin: 10px 0; word-wrap: break-word; }
+        .balance { font-weight: 700; font-size: 1.1em; color: var(--text-color); background-color: #fdf6e3; padding: 10px; border-radius: 8px; }
+        .balance span { color: var(--secondary-color); font-weight: 900; }
+
+        .owner-only { border: 2px dashed var(--primary-color); background-color: #fffaf0; }
+        footer { margin-top: 50px; padding: 20px; font-size: 0.9em; color: var(--text-light); text-align: center; }
+        .button-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        /* NFT List Styles */
+        .nft-list { display: grid; gap: 15px; max-height: 300px; overflow-y: auto; padding-right: 10px; }
+        .nft-item { background-color: #fffaf0; border: 1px solid var(--border-color); border-radius: 10px; padding: 15px; font-size: 0.9em; }
+        .nft-item strong { color: var(--secondary-color); }
+        .clickable-token-id { color: var(--primary-color); font-weight: 900; cursor: pointer; text-decoration: underline; }
+        .clickable-token-id:hover { color: var(--secondary-color); }
+        .loading-text, .empty-text { text-align: center; padding: 20px; color: var(--text-light); }
     </style>
 </head>
 <body>
 
+    <header>
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj48cGF0aCBmaWxsPSIjRjA5NTQyIiBkPSJNMjQ3LjIgMTI1YzAgNjcuNS01NC43IDEyMi4yLTEyMi4yIDEyMi4yUzIuOCAxOTIuNSAyLjggMTI1IDU3LjUgMi44IDEyNSAyLjhTDI0Ny4yIDU3LjUgMjQ3LjIgMTI1eiIvPjxwYXRoIGZpbGw9IiNGRkYiIGQ9Ik0xMjUgNDEuN2MtNDYgMC04My4zIDM3LjQtODMuMyA4My4zIDAgNDYgMzcuNCA4My4zIDgzLjMgODMuMyA0NiAwIDgzLjMtMzcuNCA4My4zLTgzLjMgMC00Ni0zNy40LTgzLjMtODMuMy04My4zeiIvPjxwYXRoIGZpbGw9IiNGMDk1NDIiIGQ9Ik0xNjIgODMuNGMtNC40IDAtOC42IDEuNC0xMi4yIDQuMmwtMTUgMTMuOC0xNS0xMy44Yy03LjQtNS41LTE3LjUtNS4yLTI0LjUgLjgtNy4xIDYtMTAuMiAxNS40LTcuOSAyNC4ybDEzLjYgNTMuM2gtNjEuNmMtOS4yIDAtMTYuNyA3LjUtMTYuNyAxNi43IDAgOS4yIDcuNSAxNi43IDE2LjcgMTYuN2g4MS4zYzkuMiAwIDE2LjctNy41IDE2LjctMTYuN3YtNjVjMC05LjItNy41LTE2LjctMTYuNy0xNi43ek0xMjUgMTUwLjhjLTguMyAwLTE1LTEyLjUtMTUtMjcuOFYxMDhjMC04LjMgNi43LTE1IDE1LTE1czE1IDYuNyAxNSAxNXYxNS4xYzAgMTUuMy02LjcgMjcuOC0xNSAyNy44eiIvPjwvc3ZnPg==" alt="Shiba Icon">
+        <h1>ShibaSwap Exchange</h1>
+    </header>
+
     <div class="container">
-        <h1>veWOOF 管理面板</h1>
 
         <div class="card">
-            <h2>连接钱包</h2>
-            <button class="connect-btn" id="connectBtn">连接 MetaMask</button>
-            <div class="info">钱包地址: <span id="wallet">未连接</span></div>
-            <div class="balance" id="veWoofBal">veWOOF 持有数量: 0</div>
-            <div class="balance" id="votingPower">总投票权: 0 veWOOF</div>
+            <div class="card-title"><i class="fas fa-wallet"></i>Connect Wallet</div>
+            <button id="connectBtn">Connect MetaMask</button>
+            <div class="info">Status: <span id="walletStatus">Not Connected</span></div>
+            <div class="info">Wallet: <span id="walletAddress">...</span></div>
+            <div class="balance">WOOF: <span id="woofBal">0</span></div>
+            <div class="balance">SOU: <span id="souBal">0</span></div>
         </div>
 
-        <div class="card">
-            <h2>我的 veWOOF NFT</h2>
-            <div id="nftLoading" style="color:#a29bfe; display:none;">加载中...</div>
+        <div class="card" id="myVeWoofNftsCard">
+            <div class="card-title"><i class="fas fa-dog"></i>My veWOOF NFTs</div>
+            <div id="nftLoading" class="loading-text" style="display: none;">🐾 Loading your NFTs...</div>
             <div id="nftList" class="nft-list"></div>
-            <div id="noNfts" class="info" style="display:none;">您当前没有 veWOOF NFT</div>
+            <div id="noNfts" class="empty-text" style="display: none;">You don't own any veWOOF NFTs.</div>
+        </div>
+
+        <div class="card" id="veWoofOpsCard">
+            <div class="card-title"><i class="fas fa-bone"></i>veWOOF → WOOF Operations</div>
+            <p class="info">Enter a veWOOF Token ID below (or click one from the list above). If it's used for voting, reset it first, then exchange.</p>
+            <input type="number" id="veWoofTokenIdInput" placeholder="Enter veWOOF Token ID">
+            <div class="button-group">
+                <button id="resetVoteBtn" class="secondary">Reset Vote</button>
+                <button id="exchangeVeWoofBtn">Exchange veWOOF</button>
+            </div>
+            <div class="info" style="margin-top: 15px;">Pool Liquidity: <span id="veWoofPoolBalance">0</span> WOOF</div>
         </div>
 
         <div class="card">
-            <h2>转账 veWOOF NFT</h2>
-            <input type="text" id="tokenIdInput" placeholder="输入 veWOOF Token ID">
-            <input type="text" id="toAddressInput" placeholder="接收方地址 (0x...)">
-            <button id="checkTransferBtn">先检查状态</button>
-            <button id="transferBtn">执行转账（强制可点）</button>
-            <div class="status" id="transferStatus">等待输入 Token ID...</div>
-            <div class="info warning">
-                转账按钮已强制可点击，无论检查是否通过都能尝试（合约可能 revert "attached"）。
-            </div>
+            <div class="card-title"><i class="fas fa-coins"></i>WOOF → SOU Exchange</div>
+            <p class="info">Exchange your WOOF tokens for SOU tokens at a 1:1 ratio.</p>
+            <input type="number" id="woofAmountInput" placeholder="Enter WOOF amount" min="0">
+            <button id="exchangeWoofBtn">Exchange to SOU</button>
+            <div class="info" style="margin-top: 15px;">Pool Liquidity: <span id="souPoolBalance">0</span> SOU</div>
         </div>
 
-        <div class="card">
-            <h2>清除投票状态 (Reset Vote)</h2>
-            <input type="text" id="resetTokenId" placeholder="输入 Token ID" oninput="validateResetId()">
-            <button id="resetBtn" class="reset-btn" disabled>执行 Reset Vote</button>
-            <div class="status" id="resetStatus">等待输入 Token ID...</div>
-            <div class="info">
-                输入有效的 Token ID 后按钮才会亮起。<br>
-                执行后 MetaMask 会弹出确认。如果没弹出，请检查 F12 Console。
-            </div>
+        <div class="card owner-only" id="ownerSection" style="display:none;">
+            <div class="card-title"><i class="fas fa-crown"></i>Owner Controls</div>
+            <p class="info"><strong>For WOOF → SOU Pool:</strong></p>
+            <input type="number" id="depositSouInput" placeholder="SOU amount to deposit">
+            <button id="depositSouBtn">Deposit SOU</button>
+            <p class="info" style="margin-top: 20px;"><strong>For veWOOF → WOOF Pool:</strong></p>
+            <input type="number" id="depositWoofInput" placeholder="WOOF amount to deposit">
+            <button id="depositWoofBtn">Deposit WOOF</button>
         </div>
+
     </div>
 
-    <footer>Powered by Shibarium | veWOOF: 0xb4cb5dB549e483539EA38d44c4109F3B25259847 | Voter: 0x30d9159c8c9e403A0e9597837052F70cf8eC362c</footer>
+    <footer>Powered by Shibarium | WOOF ↔ SOU ↔ veWOOF © 2026</footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.7.3/dist/web3.min.js"></script>
     <script>
+        // --- Constants and State ---
         let web3, account;
-        const CHAIN_ID = 109;
-        const VE_WOOF = '0xb4cb5dB549e483539EA38d44c4109F3B25259847';
-        const VOTER = '0x30d9159c8c9e403A0e9597837052F70cf8eC362c';
+        let woofContract, souContract, veWoofContract, exchange1Contract, exchange2Contract;
 
-        const veABI = [
-            {"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"locked","outputs":[{"components":[{"internalType":"int128","name":"amount","type":"int128"},{"internalType":"uint256","name":"end","type":"uint256"}],"internalType":"struct IVotingEscrow.LockedBalance","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"balanceOfNFT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},
-            {"inputs":[{"internalType":"address","name":"_owner","type":"address"},{"internalType":"uint256","name":"_tokenIndex","type":"uint256"}],"name":"tokenOfOwnerByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"attachments","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"voted","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
-            {"inputs":[{"internalType":"address","name":"_spender","type":"address"},{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"isApprovedOrOwner","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}
-        ];
+        const CHAIN_ID = 109; // Shibarium Mainnet
 
-        const voterABI = [
-            {"inputs":[{"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"reset","outputs":[],"stateMutability":"nonpayable","type":"function"}
-        ];
+        // Contract Addresses
+        const WOOF_ADDR = '0xD0daa7B6ff1B40d3cc6F0B2Cf7E85cB993D1c834';
+        const SOU_ADDR = '0x5e1AeE526d1Aa049B4d95E5B68aE7bb556e2D799';
+        const VE_WOOF_ADDR = '0xb4cb5dB549e483539EA38d44c4109F3B25259847';
+        const EXCHANGE_1_ADDR = '0x4A08b432923ed5c74b45273d05e085c56c8df1E3'; // WOOF -> SOU
+        const EXCHANGE_2_ADDR = '0xCbEC2D385c7a9E151274A36D067fce10830cfb29'; // veWOOF -> WOOF
 
-        async function initWeb3() {
-            if (window.ethereum) web3 = new Web3(window.ethereum);
-            else alert('请安装 MetaMask！');
-        }
+        // ABIs
+        const TOKEN_ABI = [{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}, {"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}, {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}];
+        const VE_WOOF_ABI = [{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}, {"inputs":[{"internalType":"address","name":"_owner","type":"address"},{"internalType":"uint256","name":"_tokenIndex","type":"uint256"}],"name":"tokenOfOwnerByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}, {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"locked","outputs":[{"components":[{"internalType":"int128","name":"amount","type":"int128"},{"internalType":"uint256","name":"end","type":"uint256"}],"internalType":"struct IVotingEscrow.LockedBalance","name":"","type":"tuple"}],"stateMutability":"view","type":"function"}, {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"balanceOfNFT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}];
+        const EXCHANGE_1_ABI = [{"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"exchange","outputs":[],"stateMutability":"nonpayable","type":"function"}, {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"depositSOU","outputs":[],"stateMutability":"nonpayable","type":"function"}, {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}];
+        const EXCHANGE_2_ABI = [{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"exchange","outputs":[],"stateMutability":"nonpayable","type":"function"}, {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"depositWoof","outputs":[],"stateMutability":"nonpayable","type":"function"}, {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}, {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"resetVote","outputs":[],"stateMutability":"nonpayable","type":"function"}];
 
-        async function connect() {
-            const btn = document.getElementById('connectBtn');
-            btn.innerText = '连接中...';
+        // --- DOM Elements ---
+        const connectBtn = document.getElementById('connectBtn' );
+        const walletStatusEl = document.getElementById('walletStatus');
+        const walletAddressEl = document.getElementById('walletAddress');
+        const woofBalEl = document.getElementById('woofBal');
+        const souBalEl = document.getElementById('souBal');
+        const souPoolEl = document.getElementById('souPoolBalance');
+        const veWoofPoolEl = document.getElementById('veWoofPoolBalance');
+        const woofAmountInput = document.getElementById('woofAmountInput');
+        const exchangeWoofBtn = document.getElementById('exchangeWoofBtn');
+        const veWoofTokenIdInput = document.getElementById('veWoofTokenIdInput');
+        const exchangeVeWoofBtn = document.getElementById('exchangeVeWoofBtn');
+        const resetVoteBtn = document.getElementById('resetVoteBtn');
+        const ownerSection = document.getElementById('ownerSection');
+        const depositSouInput = document.getElementById('depositSouInput');
+        const depositSouBtn = document.getElementById('depositSouBtn');
+        const depositWoofInput = document.getElementById('depositWoofInput');
+        const depositWoofBtn = document.getElementById('depositWoofBtn');
+        const nftLoading = document.getElementById('nftLoading');
+        const nftList = document.getElementById('nftList');
+        const noNfts = document.getElementById('noNfts');
+
+        // --- Helper Functions ---
+        const formatEth = (num) => (Number(num) / 1e18).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+        const showAlert = (message, type = 'error') => alert(`${type.toUpperCase()}: ${message}`);
+
+        // --- Core Web3 Functions ---
+        async function connectWallet() {
+            if (!window.ethereum) return showAlert('Please install MetaMask!');
+            connectBtn.disabled = true;
+            connectBtn.innerText = 'Connecting...';
             try {
+                web3 = new Web3(window.ethereum);
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 account = accounts[0];
-                const chain = await web3.eth.getChainId();
-                if (chain !== CHAIN_ID) {
-                    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x6d' }] });
-                }
-                document.getElementById('wallet').innerText = `${account.slice(0,6)}...${account.slice(-4)}`;
-                updateDashboard();
+                const chainId = await web3.eth.getChainId();
+                if (chainId !== CHAIN_ID) await switchNetwork();
+                initializeContracts();
+                updateUIForConnection();
+                await fetchAllData();
             } catch (err) {
-                alert('连接失败: ' + err.message);
+                showAlert(err.message || 'Connection failed.');
+                resetUI();
             } finally {
-                btn.innerText = '连接 MetaMask';
+                connectBtn.disabled = false;
+                connectBtn.innerText = 'Connect MetaMask';
             }
         }
 
-        async function updateDashboard() {
+        async function switchNetwork() {
+            try {
+                await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: web3.utils.toHex(CHAIN_ID) }] });
+            } catch (e) {
+                if (e.code === 4902) {
+                    await window.ethereum.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [{ chainId: web3.utils.toHex(CHAIN_ID), chainName: 'Shibarium', rpcUrls: ['https://rpc.shibarium.shib.io'], nativeCurrency: { name: 'BONE', symbol: 'BONE', decimals: 18 }, blockExplorerUrls: ['https://shibariumscan.io'] }]
+                    } );
+                } else { throw e; }
+            }
+        }
+
+        function initializeContracts() {
+            woofContract = new web3.eth.Contract(TOKEN_ABI, WOOF_ADDR);
+            souContract = new web3.eth.Contract(TOKEN_ABI, SOU_ADDR);
+            veWoofContract = new web3.eth.Contract(VE_WOOF_ABI, VE_WOOF_ADDR);
+            exchange1Contract = new web3.eth.Contract(EXCHANGE_1_ABI, EXCHANGE_1_ADDR);
+            exchange2Contract = new web3.eth.Contract(EXCHANGE_2_ABI, EXCHANGE_2_ADDR);
+        }
+
+        function updateUIForConnection() {
+            walletStatusEl.textContent = 'Connected';
+            walletStatusEl.style.color = 'var(--success-color)';
+            walletAddressEl.textContent = `${account.slice(0, 6)}...${account.slice(-4)}`;
+            connectBtn.textContent = 'Connected';
+            connectBtn.disabled = true;
+        }
+        
+        function resetUI() {
+            walletStatusEl.textContent = 'Not Connected';
+            walletStatusEl.style.color = 'var(--error-color)';
+            walletAddressEl.textContent = '...';
+            ownerSection.style.display = 'none';
+            nftList.innerHTML = '';
+            noNfts.style.display = 'none';
+        }
+
+        async function fetchAllData() {
             if (!account) return;
-            const veContract = new web3.eth.Contract(veABI, VE_WOOF);
-            const loadingEl = document.getElementById('nftLoading');
-            const listEl = document.getElementById('nftList');
-            const noNftsEl = document.getElementById('noNfts');
-            loadingEl.style.display = 'block';
-            listEl.innerHTML = '';
-            noNftsEl.style.display = 'none';
+            await Promise.all([ updateUserBalances(), updatePoolBalances(), checkOwnerStatus(), displayUserNfts() ]);
+        }
+
+        async function updateUserBalances() {
+            const wBal = await woofContract.methods.balanceOf(account).call().catch(() => 0);
+            const sBal = await souContract.methods.balanceOf(account).call().catch(() => 0);
+            woofBalEl.textContent = formatEth(wBal);
+            souBalEl.textContent = formatEth(sBal);
+        }
+
+        async function updatePoolBalances() {
+            const souPoolBal = await souContract.methods.balanceOf(EXCHANGE_1_ADDR).call().catch(() => 0);
+            souPoolEl.textContent = formatEth(souPoolBal);
+            const veWoofPoolBal = await woofContract.methods.balanceOf(EXCHANGE_2_ADDR).call().catch(() => 0);
+            veWoofPoolEl.textContent = formatEth(veWoofPoolBal);
+        }
+
+        async function checkOwnerStatus() {
             try {
-                const balance = await veContract.methods.balanceOf(account).call();
-                document.getElementById('veWoofBal').innerText = `veWOOF 持有数量: ${balance}`;
-                let totalPower = 0n;
+                const [owner1, owner2] = await Promise.all([
+                    exchange1Contract.methods.owner().call(),
+                    exchange2Contract.methods.owner().call()
+                ]);
+                if (account.toLowerCase() === owner1.toLowerCase() || account.toLowerCase() === owner2.toLowerCase()) {
+                    ownerSection.style.display = 'block';
+                }
+            } catch (e) { console.error("Could not check owner status:", e); }
+        }
+
+        async function displayUserNfts() {
+            if (!account || !veWoofContract) return;
+            nftLoading.style.display = 'block';
+            nftList.innerHTML = '';
+            noNfts.style.display = 'none';
+            try {
+                const balance = await veWoofContract.methods.balanceOf(account).call();
                 if (Number(balance) === 0) {
-                    noNftsEl.style.display = 'block';
+                    noNfts.style.display = 'block';
                 } else {
+                    let nftPromises = [];
                     for (let i = 0; i < Number(balance); i++) {
-                        try {
-                            const tokenId = await veContract.methods.tokenOfOwnerByIndex(account, i).call();
-                            const locked = await veContract.methods.locked(tokenId).call();
-                            const power = await veContract.methods.balanceOfNFT(tokenId).call();
-                            const amount = Number(locked.amount) / 1e18;
-                            const endDate = locked.end === '0' ? '已过期' : new Date(Number(locked.end) * 1000).toLocaleString();
-                            totalPower += BigInt(power);
-                            const div = document.createElement('div');
-                            div.className = 'nft-item';
-                            div.innerHTML = `
-                                <strong>Token ID:</strong> ${tokenId}<br>
-                                <strong>锁仓 WOOF:</strong> ${amount.toFixed(4)} WOOF<br>
-                                <strong>到期时间:</strong> ${endDate}<br>
-                                <strong>当前投票权:</strong> ${(Number(power) / 1e18).toFixed(4)} veWOOF
-                            `;
-                            listEl.appendChild(div);
-                        } catch (nftErr) {
-                            const errDiv = document.createElement('div');
-                            errDiv.className = 'error';
-                            errDiv.innerText = `Token 查询失败 (index ${i}): ${nftErr.message || 'RPC 超时'}`;
-                            listEl.appendChild(errDiv);
-                        }
+                        nftPromises.push(
+                            veWoofContract.methods.tokenOfOwnerByIndex(account, i).call()
+                            .then(tokenId => 
+                                Promise.all([
+                                    tokenId,
+                                    veWoofContract.methods.locked(tokenId).call(),
+                                    veWoofContract.methods.balanceOfNFT(tokenId).call()
+                                ])
+                            )
+                        );
                     }
+                    const nfts = await Promise.all(nftPromises);
+                    nfts.forEach(([tokenId, locked, power]) => {
+                        const div = document.createElement('div');
+                        div.className = 'nft-item';
+                        div.innerHTML = `
+                            <strong>Token ID:</strong> <span class="clickable-token-id" data-token-id="${tokenId}">${tokenId}</span>  
+
+                            <strong>Locked WOOF:</strong> ${formatEth(locked.amount)}  
+
+                            <strong>Expires:</strong> ${locked.end === '0' ? 'Expired' : new Date(Number(locked.end) * 1000).toLocaleDateString()}  
+
+                            <strong>Voting Power:</strong> ${formatEth(power)} veWOOF
+                        `;
+                        nftList.appendChild(div);
+                    });
                 }
-                document.getElementById('votingPower').innerText = `总投票权: ${(Number(totalPower) / 1e18).toFixed(4)} veWOOF`;
             } catch (err) {
-                listEl.innerHTML = '<p class="error">加载失败，请检查网络或稍后重试</p>';
+                nftList.innerHTML = `<div class="empty-text" style="color: var(--error-color)">Failed to load NFTs. Please try again.</div>`;
+                console.error("Error loading NFTs:", err);
             } finally {
-                loadingEl.style.display = 'none';
+                nftLoading.style.display = 'none';
             }
         }
 
-        async function checkTransfer() {
-            const tokenId = document.getElementById('tokenIdInput').value.trim();
-            const status = document.getElementById('transferStatus');
-            const transferBtn = document.getElementById('transferBtn');
-            if (!tokenId || isNaN(tokenId)) {
-                status.innerHTML = '<span class="error">请输入有效的 Token ID</span>';
-                transferBtn.disabled = true;
-                return;
-            }
-            const veContract = new web3.eth.Contract(veABI, VE_WOOF);
-            status.innerHTML = '检查中...';
+        // --- Transaction Functions ---
+        async function handleTransaction(button, transaction, successMessage) {
+            const originalText = button.innerText;
+            button.disabled = true;
+            button.innerText = 'Processing...';
             try {
-                const attachmentsVal = await veContract.methods.attachments(tokenId).call();
-                const votedVal = await veContract.methods.voted(tokenId).call();
-                const isApproved = await veContract.methods.isApprovedOrOwner(account, tokenId).call();
-                let canTransfer = (Number(attachmentsVal) === 0) && (votedVal === 'false') && isApproved;
-                let msg = `<strong>诊断结果 (Token ID: ${tokenId})：</strong><br>`;
-                msg += `attachments: ${attachmentsVal} ${attachmentsVal > 0 ? '→ <span class="error">被附着，无法转账</span>' : '→ OK'}<br>`;
-                msg += `voted: ${votedVal} ${votedVal === 'true' ? '→ <span class="error">已投票，无法转账（需 Reset Vote）</span>' : '→ OK'}<br>`;
-                msg += `你是否 owner 或 approved: ${isApproved} ${!isApproved ? '→ <span class="error">无权限</span>' : '→ OK'}<br>`;
-                if (canTransfer) {
-                    msg += '<br><span class="success">状态完全符合，可以转账！</span>';
-                } else {
-                    msg += '<br><span class="warning">不符合条件，但转账按钮已强制可点击（合约可能 revert）。</span>';
-                }
-                status.innerHTML = msg;
-                transferBtn.disabled = false;
+                await transaction.send({ from: account });
+                showAlert(successMessage, 'success');
+                await fetchAllData();
             } catch (err) {
-                status.innerHTML = `<span class="error">检查失败: ${err.message || 'RPC 错误'}</span>`;
-                document.getElementById('transferBtn').disabled = false;
+                showAlert(err.reason || err.message || 'Transaction failed.');
+            } finally {
+                button.disabled = false;
+                button.innerText = originalText;
             }
         }
 
-        async function transferNFT() {
-            const tokenId = document.getElementById('tokenIdInput').value.trim();
-            const toAddr = document.getElementById('toAddressInput').value.trim();
-            const status = document.getElementById('transferStatus');
-            if (!web3.utils.isAddress(toAddr)) {
-                status.innerHTML += '<br><span class="error">无效接收地址</span>';
-                return;
+        async function approveToken(tokenContract, spenderAddress, amount, button) {
+            const originalText = button.innerText;
+            button.innerText = 'Approving...';
+            const allowance = await tokenContract.methods.allowance(account, spenderAddress).call();
+            if (web3.utils.toBN(allowance).lt(web3.utils.toBN(amount))) {
+                await handleTransaction(button, tokenContract.methods.approve(spenderAddress, '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'), 'Approval successful! You can now proceed.');
             }
-            const veContract = new web3.eth.Contract(veABI, VE_WOOF);
-            status.innerHTML += '<br>发送交易中...';
-            try {
-                const gasEstimate = await veContract.methods.safeTransferFrom(account, toAddr, tokenId).estimateGas({ from: account }).catch(() => 200000);
-                await veContract.methods.safeTransferFrom(account, toAddr, tokenId).send({ 
-                    from: account,
-                    gas: Math.floor(gasEstimate * 1.2)
-                });
-                status.innerHTML += '<br><span class="success">转账成功！</span>';
-                setTimeout(updateDashboard, 6000);
-            } catch (err) {
-                let reason = err.reason || err.message || '未知错误';
-                if (reason.includes('attached')) reason = '合约拒绝：voted=true 或 attachments>0 ("attached" 错误)';
-                status.innerHTML += `<br><span class="error">转账失败: ${reason}</span>`;
-            }
+            button.innerText = originalText;
         }
 
-        function validateResetId() {
-            const tokenId = document.getElementById('resetTokenId').value.trim();
-            const btn = document.getElementById('resetBtn');
-            const status = document.getElementById('resetStatus');
-            if (tokenId && !isNaN(tokenId) && Number(tokenId) > 0) {
-                btn.disabled = false;
-                status.innerHTML = 'Token ID 有效，可以执行 Reset Vote';
-            } else {
-                btn.disabled = true;
-                status.innerHTML = '<span class="error">请输入有效的 Token ID (正整数)</span>';
-            }
+        async function doExchangeWoof() {
+            const amount = woofAmountInput.value.trim();
+            if (!amount || isNaN(amount) || Number(amount) <= 0) return showAlert('Please enter a valid WOOF amount.');
+            const weiAmount = web3.utils.toWei(amount, 'ether');
+            await approveToken(woofContract, EXCHANGE_1_ADDR, weiAmount, exchangeWoofBtn);
+            await handleTransaction(exchangeWoofBtn, exchange1Contract.methods.exchange(weiAmount), 'WOOF exchanged for SOU successfully!');
         }
 
-        async function doReset() {
-            const tokenId = document.getElementById('resetTokenId').value.trim();
-            const status = document.getElementById('resetStatus');
-            if (!tokenId || isNaN(tokenId)) {
-                status.innerHTML = '<span class="error">请输入有效的 Token ID</span>';
-                return;
-            }
-            status.innerHTML = '执行中... (MetaMask 应弹出确认)';
-            const voterContract = new web3.eth.Contract(voterABI, VOTER);
-            try {
-                const gasEstimate = await voterContract.methods.reset(tokenId).estimateGas({ from: account }).catch(() => 250000);
-                await voterContract.methods.reset(tokenId).send({ 
-                    from: account,
-                    gas: Math.floor(gasEstimate * 1.5)
-                });
-                status.innerHTML = `<span class="success">Reset Vote 成功！voted 已重置。</span><br>等待 10秒后自动检查状态。`;
-                setTimeout(() => {
-                    document.getElementById('tokenIdInput').value = tokenId;
-                    checkTransfer();
-                }, 10000);
-            } catch (err) {
-                let reason = err.reason || err.message || '未知错误';
-                if (reason.includes('TOKEN_ALREADY_VOTED_THIS_EPOCH')) reason = '本 epoch 已投过票，无法 reset。需等待下一个 epoch (7天周期)。';
-                if (reason.includes('isApprovedOrOwner')) reason = '你不是 owner 或未 approve 该 tokenId。';
-                status.innerHTML = `<span class="error">Reset 失败: ${reason}</span>`;
-            }
-        }
-
-        document.getElementById('connectBtn').onclick = connect;
-        document.getElementById('checkTransferBtn').onclick = checkTransfer;
-        document.getElementById('transferBtn').onclick = transferNFT;
-        document.getElementById('resetBtn').onclick = doReset;
-        document.getElementById('resetTokenId').addEventListener('input', validateResetId);
-
-        initWeb3();
-    </script>
-</body>
-</html>
+        async function doExchangeVeWoof() {
+            const tokenId = veWoofTokenIdInput.value.trim();
+            if (!tokenId || isNaN(tokenId) || Number(tokenId) < 0)
