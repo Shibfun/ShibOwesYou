@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SOU Ecosystem - Bridge & Swap</title>
-    <link rel="icon" type="image/png" href="https://www.woofswap.finance/image/tokens/sou.png">
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ShibClaw/shibarium/refs/heads/main/images/soulogo.png">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -69,7 +69,7 @@
     </style>
 </head>
 <body>
-    <nav><a href="#" class="logo-nav"><img src="https://www.woofswap.finance/image/tokens/sou.png" alt="SOU">SOU Ecosystem</a></nav>
+    <nav><a href="#" class="logo-nav"><img src="https://raw.githubusercontent.com/ShibClaw/shibarium/refs/heads/main/images/soulogo.png" alt="SOU">SOU Ecosystem</a></nav>
     <div class="wrapper">
         <div class="app-container">
             <div class="card"><div class="card-content"><button class="connect-button" id="connectBtn">Connect Wallet</button></div></div>
@@ -78,13 +78,13 @@
                 <div class="card-content">
                     <div class="input-section">
                         <div class="input-label"><span id="swapFromLabel">From (SOU)</span><span class="balance-display" id="swapBalance">Balance: 0.00</span></div>
-                        <div class="input-box"><input type="number" id="swapInput" placeholder="0.0"><div class="token-display"><img src="https://www.woofswap.finance/image/tokens/sou.png" class="token-logo"><span id="swapFromToken">SOU</span></div></div>
+                        <div class="input-box"><input type="number" id="swapInput" placeholder="0.0"><div class="token-display"><img src="https://raw.githubusercontent.com/ShibClaw/shibarium/refs/heads/main/images/soulogo.png" class="token-logo"><span id="swapFromToken">SOU</span></div></div>
                         <div class="percentage-buttons"><button class="percentage-btn" onclick="setSwapPct(25)">25%</button><button class="percentage-btn" onclick="setSwapPct(50)">50%</button><button class="percentage-btn" onclick="setSwapPct(75)">75%</button><button class="percentage-btn" onclick="setSwapPct(100)">MAX</button></div>
                     </div>
                     <div class="swap-toggle"><div class="toggle-icon" id="swapToggleBtn">⇅</div></div>
                     <div class="input-section">
                         <div class="input-label"><span id="swapToLabel">To (WSOU)</span></div>
-                        <div class="input-box"><input type="number" id="swapOutput" placeholder="0.0" disabled><div class="token-display"><img src="https://www.woofswap.finance/image/tokens/sou.png" class="token-logo"><span id="swapToToken">WSOU</span></div></div>
+                        <div class="input-box"><input type="number" id="swapOutput" placeholder="0.0" disabled><div class="token-display"><img src="https://raw.githubusercontent.com/ShibClaw/shibarium/refs/heads/main/images/soulogo.png" class="token-logo"><span id="swapToToken">WSOU</span></div></div>
                     </div>
                     <button class="action-button" id="swapActionBtn">Swap for WSOU</button>
                     <div class="message-section" id="swapMsg">Ready to swap</div>
@@ -96,7 +96,7 @@
                     <div class="chain-selector"><button class="chain-btn active" id="btnEthToShib">ETH → Shibarium</button><button class="chain-btn" id="btnShibToEth">Shibarium → ETH</button></div>
                     <div class="input-section">
                         <div class="input-label"><span id="bridgeTokenLabel">Bridge WSOU (on Ethereum)</span><span class="balance-display" id="bridgeBalance">Balance: 0.00</span></div>
-                        <div class="input-box"><input type="number" id="bridgeInput" placeholder="0.0"><div class="token-display"><img src="https://www.woofswap.finance/image/tokens/sou.png" class="token-logo"><span id="bridgeTokenName">WSOU</span></div></div>
+                        <div class="input-box"><input type="number" id="bridgeInput" placeholder="0.0"><div class="token-display"><img src="https://raw.githubusercontent.com/ShibClaw/shibarium/refs/heads/main/images/soulogo.png" class="token-logo"><span id="bridgeTokenName">WSOU</span></div></div>
                         <div class="percentage-buttons"><button class="percentage-btn" onclick="setBridgePct(25)">25%</button><button class="percentage-btn" onclick="setBridgePct(50)">50%</button><button class="percentage-btn" onclick="setBridgePct(75)">75%</button><button class="percentage-btn" onclick="setBridgePct(100)">MAX</button></div>
                     </div>
                     <button class="action-button" id="bridgeActionBtn">Initiate Bridge</button>
